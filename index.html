@@ -55,12 +55,29 @@
   .headline h1{margin:0 0 6px 0;font-size:28px}
   .headline p{margin:0;font-size:14px;opacity:.95}
 
-  /* Invisible hotspot on the wall calendar (percentages tuned for this photo) */
+  /* Click hotspot върху белия стенен календар */
   .calendar-hotspot{
-    position:absolute;right:23.5%;top:15.2%;width:11.5%;height:22%;
-    cursor:pointer;background:transparent;border:none;outline:2px solid transparent;
+    position:absolute;
+    right:23.2%;
+    top:14.8%;
+    width:12.2%;
+    height:23.2%;
+    cursor:pointer;
+    background:transparent;
+    border:none;
+    outline:2px solid transparent;
+    z-index:12;
   }
   .calendar-hotspot:focus{outline-color:rgba(255,255,255,.6);outline-offset:2px}
+  @media (max-width:600px){
+    .calendar-hotspot{
+      right:21.5%;
+      top:15.5%;
+      width:14%;
+      height:24%;
+      z-index:12;
+    }
+  }
 
   /* Fullscreen calendar modal */
   .modal{
@@ -75,6 +92,7 @@
   }
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
+
   /* Calendar UI */
   .cal{height:calc(100% - 42px)}
   .cal .head { display:flex; justify-content:space-between; align-items:center; margin:6px 0 10px }
@@ -86,12 +104,14 @@
     cursor:default; transition:filter .15s, background .15s, transform .05s; color:#e5e7eb;
   }
   .day.btn { cursor:pointer }
-  .day.btn:active{transform:scale(.98)}
-  .day.busy { background:#666b74; color:#0b0e12 }
+  .day.btn:active{ filter:brightness(.82); transform:scale(.98) }
+  .day.btn:focus-visible{ outline:2px solid rgba(255,255,255,.6); outline-offset:2px }
+  .day.busy { background:#4b5563; color:#0b0e12 }  /* по-тъмно при зает ден */
   .day.out { opacity:.28 }
   .legend{font-size:12px;margin-top:10px;color:#bcc}
   .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
-  .legend .box.busy{background:#666b74;border-color:#52575f}
+  .legend .box.busy{background:#4b5563;border-color:#52575f}
+
   /* Sections (anchors used by menu) */
   section{min-height:60vh;padding:60px 18px;color:#fff}
   #about,#gallery,#contact{background:rgba(0,0,0,.35)}
@@ -119,7 +139,7 @@
       <a class="btn-primary" id="openCalCta" href="#">Провери заети дати</a>
     </div>
 
-    <!-- Invisible hotspot върху стенния календар -->
+    <!-- Невидим бутон върху стенния календар -->
     <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
   </div>
 
@@ -143,9 +163,7 @@
           <div id="monthLabel"></div>
           <button class="navbtn" id="next">›</button>
         </div>
-        <div class="grid" id="grid">
-          <!-- filled by JS -->
-        </div>
+        <div class="grid" id="grid"></div>
         <div class="legend">
           <span class="box"></span> Свободно &nbsp;&nbsp;
           <span class="box busy"></span> Заето
@@ -172,15 +190,20 @@ document.addEventListener('click', (e)=>{
 
 /* ====== Modal open/close ====== */
 const calModal = document.getElementById('calModal');
-const openers = [ 'openCalHotspot','openCalFromMenu','openCalCta' ]
-  .map(id=>document.getElementById(id)).filter(Boolean);
-openers.forEach(el=>el.addEventListener('click', (e)=>{ e.preventDefault(); calModal.classList.add('show'); calModal.setAttribute('aria-hidden','false'); }));
-document.getElementById('closeCal').addEventListener('click',()=>{ calModal.classList.remove('show'); calModal.setAttribute('aria-hidden','true'); });
+['openCalHotspot','openCalFromMenu','openCalCta']
+  .map(id=>document.getElementById(id))
+  .forEach(el=>el&&el.addEventListener('click', (e)=>{
+    e.preventDefault();
+    calModal.classList.add('show');
+    calModal.setAttribute('aria-hidden','false');
+  }));
+document.getElementById('closeCal').addEventListener('click',()=>{
+  calModal.classList.remove('show');
+  calModal.setAttribute('aria-hidden','true');
+});
 calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ calModal.classList.remove('show'); }});
 
-/* ====== Calendar (client-only; persists in localStorage) ======
-   Replace storage with your API later. Admin mode: set localStorage.ADMIN_OK='1' to allow toggling.
-===============================================================*/
+/* ====== Calendar (localStorage demo). Admin: localStorage.ADMIN_OK='1' ====== */
 const grid = document.getElementById('grid');
 const monthLabel = document.getElementById('monthLabel');
 const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
@@ -220,12 +243,16 @@ function renderCal(){
 
   grid.innerHTML = cells;
 
+  // instant toggle + persist (admin only)
   grid.querySelectorAll('.day.btn').forEach(btn=>{
     btn.addEventListener('click', (ev)=>{
-      if (localStorage.getItem('ADMIN_OK')!=='1') return; // read-only for guests
-      const iso = ev.currentTarget.dataset.iso;
-      if (busy.has(iso)) busy.delete(iso); else busy.add(iso);
-      saveBusy(busy); renderCal();
+      if (localStorage.getItem('ADMIN_OK')!=='1') return;   // read-only for guests
+      const cell = ev.currentTarget;
+      const iso = cell.dataset.iso;
+      const nowBusy = !cell.classList.contains('busy');
+      cell.classList.toggle('busy', nowBusy);               // визуално веднага
+      if (nowBusy) busy.add(iso); else busy.delete(iso);    // съхранение
+      saveBusy(busy);
     });
   });
 }
@@ -235,10 +262,9 @@ document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=
 
 renderCal();
 
-/* ====== Helper for you (admin): open console once and run
-      localStorage.setItem('ADMIN_OK','1')
-   to allow toggling busy dates locally.
-=============================================================*/
+/* Админ помощ: отворете конзолата веднъж и изпълнете:
+     localStorage.setItem('ADMIN_OK','1')
+*/
 </script>
 </body>
 </html>
