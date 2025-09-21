@@ -35,7 +35,7 @@
   .burger span{margin:4px 0}
   /* Burger menu (drawer) */
   .drawer{
-    position:fixed;inset:auto 10px 10px auto;top:64px; /* under navbar */
+    position:fixed;inset:auto 10px 10px auto;top:64px;
     width:220px;padding:10px;border-radius:14px;overflow:hidden;
     border:1px solid rgba(255,255,255,.25);background:var(--glass-bg);
     backdrop-filter:saturate(140%) blur(10px);z-index:40;display:none
@@ -55,27 +55,27 @@
   .headline h1{margin:0 0 6px 0;font-size:28px}
   .headline p{margin:0;font-size:14px;opacity:.95}
 
-  /* Click hotspot върху белия стенен календар */
-  .calendar-hotspot{
+  /* Контейнер за календара + невидим бутон */
+  .calendar-container{
     position:absolute;
     right:23.2%;
     top:14.8%;
     width:12.2%;
     height:23.2%;
+  }
+  .calendar-hotspot{
+    position:absolute;
+    inset:0;
     cursor:pointer;
     background:transparent;
     border:none;
-    outline:2px solid transparent;
-    z-index:12;
   }
-  .calendar-hotspot:focus{outline-color:rgba(255,255,255,.6);outline-offset:2px}
   @media (max-width:600px){
-    .calendar-hotspot{
+    .calendar-container{
       right:21.5%;
       top:15.5%;
       width:14%;
       height:24%;
-      z-index:12;
     }
   }
 
@@ -106,13 +106,12 @@
   .day.btn { cursor:pointer }
   .day.btn:active{ filter:brightness(.82); transform:scale(.98) }
   .day.btn:focus-visible{ outline:2px solid rgba(255,255,255,.6); outline-offset:2px }
-  .day.busy { background:#4b5563; color:#0b0e12 }  /* по-тъмно при зает ден */
+  .day.busy { background:#4b5563; color:#0b0e12 }
   .day.out { opacity:.28 }
   .legend{font-size:12px;margin-top:10px;color:#bcc}
   .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
   .legend .box.busy{background:#4b5563;border-color:#52575f}
 
-  /* Sections (anchors used by menu) */
   section{min-height:60vh;padding:60px 18px;color:#fff}
   #about,#gallery,#contact{background:rgba(0,0,0,.35)}
   .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
@@ -140,10 +139,11 @@
     </div>
 
     <!-- Невидим бутон върху стенния календар -->
-    <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
+    <div class="calendar-container">
+      <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
+    </div>
   </div>
 
-  <!-- Скрол секции за пример -->
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
   <section id="gallery"><h2>Галерия</h2><p>Снимки и видео ще добавим тук.</p></section>
   <section id="contact"><h2>Контакти</h2><p>Тел: +359 … • Email: booking@lifehouse.bg</p></section>
@@ -173,7 +173,6 @@
   </div>
 
 <script>
-/* ====== Burger ====== */
 const burger = document.getElementById('burger');
 const drawer = document.getElementById('drawer');
 burger.addEventListener('click',()=>{
@@ -188,7 +187,6 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-/* ====== Modal open/close ====== */
 const calModal = document.getElementById('calModal');
 ['openCalHotspot','openCalFromMenu','openCalCta']
   .map(id=>document.getElementById(id))
@@ -203,7 +201,6 @@ document.getElementById('closeCal').addEventListener('click',()=>{
 });
 calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ calModal.classList.remove('show'); }});
 
-/* ====== Calendar (localStorage demo). Admin: localStorage.ADMIN_OK='1' ====== */
 const grid = document.getElementById('grid');
 const monthLabel = document.getElementById('monthLabel');
 const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
@@ -220,7 +217,7 @@ function saveBusy(set){
 function renderCal(){
   const y = state.y, m = state.m;
   const d1 = new Date(y,m,1);
-  const startDow = (d1.getDay()+6)%7; // Mon=0
+  const startDow = (d1.getDay()+6)%7;
   const daysInMonth = new Date(y,m+1,0).getDate();
   const prevDays = new Date(y,m,0).getDate();
   const busy = loadBusy();
@@ -236,22 +233,20 @@ function renderCal(){
     const cls = `day btn ${busy.has(iso)?'busy':''}`;
     cells += `<button class="${cls}" data-iso="${iso}">${day}</button>`;
   }
-  // pad to 42 cells (6 weeks)
   const cellsSoFar = 7 + startDow + daysInMonth;
   const pad = 7*6 - (cellsSoFar - 7);
   for(let i=0;i<pad;i++){ cells += `<div class="day out">${i+1}</div>`; }
 
   grid.innerHTML = cells;
 
-  // instant toggle + persist (admin only)
   grid.querySelectorAll('.day.btn').forEach(btn=>{
     btn.addEventListener('click', (ev)=>{
-      if (localStorage.getItem('ADMIN_OK')!=='1') return;   // read-only for guests
+      if (localStorage.getItem('ADMIN_OK')!=='1') return;
       const cell = ev.currentTarget;
       const iso = cell.dataset.iso;
       const nowBusy = !cell.classList.contains('busy');
-      cell.classList.toggle('busy', nowBusy);               // визуално веднага
-      if (nowBusy) busy.add(iso); else busy.delete(iso);    // съхранение
+      cell.classList.toggle('busy', nowBusy);
+      if (nowBusy) busy.add(iso); else busy.delete(iso);
       saveBusy(busy);
     });
   });
@@ -261,10 +256,6 @@ document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=1
 document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
 
 renderCal();
-
-/* Админ помощ: отворете конзолата веднъж и изпълнете:
-     localStorage.setItem('ADMIN_OK','1')
-*/
 </script>
 </body>
 </html>
