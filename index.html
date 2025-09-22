@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>LifeHouse Semkovo — Къща за гости</title>
+<title>Lifehouse Semkovo — Къща за гости</title>
 <style>
   :root{
     --glass-bg:rgba(20,20,20,.45);
@@ -12,36 +12,60 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+  /* Fullscreen hero with background */
   .hero{
     position:relative;min-height:100%;
     background:url("lifehouse-semkovo.jpg") center/cover no-repeat fixed;
     color:#fff;
   }
+
+  /* Glassy sticky navbar */
   .nav{
-    position:fixed;top:0;z-index:30;
-    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:100;
+    display:flex;align-items:center;justify-content:flex-start; /* <- за да са близо */
+    gap:12px; /* <- малък марджин между текста и бургера */
     padding:10px 14px;margin:10px;
     border-radius:14px;border:1px solid rgba(255,255,255,.25);
     background:var(--glass-bg);backdrop-filter:saturate(140%) blur(8px)
   }
-  .brand{font-weight:700;letter-spacing:.4px}
-  .burger{width:42px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
-    display:grid;place-items:center;background:transparent;color:#fff;cursor:pointer}
+  .brand{font-weight:700;letter-spacing:.4px;white-space:nowrap}
+  .burger{
+    width:42px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
+    display:grid;place-items:center;background:transparent;color:#fff;cursor:pointer;
+    margin-left:2px; /* финно отстояние */
+  }
   .burger span,.burger::before,.burger::after{
     content:"";display:block;width:20px;height:2px;background:#fff;border-radius:2px
   }
   .burger span{margin:4px 0}
+
+  /* Burger menu (drawer) – голям и четим */
   .drawer{
-    position:fixed;inset:auto 10px 10px auto;top:64px;
-    width:220px;padding:10px;border-radius:14px;overflow:hidden;
-    border:1px solid rgba(255,255,255,.25);background:var(--glass-bg);
-    backdrop-filter:saturate(140%) blur(10px);z-index:40;display:none
+    position:fixed;
+    left:10px;               /* падане под навбара, подравнено с него */
+    top:70px;                /* ≈ височината на navbar + маргин */
+    width:clamp(240px, 70vw, 360px);
+    max-height:70vh;
+    overflow:auto;           /* скрол при много елементи */
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.25);
+    background:var(--glass-bg);
+    backdrop-filter:saturate(140%) blur(10px);
+    z-index:120;
+    display:none;
   }
   .drawer a{
-    display:block;color:var(--text);text-decoration:none;padding:12px 10px;border-radius:10px
+    display:block;
+    color:var(--text);text-decoration:none;
+    padding:14px 12px;margin:4px 0;border-radius:10px;
+    font-size:16px;font-weight:600;
   }
   .drawer a:hover{background:rgba(255,255,255,.1)}
-  .show{display:block}
+  .drawer.show{display:block}
+
+  /* Centered headline block */
   .headline{
     position:absolute;left:50%;top:65%;transform:translate(-50%,-50%);
     text-align:center;padding:14px 18px;border-radius:16px;
@@ -49,47 +73,23 @@
   }
   .headline h1{margin:0 0 6px 0;font-size:28px}
   .headline p{margin:0;font-size:14px;opacity:.95}
-  .calendar-container{
-    position:absolute;
-    right:23.2%;
-    top:14.8%;
-    width:12.2%;
-    height:23.2%;
-  }
+
+  /* Click hotspot върху белия стенен календар */
   .calendar-hotspot{
     position:absolute;
-    inset:0;
-    cursor:pointer;
-    background:transparent;
-    border:none;
+    right:23.2%; top:14.8%; width:12.2%; height:23.2%;
+    cursor:pointer; background:transparent; border:none; outline:2px solid transparent;
+    z-index:12;
   }
+  .calendar-hotspot:focus{outline-color:rgba(255,255,255,.6);outline-offset:2px}
   @media (max-width:600px){
-    .calendar-container{
-      right:21.5%;
-      top:15.5%;
-      width:14%;
-      height:24%;
-    }
+    .calendar-hotspot{ right:21.5%; top:15.5%; width:14%; height:24%; }
   }
-  /* Нов контейнер за снимките */
-  .gallery-container{
-    position:absolute;
-    left:8%;      /* нагласи според реалното място */
-    top:36%;
-    width:22%;
-    height:22%;
-  }
-  .gallery-hotspot{
-    position:absolute;
-    inset:0;
-    cursor:pointer;
-    background:transparent;
-    border:none;
-    display:block;
-  }
+
+  /* Fullscreen calendar modal */
   .modal{
     position:fixed;inset:0;background:rgba(0,0,0,.55);
-    display:none;align-items:center;justify-content:center;z-index:50;padding:14px
+    display:none;align-items:center;justify-content:center;z-index:200;padding:14px
   }
   .modal.show{display:flex}
   .modal-card{
@@ -99,6 +99,8 @@
   }
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
+
+  /* Calendar UI */
   .cal{height:calc(100% - 42px)}
   .cal .head { display:flex; justify-content:space-between; align-items:center; margin:6px 0 10px }
   .navbtn { cursor:pointer; border:1px solid #333; padding:6px 10px; border-radius:10px; background:#1b1b1b; color:#eee }
@@ -116,40 +118,44 @@
   .legend{font-size:12px;margin-top:10px;color:#bcc}
   .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
   .legend .box.busy{background:#4b5563;border-color:#52575f}
+
+  /* Sections */
   section{min-height:60vh;padding:60px 18px;color:#fff}
   #about,#gallery,#contact{background:rgba(0,0,0,.35)}
   .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
 </style>
 </head>
 <body>
+  <!-- Sticky navbar -->
+  <nav class="nav">
+    <div class="brand">LifeHouse Semkovo</div>
+    <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
+    <!-- Падащо меню -->
+    <div class="drawer" id="drawer" role="menu" aria-hidden="true">
+      <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
+      <a href="#gallery" role="menuitem">Галерия</a>
+      <a href="#about" role="menuitem">За нас</a>
+    </div>
+  </nav>
+
   <div class="hero" id="home">
-    <nav class="nav">
-      <div class="brand">LifeHouse Semkovo</div>
-      <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
-      <div class="drawer" id="drawer" role="menu" aria-hidden="true">
-        <a href="#about" role="menuitem">ЗА НАС</a>
-        <a href="#gallery" role="menuitem">ГАЛЕРИЯ</a>
-        <a href="#" id="openCalFromMenu" role="menuitem">КАЛЕНДАР</a>
-        <a href="#contact" role="menuitem">КОНТАКТИ</a>
-      </div>
-    </nav>
+    <!-- Callout -->
     <div class="headline">
       <h1>Къща за гости „LifeHouse Semkovo“</h1>
-      <p>Камината бумти,a гората на една ръка разстояние.</p>
+      <p>Камината бумти, а гората на една ръка разстояние.</p>
       <a class="btn-primary" id="openCalCta" href="#">свободни дати</a>
     </div>
-    <div class="calendar-container">
-      <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
-    </div>
-    <div class="gallery-container">
-      <a href="#gallery" class="gallery-hotspot" aria-label="Отвори галерия"></a>
-    </div>
+
+    <!-- Невидим бутон върху стенния календар -->
+    <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
   </div>
 
+  <!-- Скрол секции за пример -->
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
   <section id="gallery"><h2>Галерия</h2><p>Снимки и видео ще добавим тук.</p></section>
   <section id="contact"><h2>Контакти</h2><p>Тел: +359 … • Email: booking@lifehouse.bg</p></section>
 
+  <!-- MODAL: Calendar -->
   <div class="modal" id="calModal" aria-hidden="true" aria-label="Календар за заетост">
     <div class="modal-card">
       <div class="modal-head">
@@ -172,8 +178,10 @@
   </div>
 
 <script>
+/* ====== Burger / Drawer ====== */
 const burger = document.getElementById('burger');
 const drawer = document.getElementById('drawer');
+
 burger.addEventListener('click',()=>{
   const open = drawer.classList.toggle('show');
   burger.setAttribute('aria-expanded', String(open));
@@ -185,6 +193,8 @@ document.addEventListener('click', (e)=>{
     burger.setAttribute('aria-expanded','false');
   }
 });
+
+/* ====== Modal open/close ====== */
 const calModal = document.getElementById('calModal');
 ['openCalHotspot','openCalFromMenu','openCalCta']
   .map(id=>document.getElementById(id))
@@ -192,15 +202,19 @@ const calModal = document.getElementById('calModal');
     e.preventDefault();
     calModal.classList.add('show');
     calModal.setAttribute('aria-hidden','false');
+    drawer.classList.remove('show'); // затвори менюто при отваряне на календара
   }));
 document.getElementById('closeCal').addEventListener('click',()=>{
   calModal.classList.remove('show');
   calModal.setAttribute('aria-hidden','true');
 });
 calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ calModal.classList.remove('show'); }});
+
+/* ====== Calendar (localStorage demo). Admin: localStorage.ADMIN_OK='1' ====== */
 const grid = document.getElementById('grid');
 const monthLabel = document.getElementById('monthLabel');
 const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
+
 function keyPrefix(){ return 'lifehouse-busy:'; }
 function loadBusy() {
   const raw = localStorage.getItem(keyPrefix()+`${state.y}-${state.m}`);
@@ -209,42 +223,55 @@ function loadBusy() {
 function saveBusy(set){
   localStorage.setItem(keyPrefix()+`${state.y}-${state.m}`, JSON.stringify([...set]));
 }
+
 function renderCal(){
   const y = state.y, m = state.m;
   const d1 = new Date(y,m,1);
-  const startDow = (d1.getDay()+6)%7;
+  const startDow = (d1.getDay()+6)%7; // Mon=0
   const daysInMonth = new Date(y,m+1,0).getDate();
   const prevDays = new Date(y,m,0).getDate();
   const busy = loadBusy();
+
   monthLabel.innerHTML = `<strong>${d1.toLocaleString('bg-BG',{month:'long'})}</strong> ${y}`;
   let cells = '';
   const dows = ['П','В','С','Ч','П','С','Н'].map(x=>`<div class="dow">${x}</div>`).join('');
   cells += dows;
+
   for(let i=0;i<startDow;i++){ cells += `<div class="day out">${prevDays - startDow + i + 1}</div>`; }
   for(let day=1; day<=daysInMonth; day++){
     const iso = new Date(y,m,day).toISOString().slice(0,10);
     const cls = `day btn ${busy.has(iso)?'busy':''}`;
     cells += `<button class="${cls}" data-iso="${iso}">${day}</button>`;
   }
+  // pad to 42 cells (6 weeks)
   const cellsSoFar = 7 + startDow + daysInMonth;
   const pad = 7*6 - (cellsSoFar - 7);
   for(let i=0;i<pad;i++){ cells += `<div class="day out">${i+1}</div>`; }
+
   grid.innerHTML = cells;
+
+  // instant toggle + persist (admin only)
   grid.querySelectorAll('.day.btn').forEach(btn=>{
     btn.addEventListener('click', (ev)=>{
-      if (localStorage.getItem('ADMIN_OK')!=='1') return;
+      if (localStorage.getItem('ADMIN_OK')!=='1') return;   // read-only for guests
       const cell = ev.currentTarget;
       const iso = cell.dataset.iso;
       const nowBusy = !cell.classList.contains('busy');
-      cell.classList.toggle('busy', nowBusy);
-      if (nowBusy) busy.add(iso); else busy.delete(iso);
+      cell.classList.toggle('busy', nowBusy);               // визуално веднага
+      if (nowBusy) busy.add(iso); else busy.delete(iso);    // съхранение
       saveBusy(busy);
     });
   });
 }
+
 document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
 document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
+
 renderCal();
+
+/* Админ помощ: отворете конзолата веднъж и изпълнете:
+     localStorage.setItem('ADMIN_OK','1')
+*/
 </script>
 </body>
 </html>
