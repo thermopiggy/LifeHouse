@@ -156,6 +156,19 @@
   width:auto;
   display:block;
 }
+.day.busy {
+  position: relative;
+  background:#4b5563; 
+  color:transparent;   /* скриваме цифрата */
+}
+.day.busy::after {
+  content:"✕";         /* показваме Х */
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  font-size:18px;
+  color:#fff;
+}
 
 
 </style>
