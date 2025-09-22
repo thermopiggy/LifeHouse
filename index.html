@@ -72,18 +72,27 @@
 
   /* Calendar hotspot */
   .calendar-hotspot{
-    position:absolute;
-    right:18.5%;   /* преместен малко по-наляво */
-  top:12.5%;     /* издигнат малко нагоре */
-  width:16%;     /* по-широк, да покрие целия календар */
-  height:28%; 
-    cursor:pointer; background:transparent; border:none; outline:2px solid transparent;
-    z-index:12;
+  position:absolute;
+  right:18.5%;   /* леко наляво */
+  top:12.5%;     /* малко по-нагоре */
+  width:16%;     /* по-широк */
+  height:28%;    /* по-висок */
+  cursor:pointer;
+  background:transparent;
+  border:none;
+  outline:2px solid transparent;
+  z-index:12;
+}
+
+@media (max-width:600px){
+  .calendar-hotspot{
+    right:16.5%;  /* корекция за мобилен */
+    top:13.2%;    /* малко по-надолу */
+    width:20%;    /* по-широк заради мащаба */
+    height:30%;   /* по-висок */
   }
-  .calendar-hotspot:focus{outline-color:rgba(255,255,255,.6);outline-offset:2px}
-  @media (max-width:600px){
-    .calendar-hotspot{ right:21.5%; top:15.5%; width:14%; height:24%; }
-  }
+}
+
 
   /* Modal */
   .modal{
