@@ -72,28 +72,44 @@
 
   /* Calendar hotspot */
   .calendar-hotspot{
-  position:absolute;
-  right:18.5%;   /* леко наляво */
-  top:12.5%;     /* малко по-нагоре */
-  width:16%;     /* по-широк */
-  height:28%;    /* по-висок */
-  cursor:pointer;
-  background:transparent;
-  border:none;
-  outline:2px solid transparent;
-  z-index:12;
-}
-
-@media (max-width:600px){
-  .calendar-hotspot{
-    right:0;        /* плътно вляво */
-    left:auto;    /* махаме дясното позициониране */
-    top:5%;        /* вдигнато по-нагоре (около 1/3 спрямо предишното) */
-    width:22%;     /* малко по-широк за да покрие календара */
-    height:26%;    /* малко по-нисък, за да стои пропорционално */
+    position:absolute;
+    right:18.5%;
+    top:12.5%;
+    width:16%;
+    height:28%;
+    cursor:pointer;
+    background:transparent;
+    border:none;
+    outline:2px solid transparent;
+    z-index:12;
   }
-}
+  @media (max-width:600px){
+    .calendar-hotspot{
+      right:0;
+      left:auto;
+      top:5%;
+      width:22%;
+      height:26%;
+    }
+  }
 
+  /* Gallery hotspot */
+  .gallery-hotspot{
+    position:absolute;
+    left:20%;
+    top:22%;
+    width:28%;
+    height:18%;
+    cursor:pointer;
+    background:transparent;
+    border:none;
+    outline:2px solid transparent;
+    z-index:12;
+  }
+  .gallery-hotspot:focus{
+    outline-color:rgba(255,255,255,.6);
+    outline-offset:2px;
+  }
 
   /* Modal */
   .modal{
@@ -102,9 +118,10 @@
   }
   .modal.show{display:flex}
   .modal-card{
+    position:relative;
     width:min(1100px,96vw);height:min(740px,92vh);padding:14px;
     border-radius:18px;background:#111;box-shadow:0 10px 40px rgba(0,0,0,.5);
-    color:#eee;border:1px solid #2a2a2a
+    color:#eee;border:1px solid #2a2a2a;overflow:hidden;
   }
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
@@ -116,6 +133,7 @@
   .grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
   .dow { text-align:center; font-size:12px; color:#9aa; }
   .day {
+    position:relative;
     border:1px solid #2d2f33; border-radius:12px; padding:14px 0; text-align:center; background:#202225;
     cursor:default; transition:filter .15s, background .15s, transform .05s; color:#e5e7eb;
   }
@@ -131,6 +149,36 @@
   section{min-height:60vh;padding:60px 18px;color:#fff}
   #about,#gallery,#contact{background:rgba(0,0,0,.35)}
   .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
+  .brand img {height:100%;max-height:48px;width:auto;display:block}
+
+  /* Busy mark as X */
+  .day.busy { position: relative; background:#4b5563; color:transparent; }
+  .day.busy::after { content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:18px; color:#fff; }
+
+  /* Note indicator (малка точка горе вдясно) */
+  .day.has-note::before{
+    content:""; position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%;
+    background:#ffd166; box-shadow:0 0 0 1px #2d2f33;
+  }
+
+  /* Notes panel (tab) */
+  .notes-panel{
+    position:absolute; right:-420px; top:0; height:100%; width:400px;
+    background:#0f1216; border-left:1px solid #2a2f37; box-shadow:-10px 0 30px rgba(0,0,0,.35);
+    transition:right .22s ease; padding:14px; display:flex; flex-direction:column; gap:10px;
+  }
+  .notes-panel.show{ right:0; }
+  .notes-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .notes-title{font-weight:700}
+  .notes-close{cursor:pointer;border:1px solid #333;background:#1b1f27;color:#ddd;border-radius:10px;padding:6px 10px}
+  .notes-text{flex:1; width:100%; resize:none; background:#0b0e13; color:#e7e9ee; border:1px solid #2a2f37; border-radius:12px; padding:10px; line-height:1.4}
+  .notes-actions{display:flex;gap:8px;justify-content:flex-end}
+  .btn{cursor:pointer;border:1px solid #333;background:#1b1b1b;color:#eee;border-radius:10px;padding:8px 12px}
+  .btn.primary{background:var(--accent);color:#111;border-color:#caa84e;font-weight:700}
+  @media (max-width:520px){
+    .notes-panel{ width:92vw; right:-92vw; }
+    .notes-panel.show{ right:0; }
+  }
 </style>
 </head>
 <body>
@@ -138,7 +186,9 @@
   <div class="hero" id="home">
     <!-- NAV -->
     <nav class="nav">
-      <div class="brand">LifeHouse Semkovo</div>
+      <a href="#home" class="brand">
+        <img src="lifehouselogo.png" alt="LifeHouse Semkovo" />
+      </a>
       <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
@@ -149,13 +199,17 @@
 
     <!-- Callout -->
     <div class="headline">
-      <h1>Къща за гости „LifeHouse Semkovo“</h1>
-      <p>Камината бумти, а гората на една ръка разстояние.</p>
+      <h1>Къща за гости LifeHouse Semkovo</h1>
+      <p>Камината бумти(натисни я), а гората е на една ръка разстояние(натисни и нея).</p>
       <a class="btn-primary" id="openCalCta" href="#">свободни дати</a>
     </div>
 
     <!-- Hotspot върху календара -->
     <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
+
+    <!-- Hotspot върху снимките (галерия) -->
+    <a href="#gallery" class="gallery-hotspot" aria-label="Отвори галерията"></a>
+
   </div>
 
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
@@ -176,15 +230,25 @@
           <button class="navbtn" id="next">›</button>
         </div>
         <div class="grid" id="grid"></div>
-        <div class="legend">
-          <span class="box"></span> Свободно &nbsp;&nbsp;
-          <span class="box busy"></span> Заето
-        </div>
       </div>
+
+      <!-- Notes panel (TAB) -->
+      <aside class="notes-panel" id="notesPanel" aria-hidden="true">
+        <div class="notes-head">
+          <div class="notes-title" id="notesTitle">Бележка</div>
+          <button class="notes-close" id="closeNotes">Затвори</button>
+        </div>
+        <textarea class="notes-text" id="notesText" placeholder="Напишете бележка за избрания ден…"></textarea>
+        <div class="notes-actions">
+          <button class="btn" id="deleteNotes">Изтрий</button>
+          <button class="btn primary" id="saveNotes">Запази</button>
+        </div>
+      </aside>
     </div>
   </div>
 
 <script>
+/* Drawer */
 const burger = document.getElementById('burger');
 const drawer = document.getElementById('drawer');
 burger.addEventListener('click',()=>{
@@ -199,34 +263,55 @@ document.addEventListener('click', (e)=>{
   }
 });
 
+/* Calendar modal open/close */
 const calModal = document.getElementById('calModal');
 ['openCalHotspot','openCalFromMenu','openCalCta']
   .map(id=>document.getElementById(id))
-  .forEach(el=>el&&el.addEventListener('click', (e)=>{
+  .forEach(el=>el && el.addEventListener('click', (e)=>{
     e.preventDefault();
     calModal.classList.add('show');
     calModal.setAttribute('aria-hidden','false');
     drawer.classList.remove('show');
   }));
-document.getElementById('closeCal').addEventListener('click',()=>{
+document.getElementById('closeCal').addEventListener('click',closeCalendar);
+function closeCalendar(){
   calModal.classList.remove('show');
   calModal.setAttribute('aria-hidden','true');
-});
-calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ calModal.classList.remove('show'); }});
+  closeNotes();
+}
+calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ closeCalendar(); }});
 
+/* Calendar state */
 const grid = document.getElementById('grid');
 const monthLabel = document.getElementById('monthLabel');
 const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
 
-function keyPrefix(){ return 'lifehouse-busy:'; }
+/* Storage keys */
+const busyKey = () => `lifehouse-busy:${state.y}-${state.m}`;
+const notesKey = (iso) => `lifehouse-notes:${iso}`;
+
+/* Busy helpers */
 function loadBusy() {
-  const raw = localStorage.getItem(keyPrefix()+`${state.y}-${state.m}`);
+  const raw = localStorage.getItem(busyKey());
   try { return new Set(raw ? JSON.parse(raw) : []); } catch { return new Set(); }
 }
 function saveBusy(set){
-  localStorage.setItem(keyPrefix()+`${state.y}-${state.m}`, JSON.stringify([...set]));
+  localStorage.setItem(busyKey(), JSON.stringify([...set]));
 }
 
+/* Notes helpers */
+function loadNote(iso){
+  return localStorage.getItem(notesKey(iso)) || '';
+}
+function saveNote(iso, text){
+  if (text && text.trim().length){
+    localStorage.setItem(notesKey(iso), text.trim());
+  } else {
+    localStorage.removeItem(notesKey(iso));
+  }
+}
+
+/* Render calendar */
 function renderCal(){
   const y = state.y, m = state.m;
   const d1 = new Date(y,m,1);
@@ -243,8 +328,9 @@ function renderCal(){
   for(let i=0;i<startDow;i++){ cells += `<div class="day out">${prevDays - startDow + i + 1}</div>`; }
   for(let day=1; day<=daysInMonth; day++){
     const iso = new Date(y,m,day).toISOString().slice(0,10);
-    const cls = `day btn ${busy.has(iso)?'busy':''}`;
-    cells += `<button class="${cls}" data-iso="${iso}">${day}</button>`;
+    const hasNote = !!loadNote(iso);
+    const cls = `day btn ${busy.has(iso)?'busy':''} ${hasNote?'has-note':''}`;
+    cells += `<button class="${cls}" data-iso="${iso}" aria-label="Ден ${day}">${day}</button>`;
   }
   const cellsSoFar = 7 + startDow + daysInMonth;
   const pad = 7*6 - (cellsSoFar - 7);
@@ -252,22 +338,83 @@ function renderCal(){
 
   grid.innerHTML = cells;
 
+  /* Click = toggle busy (admin only) */
   grid.querySelectorAll('.day.btn').forEach(btn=>{
     btn.addEventListener('click', (ev)=>{
       if (localStorage.getItem('ADMIN_OK')!=='1') return;
       const cell = ev.currentTarget;
       const iso = cell.dataset.iso;
       const nowBusy = !cell.classList.contains('busy');
+      const busySet = loadBusy();
       cell.classList.toggle('busy', nowBusy);
-      if (nowBusy) busy.add(iso); else busy.delete(iso);
-      saveBusy(busy);
+      if (nowBusy) busySet.add(iso); else busySet.delete(iso);
+      saveBusy(busySet);
+    });
+
+    /* Double click = open notes tab */
+    btn.addEventListener('dblclick',(ev)=>{
+      ev.preventDefault();
+      const iso = ev.currentTarget.dataset.iso;
+      openNotes(iso);
     });
   });
 }
 
+/* Month nav */
 document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
 document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
 
+/* Notes panel logic */
+const notesPanel = document.getElementById('notesPanel');
+const notesTitle = document.getElementById('notesTitle');
+const notesText  = document.getElementById('notesText');
+const saveBtn    = document.getElementById('saveNotes');
+const delBtn     = document.getElementById('deleteNotes');
+const closeBtn   = document.getElementById('closeNotes');
+
+let currentIso = null;
+
+function openNotes(iso){
+  currentIso = iso;
+  notesTitle.textContent = `Бележка — ${iso}`;
+  notesText.value = loadNote(iso);
+  notesPanel.classList.add('show');
+  notesPanel.setAttribute('aria-hidden','false');
+  notesText.focus();
+}
+
+function closeNotes(){
+  notesPanel.classList.remove('show');
+  notesPanel.setAttribute('aria-hidden','true');
+  currentIso = null;
+}
+
+/* Save / Delete / Close */
+saveBtn.addEventListener('click', ()=>{
+  if(!currentIso) return;
+  saveNote(currentIso, notesText.value);
+  renderCal(); // обнови индикатора "has-note"
+});
+delBtn.addEventListener('click', ()=>{
+  if(!currentIso) return;
+  notesText.value = '';
+  saveNote(currentIso, '');
+  renderCal();
+});
+closeBtn.addEventListener('click', closeNotes);
+
+/* Autosave on input (дискретно) */
+let autosaveTimer = null;
+notesText.addEventListener('input', ()=>{
+  if(!currentIso) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(()=>{
+    saveNote(currentIso, notesText.value);
+    renderCal();
+  }, 500);
+});
+
+/* Init */
 renderCal();
 </script>
 </body>
