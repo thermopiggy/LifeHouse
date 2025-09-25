@@ -255,9 +255,14 @@
 <script>
 /* ===== Firebase INIT (сложи своя config) ===== */
 const firebaseConfig = {
-  /* TODO: постави данните от Project Settings → General:
-     apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId */
+  apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
+  authDomain: "lifehouse-24137.firebaseapp.com",
+  projectId: "lifehouse-24137",
+  storageBucket: "lifehouse-24137.appspot.com",
+  messagingSenderId: "1017631883575",
+  appId: "1:1017631883575:web:bd44bb5b32bf21e34b1ab2"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
