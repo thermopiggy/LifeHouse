@@ -310,7 +310,9 @@ let unsubBusy = null;
 let currentBusySet = new Set(); // от Firestore
 
 function busyDocRef(y,m){
-  return db.collection('state').doc(`busy_${y}_${m}`); // m = 0..11
+  return db.collection('busy').doc(`busy_${y}_${m}`);
+}
+
 }
 function attachBusyListener(y,m){
   if (unsubBusy) unsubBusy();
