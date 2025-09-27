@@ -176,6 +176,35 @@
 
   /* Малък индикатор за админ статуса */
   .admin-badge{font-size:12px;opacity:.8;margin-left:8px}
+  /* Невидим бутон долу вдясно */
+.admin-hotspot{
+  position:fixed; right:12px; bottom:12px; width:64px; height:64px;
+  background:transparent; border:none; cursor:pointer; z-index:140;
+  /* невидим, но кликаем */
+  opacity:0;
+}
+.admin-hotspot:focus-visible{ outline:2px dashed rgba(255,255,255,.6); outline-offset:4px }
+
+/* Отделен ADMIN drawer (дясно-долу) */
+.admin-drawer{
+  position:fixed; right:12px; bottom:12px; z-index:135;
+  width:clamp(240px, 60vw, 360px); max-height:70vh; overflow:auto;
+  padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
+  background:var(--glass-bg); backdrop-filter:saturate(140%) blur(10px);
+  display:none; color:var(--text);
+}
+.admin-drawer.show{ display:block }
+
+.admin-drawer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px }
+.admin-close{ cursor:pointer; border:1px solid #333; background:#1b1b1b; color:#eee; border-radius:10px; padding:6px 10px }
+
+.admin-drawer-body button{
+  display:block; width:100%; text-align:left; cursor:pointer;
+  border:none; background:transparent; color:var(--text);
+  padding:12px; border-radius:10px; font-weight:600;
+}
+.admin-drawer-body button:hover{ background:rgba(255,255,255,.1) }
+
 </style>
 </head>
 <body>
@@ -198,10 +227,6 @@
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
         <a href="#gallery" role="menuitem">Галерия</a>
         <a href="#about" role="menuitem">За нас</a>
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.2);margin:8px 0">
-        <button id="adminLogin">Админ вход</button>
-        <button id="adminLogout">Изход</button>
-        <div id="adminBadge" class="admin-badge"></div>
       </div>
     </nav>
 
@@ -569,5 +594,42 @@ auth.onAuthStateChanged(async (user)=>{
 /* ===== Init ===== */
 renderCal();
 </script>
+  <!-- Невидим бутон долу вдясно -->
+<button class="admin-hotspot" id="adminHotspot" aria-label="Админ панел"></button>
+
+<!-- Отделен ADMIN drawer -->
+<div class="admin-drawer" id="adminDrawer" aria-hidden="true">
+  <div class="admin-drawer-head">
+    <strong>Админ панел</strong>
+    <button class="admin-close" id="adminClose" aria-label="Затвори">×</button>
+  </div>
+  <div class="admin-drawer-body">
+    <button id="adminLogin">Админ вход</button>
+    <button id="adminLogout">Изход</button>
+    <div id="adminBadge" class="admin-badge">Статус: гост</div>
+  </div>
+</div>
+  /* ===== Admin Drawer (отделен) ===== */
+const adminHotspot = document.getElementById('adminHotspot');
+const adminDrawer  = document.getElementById('adminDrawer');
+const adminClose   = document.getElementById('adminClose');
+
+function toggleAdminDrawer(force){
+  const willShow = typeof force === 'boolean' ? force : !adminDrawer.classList.contains('show');
+  adminDrawer.classList.toggle('show', willShow);
+  adminDrawer.setAttribute('aria-hidden', String(!willShow));
+}
+
+adminHotspot.addEventListener('click', (e)=>{ e.stopPropagation(); toggleAdminDrawer(true); });
+adminClose.addEventListener('click',  ()=> toggleAdminDrawer(false));
+
+document.addEventListener('click', (e)=>{
+  const clickInside = adminDrawer.contains(e.target) || adminHotspot.contains(e.target);
+  if (!clickInside) toggleAdminDrawer(false);
+});
+
+/* Вече съществуващият код за adminLogin/adminLogout/adminBadge остава същия */
+/* (IDs са запазени, само са преместени в новия admin drawer) */
+
 </body>
 </html>
