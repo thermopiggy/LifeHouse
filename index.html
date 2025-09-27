@@ -609,7 +609,8 @@ renderCal();
     <div id="adminBadge" class="admin-badge">Статус: гост</div>
   </div>
 </div>
-  /* ===== Admin Drawer (отделен) ===== */
+<script>
+/* ===== Admin Drawer (отделен) ===== */
 const adminHotspot = document.getElementById('adminHotspot');
 const adminDrawer  = document.getElementById('adminDrawer');
 const adminClose   = document.getElementById('adminClose');
@@ -627,9 +628,6 @@ document.addEventListener('click', (e)=>{
   const clickInside = adminDrawer.contains(e.target) || adminHotspot.contains(e.target);
   if (!clickInside) toggleAdminDrawer(false);
 });
-
-/* Вече съществуващият код за adminLogin/adminLogout/adminBadge остава същия */
-/* (IDs са запазени, само са преместени в новия admin drawer) */
-
+</script>
 </body>
 </html>
