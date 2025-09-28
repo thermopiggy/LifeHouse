@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Lifehouse Semkovo — Къща за гости</title>
 
-<!-- Firebase (compat build, лесно за вграждане) -->
+<!-- Firebase (compat build) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -103,6 +103,11 @@
   }
   .gallery-hotspot:focus{ outline-color:rgba(255,255,255,.6); outline-offset:2px; }
 
+  /* Sections */
+  section{min-height:60vh;padding:60px 18px;color:#fff}
+  #about,#gallery,#contact{background:rgba(0,0,0,.35)}
+  .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
+
   /* Modal */
   .modal{
     position:fixed; inset:0; background:rgba(0,0,0,.55);
@@ -137,13 +142,9 @@
   .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
   .legend .box.busy{background:#4b5563;border-color:#52575f}
 
-  section{min-height:60vh;padding:60px 18px;color:#fff}
-  #about,#gallery,#contact{background:rgba(0,0,0,.35)}
-  .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
-
   /* Busy X */
   .day.busy { position: relative; background:#4b5563; color:transparent; }
-  .day.busy::after { content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:18px; color:#fff; }
+  .day.busy::after { content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:18px; color:#fff; }
 
   /* Note indicator */
   .day.has-note::before{
@@ -234,6 +235,7 @@
         <img src="lifehouselogo.png" alt="LifeHouse Semkovo" />
       </a>
       <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
+
       <!-- ПИН към Google Maps, до хамбургера -->
       <a href="https://www.google.com/maps/place/Life+House/@42.0479645,23.5272436,142m/data=!3m1!1e3!4m17!1m7!3m6!1s0x14ab05c2b76ace83:0x9ce278f0d33929d!2sSemkovo+Mountain+Resort!8m2!3d42.0446093!4d23.5258354!16s%2Fg%2F11jm7lr6cv!3m8!1s0x14ab05371801afd1:0x1abbb9a791e4b886!5m2!4m1!1i2!8m2!3d42.0481271!4d23.5274758!16s%2Fg%2F11f8mg2m1x?entry=ttu"
          target="_blank" aria-label="Google Maps">
@@ -241,6 +243,7 @@
           <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
         </svg>
       </a>
+
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
         <a href="#gallery" role="menuitem">Галерия</a>
@@ -258,7 +261,6 @@
     <!-- Hotspots -->
     <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
     <a href="#gallery" class="gallery-hotspot" aria-label="Отвори галерията"></a>
-
   </div>
 
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
@@ -281,9 +283,49 @@
   <!-- Невидим бутон долу вдясно (в края на сайта) -->
   <button class="admin-hotspot" id="adminHotspot" aria-label="Админ панел"></button>
 
+  <!-- ===== КАЛЕНДАР МОДАЛ ===== -->
+  <div class="modal" id="calModal" aria-hidden="true" aria-label="Календар за заетост">
+    <div class="modal-card">
+      <div class="modal-head">
+        <strong>Календар — заети дати</strong>
+        <div><button class="x" id="closeCal">Затвори</button></div>
+      </div>
+      <div class="cal">
+        <div class="head">
+          <button class="navbtn" id="prev">‹</button>
+          <div id="monthLabel"></div>
+          <button class="navbtn" id="next">›</button>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="legend">
+          <span class="box"></span> свободно &nbsp; <span class="box busy"></span> заето
+        </div>
+      </div>
+
+      <!-- Notes panel -->
+      <aside class="notes-panel" id="notesPanel" aria-hidden="true">
+        <div class="notes-head">
+          <div class="notes-title" id="notesTitle">Бележка</div>
+          <button class="notes-close" id="closeNotes">Затвори</button>
+        </div>
+
+        <div class="notes-row">
+          <label>От: <input type="date" id="notesStart"></label>
+          <label>До: <input type="date" id="notesEnd"></label>
+        </div>
+
+        <textarea class="notes-text" id="notesText" placeholder="Напишете бележка за избрания ден или диапазон…"></textarea>
+        <div class="notes-actions">
+          <button class="btn" id="deleteNotes">Изтрий</button>
+          <button class="btn primary" id="saveNotes">Запази</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
   <!-- ===== Основни скриптове ===== -->
   <script>
-  /* ===== Firebase INIT (сложи своя config) ===== */
+  /* ===== Firebase INIT (сложи своя config при нужда) ===== */
   const firebaseConfig = {
     apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
     authDomain: "lifehouse-24137.firebaseapp.com",
@@ -312,23 +354,34 @@
     }
   });
 
-  /* ===== Modal open/close ===== */
+  /* ===== Modal open/close (устойчиво вързване) ===== */
   const calModal = document.getElementById('calModal');
-  ['openCalHotspot','openCalFromMenu','openCalCta']
-    .map(id=>document.getElementById(id))
-    .forEach(el=>el && el.addEventListener('click', (e)=>{
-      e.preventDefault();
-      calModal.classList.add('show');
-      calModal.setAttribute('aria-hidden','false');
-      drawer.classList.remove('show');
-    }));
-  document.getElementById('closeCal').addEventListener('click',closeCalendar);
+
+  function openCalendar(e){
+    e && e.preventDefault();
+    if (!calModal) return;
+    calModal.classList.add('show');
+    calModal.setAttribute('aria-hidden','false');
+    drawer && drawer.classList.remove('show');
+  }
   function closeCalendar(){
+    if (!calModal) return;
     calModal.classList.remove('show');
     calModal.setAttribute('aria-hidden','true');
-    closeNotes();
+    typeof closeNotes === 'function' && closeNotes();
   }
-  calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ closeCalendar(); }});
+
+  ['openCalHotspot','openCalFromMenu','openCalCta']
+    .map(id => document.getElementById(id))
+    .filter(Boolean)
+    .forEach(el => el.addEventListener('click', openCalendar));
+
+  const closeCalBtn = document.getElementById('closeCal');
+  closeCalBtn && closeCalBtn.addEventListener('click', closeCalendar);
+
+  calModal && calModal.addEventListener('click', (e)=>{
+    if (e.target === calModal) closeCalendar();
+  });
 
   /* ===== Calendar state ===== */
   const grid = document.getElementById('grid');
@@ -339,9 +392,7 @@
   let unsubBusy = null;
   let currentBusySet = new Set(); // от Firestore
 
-  function busyDocRef(y,m){
-    return db.collection('state').doc(`busy_${y}_${m}`);
-  }
+  function busyDocRef(y,m){ return db.collection('state').doc(`busy_${y}_${m}`); }
 
   function attachBusyListener(y,m){
     if (unsubBusy) unsubBusy();
@@ -365,7 +416,6 @@
     if (unsubRanges) return; // един слушател е достатъчен
     unsubRanges = rangesDoc.onSnapshot(snap=>{
       currentRanges = snap.exists ? (snap.data().list || []) : [];
-      // обнови индикаторите за бележки
       markNoteDots();
     });
   }
@@ -416,7 +466,7 @@
         saveBusyRemote(set).catch(console.error);
       });
 
-      // дабълклик за бележки (видимо за админ, но всеки може да чете)
+      // дабълклик за бележки
       btn.addEventListener('dblclick',(ev)=>{
         ev.preventDefault();
         const iso = ev.currentTarget.dataset.iso;
@@ -424,17 +474,13 @@
       });
     });
 
-    // слушатели
     attachBusyListener(y,m);
     attachRangesListener();
-
-    // първоначално маркиране
     updateBusyClasses();
     markNoteDots();
   }
 
   function updateBusyClasses(){
-    // маркира busy класовете върху текущата мрежа
     grid.querySelectorAll('.day.btn').forEach(cell=>{
       const iso = cell.dataset.iso;
       cell.classList.toggle('busy', currentBusySet.has(iso));
@@ -443,8 +489,7 @@
   function markNoteDots(){
     grid.querySelectorAll('.day.btn').forEach(cell=>{
       const iso = cell.dataset.iso;
-      const has = hasRangeNote(iso);
-      cell.classList.toggle('has-note', has);
+      cell.classList.toggle('has-note', hasRangeNote(iso));
     });
   }
 
@@ -514,7 +559,7 @@
 
     if (!text){
       if (editingIndex !== -1){ arr.splice(editingIndex,1); }
-      saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
+      saveRangesRemote(arr).catch(console.error);
       return;
     }
 
@@ -522,7 +567,7 @@
     if (editingIndex !== -1) arr[editingIndex] = payload;
     else arr.push(payload);
 
-    saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
+    saveRangesRemote(arr).catch(console.error);
     notesTitle.textContent = `Бележка — ${a} → ${b}`;
   });
 
@@ -533,18 +578,16 @@
     if (editingIndex !== -1){
       arr.splice(editingIndex,1);
       saveRangesRemote(arr).catch(console.error);
-    } else {
-      // няма диапазон – нищо за триене
     }
     notesText.value = '';
   });
   closeBtn.addEventListener('click', closeNotes);
 
-  /* ===== Auth & Admin (динамичен badge, без ранни селектори) ===== */
+  /* ===== Auth & Admin (динамичен badge, UID или Email) ===== */
   window.IS_ADMIN = false;
 
   function setBadge(user, isAdmin){
-    const badgeEl = document.getElementById('adminBadge'); // намираме го динамично
+    const badgeEl = document.getElementById('adminBadge');
     if (!badgeEl){ return; }
     if (!user){
       badgeEl.textContent = 'Статус: гост';
@@ -553,10 +596,20 @@
     badgeEl.textContent = isAdmin ? `Админ: ${user.email}` : `Вход: ${user.email}`;
   }
 
-  async function checkAdmin(uid){
-    const doc = await db.collection('meta').doc('admins').get();
-    const list = doc.exists ? (doc.data().list || []) : [];
-    return list.includes(uid);
+  async function checkAdmin(user){
+    try{
+      const snap = await db.collection('meta').doc('admins').get();
+      const data = snap.exists ? snap.data() : {};
+      const uids   = Array.isArray(data.uids)   ? data.uids   : (Array.isArray(data.list) ? data.list : []);
+      const emails = Array.isArray(data.emails) ? data.emails : [];
+      const byUid   = user?.uid   && uids.includes(user.uid);
+      const byEmail = user?.email && emails.map(s=>String(s).toLowerCase().trim())
+                                           .includes(String(user.email).toLowerCase().trim());
+      return !!(byUid || byEmail);
+    }catch(e){
+      console.error('checkAdmin:', e);
+      return false;
+    }
   }
 
   auth.onAuthStateChanged(async (user)=>{
@@ -565,7 +618,7 @@
       setBadge(null,false);
       return;
     }
-    const isAdmin = await checkAdmin(user.uid).catch(()=>false);
+    const isAdmin = await checkAdmin(user);
     window.IS_ADMIN = !!isAdmin;
     setBadge(user, isAdmin);
   });
@@ -574,9 +627,8 @@
   renderCal();
   </script>
 
-  <!-- ===== Admin Drawer Logic (след HTML на admin drawer и бутона) ===== -->
+  <!-- ===== Admin Drawer Logic ===== -->
   <script>
-  /* Отделен admin drawer + hotspot */
   const adminHotspot = document.getElementById('adminHotspot');
   const adminDrawer  = document.getElementById('adminDrawer');
   const adminClose   = document.getElementById('adminClose');
@@ -595,24 +647,30 @@
     if (!clickInside) toggleAdminDrawer(false);
   });
 
-  /* Слушатели за вход/изход — елементите вече съществуват */
-  document.getElementById('adminLogin').addEventListener('click', async ()=>{
-    toggleAdminDrawer(false);
-    const email = prompt('Email за админ вход:');
-    if (!email) return;
-    const pass = prompt('Парола:');
-    if (!pass) return;
-    try{
-      await auth.signInWithEmailAndPassword(email, pass);
-    }catch(err){
-      alert('Грешен вход: ' + err.message);
-    }
-  });
+  const loginBtn  = document.getElementById('adminLogin');
+  const logoutBtn = document.getElementById('adminLogout');
 
-  document.getElementById('adminLogout').addEventListener('click', async ()=>{
-    toggleAdminDrawer(false);
-    await auth.signOut();
-  });
+  if (loginBtn){
+    loginBtn.addEventListener('click', async ()=>{
+      toggleAdminDrawer(false);
+      const email = prompt('Email за админ вход:');
+      if (!email) return;
+      const pass = prompt('Парола:');
+      if (!pass) return;
+      try{
+        await auth.signInWithEmailAndPassword(email, pass);
+      }catch(err){
+        alert('Грешен вход: ' + err.message);
+      }
+    });
+  }
+
+  if (logoutBtn){
+    logoutBtn.addEventListener('click', async ()=>{
+      toggleAdminDrawer(false);
+      try{ await auth.signOut(); }catch(e){ console.error(e); }
+    });
+  }
   </script>
 
 </body>
