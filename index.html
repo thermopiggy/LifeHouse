@@ -177,27 +177,30 @@
   /* Малък индикатор за админ статуса */
   .admin-badge{font-size:12px;opacity:.8;margin-left:8px}
 
-  /* Невидим бутон долу вдясно (фиксиран за целия сайт) */
+  /* Админ бутон – долу вдясно на сайта (не fixed) */
   .admin-hotspot{
+    display:block;
     width:64px;
     height:64px;
     background:transparent;
     border:none;
     cursor:pointer;
-    z-index:250;
-    opacity:0; /* напълно невидим, но кликаем */
+    opacity:0;          /* невидим, но кликаем */
+    margin-left:auto;
+    margin-right:0;
+    margin-top:40px;
+    margin-bottom:0;
   }
   .admin-hotspot:focus-visible{
     outline:2px dashed rgba(255,255,255,.6);
     outline-offset:4px;
   }
 
-  /* Admin drawer (отделен от основния drawer) */
+  /* Admin drawer (част от потока, вдясно долу) */
   .admin-drawer{
-    position:fixed;
-    right:12px;
-    bottom:12px;
-    z-index:240;
+    position:relative;
+    margin-left:auto;
+    margin-right:0;
     width:clamp(240px, 60vw, 360px);
     max-height:70vh;
     overflow:auto;
@@ -230,9 +233,7 @@
       <a href="#home" class="brand">
         <img src="lifehouselogo.png" alt="LifeHouse Semkovo" />
       </a>
-
       <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
-
       <!-- ПИН към Google Maps, до хамбургера -->
       <a href="https://www.google.com/maps/place/Life+House/@42.0479645,23.5272436,142m/data=!3m1!1e3!4m17!1m7!3m6!1s0x14ab05c2b76ace83:0x9ce278f0d33929d!2sSemkovo+Mountain+Resort!8m2!3d42.0446093!4d23.5258354!16s%2Fg%2F11jm7lr6cv!3m8!1s0x14ab05371801afd1:0x1abbb9a791e4b886!5m2!4m1!1i2!8m2!3d42.0481271!4d23.5274758!16s%2Fg%2F11f8mg2m1x?entry=ttu"
          target="_blank" aria-label="Google Maps">
@@ -240,7 +241,6 @@
           <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
         </svg>
       </a>
-
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
         <a href="#gallery" role="menuitem">Галерия</a>
@@ -258,52 +258,14 @@
     <!-- Hotspots -->
     <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
     <a href="#gallery" class="gallery-hotspot" aria-label="Отвори галерията"></a>
+
   </div>
 
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
   <section id="gallery"><h2>Галерия</h2><p>Снимки и видео ще добавим тук.</p></section>
   <section id="contact"><h2>Контакти</h2><p>Тел: +359 … • Email: booking@lifehouse.bg</p></section>
 
-  <!-- Modal -->
-  <div class="modal" id="calModal" aria-hidden="true" aria-label="Календар за заетост">
-    <div class="modal-card">
-      <div class="modal-head">
-        <strong>Календар — заети дати</strong>
-        <div><button class="x" id="closeCal">Затвори</button></div>
-      </div>
-      <div class="cal">
-        <div class="head">
-          <button class="navbtn" id="prev">‹</button>
-          <div id="monthLabel"></div>
-          <button class="navbtn" id="next">›</button>
-        </div>
-        <div class="grid" id="grid"></div>
-      </div>
-
-      <!-- Notes panel -->
-      <aside class="notes-panel" id="notesPanel" aria-hidden="true">
-        <div class="notes-head">
-          <div class="notes-title" id="notesTitle">Бележка</div>
-          <button class="notes-close" id="closeNotes">Затвори</button>
-        </div>
-
-        <div class="notes-row">
-          <label>От: <input type="date" id="notesStart"></label>
-          <label>До: <input type="date" id="notesEnd"></label>
-        </div>
-
-        <textarea class="notes-text" id="notesText" placeholder="Напишете бележка за избрания ден или диапазон…"></textarea>
-        <div class="notes-actions">
-          <button class="btn" id="deleteNotes">Изтрий</button>
-          <button class="btn primary" id="saveNotes">Запази</button>
-        </div>
-      </aside>
-    </div>
-  </div>
-
-
-
-  <!-- Отделен ADMIN drawer -->
+  <!-- Admin Drawer (част от потока на страницата) -->
   <div class="admin-drawer" id="adminDrawer" aria-hidden="true">
     <div class="admin-drawer-head">
       <strong>Админ панел</strong>
@@ -316,340 +278,342 @@
     </div>
   </div>
 
-<script>
-/* ===== Firebase INIT (сложи своя config) ===== */
-const firebaseConfig = {
-  apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
-  authDomain: "lifehouse-24137.firebaseapp.com",
-  projectId: "lifehouse-24137",
-  storageBucket: "lifehouse-24137.appspot.com",
-  messagingSenderId: "1017631883575",
-  appId: "1:1017631883575:web:bd44bb5b32bf21e34b1ab2"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db   = firebase.firestore();
-
-/* ===== Drawer ===== */
-const burger = document.getElementById('burger');
-const drawer = document.getElementById('drawer');
-burger.addEventListener('click',()=>{
-  const open = drawer.classList.toggle('show');
-  burger.setAttribute('aria-expanded', String(open));
-  drawer.setAttribute('aria-hidden', String(!open));
-});
-document.addEventListener('click', (e)=>{
-  if (!drawer.contains(e.target) && !burger.contains(e.target)) {
-    drawer.classList.remove('show');
-    burger.setAttribute('aria-expanded','false');
-  }
-});
-
-/* ===== Modal open/close ===== */
-const calModal = document.getElementById('calModal');
-['openCalHotspot','openCalFromMenu','openCalCta']
-  .map(id=>document.getElementById(id))
-  .forEach(el=>el && el.addEventListener('click', (e)=>{
-    e.preventDefault();
-    calModal.classList.add('show');
-    calModal.setAttribute('aria-hidden','false');
-    drawer.classList.remove('show');
-  }));
-document.getElementById('closeCal').addEventListener('click',closeCalendar);
-function closeCalendar(){
-  calModal.classList.remove('show');
-  calModal.setAttribute('aria-hidden','true');
-  closeNotes();
-}
-calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ closeCalendar(); }});
-
-/* ===== Calendar state ===== */
-const grid = document.getElementById('grid');
-const monthLabel = document.getElementById('monthLabel');
-const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
-
-/* ===== Remote busy for current month (doc per month) ===== */
-let unsubBusy = null;
-let currentBusySet = new Set(); // от Firestore
-
-function busyDocRef(y,m){
-  return db.collection('state').doc(`busy_${y}_${m}`);
-}
-
-function attachBusyListener(y,m){
-  if (unsubBusy) unsubBusy();
-  unsubBusy = busyDocRef(y,m).onSnapshot(snap=>{
-    const arr = snap.exists ? (snap.data().list || []) : [];
-    currentBusySet = new Set(arr);
-    updateBusyClasses();
-  });
-}
-async function saveBusyRemote(set){
-  if (!window.IS_ADMIN) return;
-  await busyDocRef(state.y, state.m).set({ list: [...set] }, { merge:false });
-}
-
-/* ===== Notes ranges (global doc) ===== */
-const rangesDoc = db.collection('state').doc('ranges');
-let unsubRanges = null;
-let currentRanges = []; // [{start,end,text},...]
-
-function attachRangesListener(){
-  if (unsubRanges) return; // един слушател е достатъчен
-  unsubRanges = rangesDoc.onSnapshot(snap=>{
-    currentRanges = snap.exists ? (snap.data().list || []) : [];
-    // обнови индикаторите за бележки
-    markNoteDots();
-  });
-}
-async function saveRangesRemote(arr){
-  if (!window.IS_ADMIN) return;
-  await rangesDoc.set({ list: arr });
-}
-function hasRangeNote(iso){
-  return currentRanges.some(r => iso >= r.start && iso <= r.end);
-}
-
-/* ===== Render calendar ===== */
-function renderCal(){
-  const y = state.y, m = state.m;
-  const d1 = new Date(y,m,1);
-  const startDow = (d1.getDay()+6)%7;
-  const daysInMonth = new Date(y,m+1,0).getDate();
-  const prevDays = new Date(y,m,0).getDate();
-
-  monthLabel.innerHTML = `<strong>${d1.toLocaleString('bg-BG',{month:'long'})}</strong> ${y}`;
-  let cells = '';
-  const dows = ['П','В','С','Ч','П','С','Н'].map(x=>`<div class="dow">${x}</div>`).join('');
-  cells += dows;
-
-  for(let i=0;i<startDow;i++){ cells += `<div class="day out">${prevDays - startDow + i + 1}</div>`; }
-  for(let day=1; day<=daysInMonth; day++){
-    const iso = new Date(y,m,day).toISOString().slice(0,10);
-    const cls = `day btn`;
-    cells += `<button class="${cls}" data-iso="${iso}" aria-label="Ден ${day}">${day}</button>`;
-  }
-  const cellsSoFar = 7 + startDow + daysInMonth;
-  const pad = 7*6 - (cellsSoFar - 7);
-  for(let i=0;i<pad;i++){ cells += `<div class="day out">${i+1}</div>`; }
-
-  grid.innerHTML = cells;
-
-  // клик за заетост (само админ)
-  grid.querySelectorAll('.day.btn').forEach(btn=>{
-    btn.addEventListener('click', (ev)=>{
-      if (!window.IS_ADMIN) return;
-      const cell = ev.currentTarget;
-      const iso = cell.dataset.iso;
-      const set = new Set(currentBusySet);
-      const nowBusy = !set.has(iso);
-      if (nowBusy) set.add(iso); else set.delete(iso);
-      currentBusySet = set;
-      updateBusyClasses();
-      saveBusyRemote(set).catch(console.error);
-    });
-
-    // дабълклик за бележки (видимо за админ, но всеки може да чете)
-    btn.addEventListener('dblclick',(ev)=>{
-      ev.preventDefault();
-      const iso = ev.currentTarget.dataset.iso;
-      openNotes(iso);
-    });
-  });
-
-  // слушатели
-  attachBusyListener(y,m);
-  attachRangesListener();
-
-  // първоначално маркиране
-  updateBusyClasses();
-  markNoteDots();
-}
-
-function updateBusyClasses(){
-  // маркира busy класовете върху текущата мрежа
-  grid.querySelectorAll('.day.btn').forEach(cell=>{
-    const iso = cell.dataset.iso;
-    cell.classList.toggle('busy', currentBusySet.has(iso));
-  });
-}
-function markNoteDots(){
-  grid.querySelectorAll('.day.btn').forEach(cell=>{
-    const iso = cell.dataset.iso;
-    const has = hasRangeNote(iso);
-    cell.classList.toggle('has-note', has);
-  });
-}
-
-/* ===== Month nav ===== */
-document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
-document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
-
-/* ===== Notes panel logic ===== */
-const notesPanel = document.getElementById('notesPanel');
-const notesTitle = document.getElementById('notesTitle');
-const notesText  = document.getElementById('notesText');
-const saveBtn    = document.getElementById('saveNotes');
-const delBtn     = document.getElementById('deleteNotes');
-const closeBtn   = document.getElementById('closeNotes');
-const notesStart = document.getElementById('notesStart');
-const notesEnd   = document.getElementById('notesEnd');
-
-let currentIso = null;
-let editingIndex = -1;
-
-function findRangeIndexForDate(iso){
-  for (let i=0;i<currentRanges.length;i++){
-    const r = currentRanges[i];
-    if (iso >= r.start && iso <= r.end) return i;
-  }
-  return -1;
-}
-
-function openNotes(iso){
-  currentIso = iso;
-  editingIndex = findRangeIndexForDate(iso);
-
-  if (editingIndex !== -1){
-    const r = currentRanges[editingIndex];
-    notesStart.value = r.start;
-    notesEnd.value   = r.end;
-    notesText.value  = r.text || '';
-    notesTitle.textContent = `Бележка — ${r.start} → ${r.end}`;
-  } else {
-    notesStart.value = iso;
-    notesEnd.value   = iso;
-    notesText.value  = '';
-    notesTitle.textContent = `Бележка — ${iso}`;
-  }
-  notesPanel.classList.add('show');
-  notesPanel.setAttribute('aria-hidden','false');
-  notesText.focus();
-}
-
-function closeNotes(){
-  notesPanel.classList.remove('show');
-  notesPanel.setAttribute('aria-hidden','true');
-  currentIso = null;
-  editingIndex = -1;
-}
-
-saveBtn.addEventListener('click', ()=>{
-  if (!window.IS_ADMIN) return;
-  if (!currentIso) return;
-
-  let a = notesStart.value || currentIso;
-  let b = notesEnd.value   || a;
-  if (a > b) [a,b] = [b,a];
-
-  const text = (notesText.value || '').trim();
-  const arr = [...currentRanges];
-
-  if (!text){
-    if (editingIndex !== -1){ arr.splice(editingIndex,1); }
-    saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
-    return;
-  }
-
-  const payload = { start:a, end:b, text };
-  if (editingIndex !== -1) arr[editingIndex] = payload;
-  else arr.push(payload);
-
-  saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
-  notesTitle.textContent = `Бележка — ${a} → ${b}`;
-});
-
-delBtn.addEventListener('click', ()=>{
-  if (!window.IS_ADMIN) return;
-  if (!currentIso) return;
-  const arr = [...currentRanges];
-  if (editingIndex !== -1){
-    arr.splice(editingIndex,1);
-    saveRangesRemote(arr).catch(console.error);
-  } else {
-    // няма диапазон – нищо за триене
-  }
-  notesText.value = '';
-});
-closeBtn.addEventListener('click', closeNotes);
-
-/* ===== Auth & Admin (без ранни селектори) ===== */
-window.IS_ADMIN = false;
-
-function setBadge(user, isAdmin){
-  const badgeEl = document.getElementById('adminBadge'); // намираме го динамично
-  if (!badgeEl){ return; }
-  if (!user){
-    badgeEl.textContent = 'Статус: гост';
-    return;
-  }
-  badgeEl.textContent = isAdmin ? `Админ: ${user.email}` : `Вход: ${user.email}`;
-}
-
-async function checkAdmin(uid){
-  const doc = await db.collection('meta').doc('admins').get();
-  const list = doc.exists ? (doc.data().list || []) : [];
-  return list.includes(uid);
-}
-
-auth.onAuthStateChanged(async (user)=>{
-  if (!user){
-    window.IS_ADMIN = false;
-    setBadge(null,false);
-    return;
-  }
-  const isAdmin = await checkAdmin(user.uid).catch(()=>false);
-  window.IS_ADMIN = !!isAdmin;
-  setBadge(user, isAdmin);
-});
-
-/* ===== Init ===== */
-renderCal();
-</script>
-
-<!-- ===== Admin Drawer Logic (след HTML на admin drawer) ===== -->
-<script>
-/* Отделен admin drawer + hotspot */
-const adminHotspot = document.getElementById('adminHotspot');
-const adminDrawer  = document.getElementById('adminDrawer');
-const adminClose   = document.getElementById('adminClose');
-
-function toggleAdminDrawer(force){
-  const willShow = typeof force === 'boolean' ? force : !adminDrawer.classList.contains('show');
-  adminDrawer.classList.toggle('show', willShow);
-  adminDrawer.setAttribute('aria-hidden', String(!willShow));
-}
-
-adminHotspot.addEventListener('click', (e)=>{ e.stopPropagation(); toggleAdminDrawer(true); });
-adminClose.addEventListener('click',  ()=> toggleAdminDrawer(false));
-
-document.addEventListener('click', (e)=>{
-  const clickInside = adminDrawer.contains(e.target) || adminHotspot.contains(e.target);
-  if (!clickInside) toggleAdminDrawer(false);
-});
-
-/* Слушатели за вход/изход — елементите вече съществуват */
-document.getElementById('adminLogin').addEventListener('click', async ()=>{
-  toggleAdminDrawer(false);
-  const email = prompt('Email за админ вход:');
-  if (!email) return;
-  const pass = prompt('Парола:');
-  if (!pass) return;
-  try{
-    await auth.signInWithEmailAndPassword(email, pass);
-  }catch(err){
-    alert('Грешен вход: ' + err.message);
-  }
-});
-
-document.getElementById('adminLogout').addEventListener('click', async ()=>{
-  toggleAdminDrawer(false);
-  await auth.signOut();
-});
-</script>
-   <!-- Невидим бутон долу вдясно -->
+  <!-- Невидим бутон долу вдясно (в края на сайта) -->
   <button class="admin-hotspot" id="adminHotspot" aria-label="Админ панел"></button>
+
+  <!-- ===== Основни скриптове ===== -->
+  <script>
+  /* ===== Firebase INIT (сложи своя config) ===== */
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
+    authDomain: "lifehouse-24137.firebaseapp.com",
+    projectId: "lifehouse-24137",
+    storageBucket: "lifehouse-24137.appspot.com",
+    messagingSenderId: "1017631883575",
+    appId: "1:1017631883575:web:bd44bb5b32bf21e34b1ab2"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+
+  /* ===== Drawer ===== */
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer');
+  burger.addEventListener('click',()=>{
+    const open = drawer.classList.toggle('show');
+    burger.setAttribute('aria-expanded', String(open));
+    drawer.setAttribute('aria-hidden', String(!open));
+  });
+  document.addEventListener('click', (e)=>{
+    if (!drawer.contains(e.target) && !burger.contains(e.target)) {
+      drawer.classList.remove('show');
+      burger.setAttribute('aria-expanded','false');
+    }
+  });
+
+  /* ===== Modal open/close ===== */
+  const calModal = document.getElementById('calModal');
+  ['openCalHotspot','openCalFromMenu','openCalCta']
+    .map(id=>document.getElementById(id))
+    .forEach(el=>el && el.addEventListener('click', (e)=>{
+      e.preventDefault();
+      calModal.classList.add('show');
+      calModal.setAttribute('aria-hidden','false');
+      drawer.classList.remove('show');
+    }));
+  document.getElementById('closeCal').addEventListener('click',closeCalendar);
+  function closeCalendar(){
+    calModal.classList.remove('show');
+    calModal.setAttribute('aria-hidden','true');
+    closeNotes();
+  }
+  calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ closeCalendar(); }});
+
+  /* ===== Calendar state ===== */
+  const grid = document.getElementById('grid');
+  const monthLabel = document.getElementById('monthLabel');
+  const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
+
+  /* ===== Remote busy for current month (doc per month) ===== */
+  let unsubBusy = null;
+  let currentBusySet = new Set(); // от Firestore
+
+  function busyDocRef(y,m){
+    return db.collection('state').doc(`busy_${y}_${m}`);
+  }
+
+  function attachBusyListener(y,m){
+    if (unsubBusy) unsubBusy();
+    unsubBusy = busyDocRef(y,m).onSnapshot(snap=>{
+      const arr = snap.exists ? (snap.data().list || []) : [];
+      currentBusySet = new Set(arr);
+      updateBusyClasses();
+    });
+  }
+  async function saveBusyRemote(set){
+    if (!window.IS_ADMIN) return;
+    await busyDocRef(state.y, state.m).set({ list: [...set] }, { merge:false });
+  }
+
+  /* ===== Notes ranges (global doc) ===== */
+  const rangesDoc = db.collection('state').doc('ranges');
+  let unsubRanges = null;
+  let currentRanges = []; // [{start,end,text},...]
+
+  function attachRangesListener(){
+    if (unsubRanges) return; // един слушател е достатъчен
+    unsubRanges = rangesDoc.onSnapshot(snap=>{
+      currentRanges = snap.exists ? (snap.data().list || []) : [];
+      // обнови индикаторите за бележки
+      markNoteDots();
+    });
+  }
+  async function saveRangesRemote(arr){
+    if (!window.IS_ADMIN) return;
+    await rangesDoc.set({ list: arr });
+  }
+  function hasRangeNote(iso){
+    return currentRanges.some(r => iso >= r.start && iso <= r.end);
+  }
+
+  /* ===== Render calendar ===== */
+  function renderCal(){
+    const y = state.y, m = state.m;
+    const d1 = new Date(y,m,1);
+    const startDow = (d1.getDay()+6)%7;
+    const daysInMonth = new Date(y,m+1,0).getDate();
+    const prevDays = new Date(y,m,0).getDate();
+
+    monthLabel.innerHTML = `<strong>${d1.toLocaleString('bg-BG',{month:'long'})}</strong> ${y}`;
+    let cells = '';
+    const dows = ['П','В','С','Ч','П','С','Н'].map(x=>`<div class="dow">${x}</div>`).join('');
+    cells += dows;
+
+    for(let i=0;i<startDow;i++){ cells += `<div class="day out">${prevDays - startDow + i + 1}</div>`; }
+    for(let day=1; day<=daysInMonth; day++){
+      const iso = new Date(y,m,day).toISOString().slice(0,10);
+      const cls = `day btn`;
+      cells += `<button class="${cls}" data-iso="${iso}" aria-label="Ден ${day}">${day}</button>`;
+    }
+    const cellsSoFar = 7 + startDow + daysInMonth;
+    const pad = 7*6 - (cellsSoFar - 7);
+    for(let i=0;i<pad;i++){ cells += `<div class="day out">${i+1}</div>`; }
+
+    grid.innerHTML = cells;
+
+    // клик за заетост (само админ)
+    grid.querySelectorAll('.day.btn').forEach(btn=>{
+      btn.addEventListener('click', (ev)=>{
+        if (!window.IS_ADMIN) return;
+        const cell = ev.currentTarget;
+        const iso = cell.dataset.iso;
+        const set = new Set(currentBusySet);
+        const nowBusy = !set.has(iso);
+        if (nowBusy) set.add(iso); else set.delete(iso);
+        currentBusySet = set;
+        updateBusyClasses();
+        saveBusyRemote(set).catch(console.error);
+      });
+
+      // дабълклик за бележки (видимо за админ, но всеки може да чете)
+      btn.addEventListener('dblclick',(ev)=>{
+        ev.preventDefault();
+        const iso = ev.currentTarget.dataset.iso;
+        openNotes(iso);
+      });
+    });
+
+    // слушатели
+    attachBusyListener(y,m);
+    attachRangesListener();
+
+    // първоначално маркиране
+    updateBusyClasses();
+    markNoteDots();
+  }
+
+  function updateBusyClasses(){
+    // маркира busy класовете върху текущата мрежа
+    grid.querySelectorAll('.day.btn').forEach(cell=>{
+      const iso = cell.dataset.iso;
+      cell.classList.toggle('busy', currentBusySet.has(iso));
+    });
+  }
+  function markNoteDots(){
+    grid.querySelectorAll('.day.btn').forEach(cell=>{
+      const iso = cell.dataset.iso;
+      const has = hasRangeNote(iso);
+      cell.classList.toggle('has-note', has);
+    });
+  }
+
+  /* ===== Month nav ===== */
+  document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
+  document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
+
+  /* ===== Notes panel logic ===== */
+  const notesPanel = document.getElementById('notesPanel');
+  const notesTitle = document.getElementById('notesTitle');
+  const notesText  = document.getElementById('notesText');
+  const saveBtn    = document.getElementById('saveNotes');
+  const delBtn     = document.getElementById('deleteNotes');
+  const closeBtn   = document.getElementById('closeNotes');
+  const notesStart = document.getElementById('notesStart');
+  const notesEnd   = document.getElementById('notesEnd');
+
+  let currentIso = null;
+  let editingIndex = -1;
+
+  function findRangeIndexForDate(iso){
+    for (let i=0;i<currentRanges.length;i++){
+      const r = currentRanges[i];
+      if (iso >= r.start && iso <= r.end) return i;
+    }
+    return -1;
+  }
+
+  function openNotes(iso){
+    currentIso = iso;
+    editingIndex = findRangeIndexForDate(iso);
+
+    if (editingIndex !== -1){
+      const r = currentRanges[editingIndex];
+      notesStart.value = r.start;
+      notesEnd.value   = r.end;
+      notesText.value  = r.text || '';
+      notesTitle.textContent = `Бележка — ${r.start} → ${r.end}`;
+    } else {
+      notesStart.value = iso;
+      notesEnd.value   = iso;
+      notesText.value  = '';
+      notesTitle.textContent = `Бележка — ${iso}`;
+    }
+    notesPanel.classList.add('show');
+    notesPanel.setAttribute('aria-hidden','false');
+    notesText.focus();
+  }
+
+  function closeNotes(){
+    notesPanel.classList.remove('show');
+    notesPanel.setAttribute('aria-hidden','true');
+    currentIso = null;
+    editingIndex = -1;
+  }
+
+  saveBtn.addEventListener('click', ()=>{
+    if (!window.IS_ADMIN) return;
+    if (!currentIso) return;
+
+    let a = notesStart.value || currentIso;
+    let b = notesEnd.value   || a;
+    if (a > b) [a,b] = [b,a];
+
+    const text = (notesText.value || '').trim();
+    const arr = [...currentRanges];
+
+    if (!text){
+      if (editingIndex !== -1){ arr.splice(editingIndex,1); }
+      saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
+      return;
+    }
+
+    const payload = { start:a, end:b, text };
+    if (editingIndex !== -1) arr[editingIndex] = payload;
+    else arr.push(payload);
+
+    saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
+    notesTitle.textContent = `Бележка — ${a} → ${b}`;
+  });
+
+  delBtn.addEventListener('click', ()=>{
+    if (!window.IS_ADMIN) return;
+    if (!currentIso) return;
+    const arr = [...currentRanges];
+    if (editingIndex !== -1){
+      arr.splice(editingIndex,1);
+      saveRangesRemote(arr).catch(console.error);
+    } else {
+      // няма диапазон – нищо за триене
+    }
+    notesText.value = '';
+  });
+  closeBtn.addEventListener('click', closeNotes);
+
+  /* ===== Auth & Admin (динамичен badge, без ранни селектори) ===== */
+  window.IS_ADMIN = false;
+
+  function setBadge(user, isAdmin){
+    const badgeEl = document.getElementById('adminBadge'); // намираме го динамично
+    if (!badgeEl){ return; }
+    if (!user){
+      badgeEl.textContent = 'Статус: гост';
+      return;
+    }
+    badgeEl.textContent = isAdmin ? `Админ: ${user.email}` : `Вход: ${user.email}`;
+  }
+
+  async function checkAdmin(uid){
+    const doc = await db.collection('meta').doc('admins').get();
+    const list = doc.exists ? (doc.data().list || []) : [];
+    return list.includes(uid);
+  }
+
+  auth.onAuthStateChanged(async (user)=>{
+    if (!user){
+      window.IS_ADMIN = false;
+      setBadge(null,false);
+      return;
+    }
+    const isAdmin = await checkAdmin(user.uid).catch(()=>false);
+    window.IS_ADMIN = !!isAdmin;
+    setBadge(user, isAdmin);
+  });
+
+  /* ===== Init ===== */
+  renderCal();
+  </script>
+
+  <!-- ===== Admin Drawer Logic (след HTML на admin drawer и бутона) ===== -->
+  <script>
+  /* Отделен admin drawer + hotspot */
+  const adminHotspot = document.getElementById('adminHotspot');
+  const adminDrawer  = document.getElementById('adminDrawer');
+  const adminClose   = document.getElementById('adminClose');
+
+  function toggleAdminDrawer(force){
+    const willShow = typeof force === 'boolean' ? force : !adminDrawer.classList.contains('show');
+    adminDrawer.classList.toggle('show', willShow);
+    adminDrawer.setAttribute('aria-hidden', String(!willShow));
+  }
+
+  adminHotspot.addEventListener('click', (e)=>{ e.stopPropagation(); toggleAdminDrawer(true); });
+  adminClose.addEventListener('click',  ()=> toggleAdminDrawer(false));
+
+  document.addEventListener('click', (e)=>{
+    const clickInside = adminDrawer.contains(e.target) || adminHotspot.contains(e.target);
+    if (!clickInside) toggleAdminDrawer(false);
+  });
+
+  /* Слушатели за вход/изход — елементите вече съществуват */
+  document.getElementById('adminLogin').addEventListener('click', async ()=>{
+    toggleAdminDrawer(false);
+    const email = prompt('Email за админ вход:');
+    if (!email) return;
+    const pass = prompt('Парола:');
+    if (!pass) return;
+    try{
+      await auth.signInWithEmailAndPassword(email, pass);
+    }catch(err){
+      alert('Грешен вход: ' + err.message);
+    }
+  });
+
+  document.getElementById('adminLogout').addEventListener('click', async ()=>{
+    toggleAdminDrawer(false);
+    await auth.signOut();
+  });
+  </script>
+
 </body>
- 
 </html>
