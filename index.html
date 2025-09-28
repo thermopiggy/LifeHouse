@@ -4,6 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Lifehouse Semkovo — Къща за гости</title>
+
+<!-- Firebase (compat build, лесно за вграждане) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
 <style>
   :root{
     --glass-bg:rgba(20,20,20,.45);
@@ -20,19 +26,16 @@
     color:#fff;
   }
 
-  /* NAV: fixed върху снимката, компактен (не full-width) */
+  /* NAV */
   .nav{
-    position:fixed;         
-    top:10px; left:10px;
-    z-index:120;
-    display:inline-flex;    
-    align-items:center; gap:12px;
-    padding:10px 14px; margin:0;
-    border-radius:14px; border:1px solid rgba(255,255,255,.25);
+    position:fixed; top:10px; left:10px; z-index:120;
+    display:inline-flex; align-items:center; gap:12px;
+    padding:10px 14px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
     background:var(--glass-bg); backdrop-filter:saturate(140%) blur(8px);
     max-width:calc(100vw - 20px);
   }
   .brand{font-weight:700;letter-spacing:.4px;white-space:nowrap}
+  .brand img {height:100%;max-height:48px;width:auto;display:block}
   .burger{
     width:42px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
     display:grid;place-items:center;background:transparent;color:#fff;cursor:pointer
@@ -44,21 +47,18 @@
 
   /* Drawer */
   .drawer{
-    position:fixed;
-    left:10px;
-    top:calc(10px + 48px);  
-    width:clamp(240px,70vw,360px);
-    max-height:70vh; overflow:auto;
-    padding:12px; border-radius:14px;
-    border:1px solid rgba(255,255,255,.25);
+    position:fixed; left:10px; top:calc(10px + 48px);
+    width:clamp(240px,70vw,360px); max-height:70vh; overflow:auto;
+    padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
     background:var(--glass-bg); backdrop-filter:saturate(140%) blur(10px);
     z-index:110; display:none;
   }
-  .drawer a{
+  .drawer a, .drawer button{
     display:block;color:var(--text);text-decoration:none;
     padding:14px 12px;margin:4px 0;border-radius:10px;font-size:16px;font-weight:600;
+    width:100%; text-align:left; background:transparent; border:none; cursor:pointer;
   }
-  .drawer a:hover{background:rgba(255,255,255,.1)}
+  .drawer a:hover, .drawer button:hover{background:rgba(255,255,255,.1)}
   .drawer.show{display:block}
 
   /* Headline */
@@ -73,55 +73,46 @@
   /* Calendar hotspot */
   .calendar-hotspot{
     position:absolute;
-    right:18.5%;
-    top:12.5%;
-    width:16%;
-    height:28%;
+    left:54.173%;
+    top:11.068%;
+    width:16.837%;
+    height:20.833%;
     cursor:pointer;
     background:transparent;
     border:none;
     outline:2px solid transparent;
     z-index:12;
   }
-  @media (max-width:600px){
-    .calendar-hotspot{
-      right:0;
-      left:auto;
-      top:5%;
-      width:22%;
-      height:26%;
-    }
+  @media (min-width:1024px){ .calendar-hotspot{ top:6%; } }
+  @media (max-width:1023px){
+    .calendar-hotspot{ left:auto; right:0; width:32%; }
   }
 
   /* Gallery hotspot */
   .gallery-hotspot{
     position:absolute;
-    left:20%;
+    left:42%;
     top:22%;
-    width:28%;
-    height:18%;
+    width:15%;
+    height:20%;
     cursor:pointer;
     background:transparent;
     border:none;
     outline:2px solid transparent;
     z-index:12;
   }
-  .gallery-hotspot:focus{
-    outline-color:rgba(255,255,255,.6);
-    outline-offset:2px;
-  }
+  .gallery-hotspot:focus{ outline-color:rgba(255,255,255,.6); outline-offset:2px; }
 
   /* Modal */
   .modal{
-    position:fixed;inset:0;background:rgba(0,0,0,.55);
-    display:none;align-items:center;justify-content:center;z-index:200;padding:14px
+    position:fixed; inset:0; background:rgba(0,0,0,.55);
+    display:none; align-items:center; justify-content:center; z-index:200; padding:14px
   }
   .modal.show{display:flex}
   .modal-card{
-    position:relative;
-    width:min(1100px,96vw);height:min(740px,92vh);padding:14px;
-    border-radius:18px;background:#111;box-shadow:0 10px 40px rgba(0,0,0,.5);
-    color:#eee;border:1px solid #2a2a2a;overflow:hidden;
+    position:relative; width:min(1100px,96vw); height:min(740px,92vh); padding:14px;
+    border-radius:18px; background:#111; box-shadow:0 10px 40px rgba(0,0,0,.5);
+    color:#eee; border:1px solid #2a2a2a; overflow:hidden;
   }
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
@@ -149,19 +140,18 @@
   section{min-height:60vh;padding:60px 18px;color:#fff}
   #about,#gallery,#contact{background:rgba(0,0,0,.35)}
   .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
-  .brand img {height:100%;max-height:48px;width:auto;display:block}
 
-  /* Busy mark as X */
+  /* Busy X */
   .day.busy { position: relative; background:#4b5563; color:transparent; }
   .day.busy::after { content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:18px; color:#fff; }
 
-  /* Note indicator (малка точка горе вдясно) */
+  /* Note indicator */
   .day.has-note::before{
     content:""; position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%;
     background:#ffd166; box-shadow:0 0 0 1px #2d2f33;
   }
 
-  /* Notes panel (tab) */
+  /* Notes panel */
   .notes-panel{
     position:absolute; right:-420px; top:0; height:100%; width:400px;
     background:#0f1216; border-left:1px solid #2a2f37; box-shadow:-10px 0 30px rgba(0,0,0,.35);
@@ -180,10 +170,59 @@
     .notes-panel.show{ right:0; }
   }
 
-  /* NEW: Ред с дати От/До */
   .notes-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .notes-row label{font-size:13px;color:#cfd3da;display:flex;align-items:center;gap:6px}
   .notes-row input[type="date"]{background:#0b0e13;color:#e7e9ee;border:1px solid #2a2f37;border-radius:10px;padding:6px 8px}
+
+  /* Малък индикатор за админ статуса */
+  .admin-badge{font-size:12px;opacity:.8;margin-left:8px}
+
+  /* Невидим бутон долу вдясно (фиксиран за целия сайт) */
+  .admin-hotspot{
+    position:fixed;
+    right:12px;
+    bottom:12px;
+    width:64px;
+    height:64px;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    z-index:250;
+    opacity:0; /* напълно невидим, но кликаем */
+  }
+  .admin-hotspot:focus-visible{
+    outline:2px dashed rgba(255,255,255,.6);
+    outline-offset:4px;
+  }
+
+  /* Admin drawer (отделен от основния drawer) */
+  .admin-drawer{
+    position:fixed;
+    right:12px;
+    bottom:12px;
+    z-index:240;
+    width:clamp(240px, 60vw, 360px);
+    max-height:70vh;
+    overflow:auto;
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.25);
+    background:var(--glass-bg);
+    backdrop-filter:saturate(140%) blur(10px);
+    display:none;
+    color:var(--text);
+  }
+  .admin-drawer.show{ display:block }
+
+  .admin-drawer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px }
+  .admin-close{ cursor:pointer; border:1px solid #333; background:#1b1b1b; color:#eee; border-radius:10px; padding:6px 10px }
+
+  .admin-drawer-body button{
+    display:block; width:100%; text-align:left; cursor:pointer;
+    border:none; background:transparent; color:var(--text);
+    padding:12px; border-radius:10px; font-weight:600;
+  }
+  .admin-drawer-body button:hover{ background:rgba(255,255,255,.1) }
 </style>
 </head>
 <body>
@@ -194,7 +233,17 @@
       <a href="#home" class="brand">
         <img src="lifehouselogo.png" alt="LifeHouse Semkovo" />
       </a>
+
       <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
+
+      <!-- ПИН към Google Maps, до хамбургера -->
+      <a href="https://www.google.com/maps/place/Life+House/@42.0479645,23.5272436,142m/data=!3m1!1e3!4m17!1m7!3m6!1s0x14ab05c2b76ace83:0x9ce278f0d33929d!2sSemkovo+Mountain+Resort!8m2!3d42.0446093!4d23.5258354!16s%2Fg%2F11jm7lr6cv!3m8!1s0x14ab05371801afd1:0x1abbb9a791e4b886!5m2!4m1!1i2!8m2!3d42.0481271!4d23.5274758!16s%2Fg%2F11f8mg2m1x?entry=ttu"
+         target="_blank" aria-label="Google Maps">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16" style="color:#ffd166;cursor:pointer">
+          <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+        </svg>
+      </a>
+
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
         <a href="#gallery" role="menuitem">Галерия</a>
@@ -209,12 +258,9 @@
       <a class="btn-primary" id="openCalCta" href="#">свободни дати</a>
     </div>
 
-    <!-- Hotspot върху календара -->
+    <!-- Hotspots -->
     <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
-
-    <!-- Hotspot върху снимките (галерия) -->
     <a href="#gallery" class="gallery-hotspot" aria-label="Отвори галерията"></a>
-
   </div>
 
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
@@ -237,14 +283,13 @@
         <div class="grid" id="grid"></div>
       </div>
 
-      <!-- Notes panel (TAB) -->
+      <!-- Notes panel -->
       <aside class="notes-panel" id="notesPanel" aria-hidden="true">
         <div class="notes-head">
           <div class="notes-title" id="notesTitle">Бележка</div>
           <button class="notes-close" id="closeNotes">Затвори</button>
         </div>
 
-        <!-- NEW: диапазон От / До -->
         <div class="notes-row">
           <label>От: <input type="date" id="notesStart"></label>
           <label>До: <input type="date" id="notesEnd"></label>
@@ -259,8 +304,38 @@
     </div>
   </div>
 
+  <!-- Невидим бутон долу вдясно -->
+  <button class="admin-hotspot" id="adminHotspot" aria-label="Админ панел"></button>
+
+  <!-- Отделен ADMIN drawer -->
+  <div class="admin-drawer" id="adminDrawer" aria-hidden="true">
+    <div class="admin-drawer-head">
+      <strong>Админ панел</strong>
+      <button class="admin-close" id="adminClose" aria-label="Затвори">×</button>
+    </div>
+    <div class="admin-drawer-body">
+      <button id="adminLogin">Админ вход</button>
+      <button id="adminLogout">Изход</button>
+      <div id="adminBadge" class="admin-badge">Статус: гост</div>
+    </div>
+  </div>
+
 <script>
-/* Drawer */
+/* ===== Firebase INIT (сложи своя config) ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
+  authDomain: "lifehouse-24137.firebaseapp.com",
+  projectId: "lifehouse-24137",
+  storageBucket: "lifehouse-24137.appspot.com",
+  messagingSenderId: "1017631883575",
+  appId: "1:1017631883575:web:bd44bb5b32bf21e34b1ab2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+/* ===== Drawer ===== */
 const burger = document.getElementById('burger');
 const drawer = document.getElementById('drawer');
 burger.addEventListener('click',()=>{
@@ -275,7 +350,7 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-/* Calendar modal open/close */
+/* ===== Modal open/close ===== */
 const calModal = document.getElementById('calModal');
 ['openCalHotspot','openCalFromMenu','openCalCta']
   .map(id=>document.getElementById(id))
@@ -293,62 +368,60 @@ function closeCalendar(){
 }
 calModal.addEventListener('click',(e)=>{ if(e.target===calModal){ closeCalendar(); }});
 
-/* Calendar state */
+/* ===== Calendar state ===== */
 const grid = document.getElementById('grid');
 const monthLabel = document.getElementById('monthLabel');
 const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
 
-/* Storage keys */
-const busyKey = () => `lifehouse-busy:${state.y}-${state.m}`;
-const notesKey = (iso) => `lifehouse-notes:${iso}`;
+/* ===== Remote busy for current month (doc per month) ===== */
+let unsubBusy = null;
+let currentBusySet = new Set(); // от Firestore
 
-/* Busy helpers */
-function loadBusy() {
-  const raw = localStorage.getItem(busyKey());
-  try { return new Set(raw ? JSON.parse(raw) : []); } catch { return new Set(); }
-}
-function saveBusy(set){
-  localStorage.setItem(busyKey(), JSON.stringify([...set]));
+function busyDocRef(y,m){
+  return db.collection('state').doc(`busy_${y}_${m}`);
 }
 
-/* Notes helpers (legacy single-day) */
-function loadNote(iso){
-  return localStorage.getItem(notesKey(iso)) || '';
+function attachBusyListener(y,m){
+  if (unsubBusy) unsubBusy();
+  unsubBusy = busyDocRef(y,m).onSnapshot(snap=>{
+    const arr = snap.exists ? (snap.data().list || []) : [];
+    currentBusySet = new Set(arr);
+    updateBusyClasses();
+  });
 }
-function saveNote(iso, text){
-  if (text && text.trim().length){
-    localStorage.setItem(notesKey(iso), text.trim());
-  } else {
-    localStorage.removeItem(notesKey(iso));
-  }
+async function saveBusyRemote(set){
+  if (!window.IS_ADMIN) return;
+  await busyDocRef(state.y, state.m).set({ list: [...set] }, { merge:false });
 }
 
-/* NEW: Notes ranges (start–end) */
-const rangesStorageKey = 'lifehouse-noteRanges';
-function loadRanges(){
-  try { return JSON.parse(localStorage.getItem(rangesStorageKey)) || []; }
-  catch { return []; }
-}
-function saveRanges(arr){ localStorage.setItem(rangesStorageKey, JSON.stringify(arr)); }
-function includesIso(iso, a, b){ return iso >= a && iso <= b; }
-function findRangeIndexForDate(iso){
-  const arr = loadRanges();
-  for (let i=0;i<arr.length;i++){
-    const r = arr[i];
-    if (includesIso(iso, r.start, r.end)) return i;
-  }
-  return -1;
-}
-function hasRangeNote(iso){ return findRangeIndexForDate(iso) !== -1; }
+/* ===== Notes ranges (global doc) ===== */
+const rangesDoc = db.collection('state').doc('ranges');
+let unsubRanges = null;
+let currentRanges = []; // [{start,end,text},...]
 
-/* Render calendar */
+function attachRangesListener(){
+  if (unsubRanges) return; // един слушател е достатъчен
+  unsubRanges = rangesDoc.onSnapshot(snap=>{
+    currentRanges = snap.exists ? (snap.data().list || []) : [];
+    // обнови индикаторите за бележки
+    markNoteDots();
+  });
+}
+async function saveRangesRemote(arr){
+  if (!window.IS_ADMIN) return;
+  await rangesDoc.set({ list: arr });
+}
+function hasRangeNote(iso){
+  return currentRanges.some(r => iso >= r.start && iso <= r.end);
+}
+
+/* ===== Render calendar ===== */
 function renderCal(){
   const y = state.y, m = state.m;
   const d1 = new Date(y,m,1);
   const startDow = (d1.getDay()+6)%7;
   const daysInMonth = new Date(y,m+1,0).getDate();
   const prevDays = new Date(y,m,0).getDate();
-  const busy = loadBusy();
 
   monthLabel.innerHTML = `<strong>${d1.toLocaleString('bg-BG',{month:'long'})}</strong> ${y}`;
   let cells = '';
@@ -358,8 +431,7 @@ function renderCal(){
   for(let i=0;i<startDow;i++){ cells += `<div class="day out">${prevDays - startDow + i + 1}</div>`; }
   for(let day=1; day<=daysInMonth; day++){
     const iso = new Date(y,m,day).toISOString().slice(0,10);
-    const hasNote = hasRangeNote(iso) || !!loadNote(iso); /* NEW */
-    const cls = `day btn ${busy.has(iso)?'busy':''} ${hasNote?'has-note':''}`;
+    const cls = `day btn`;
     cells += `<button class="${cls}" data-iso="${iso}" aria-label="Ден ${day}">${day}</button>`;
   }
   const cellsSoFar = 7 + startDow + daysInMonth;
@@ -368,54 +440,83 @@ function renderCal(){
 
   grid.innerHTML = cells;
 
-  /* Click = toggle busy (admin only) */
+  // клик за заетост (само админ)
   grid.querySelectorAll('.day.btn').forEach(btn=>{
     btn.addEventListener('click', (ev)=>{
-      if (localStorage.getItem('ADMIN_OK')!=='1') return;
+      if (!window.IS_ADMIN) return;
       const cell = ev.currentTarget;
       const iso = cell.dataset.iso;
-      const nowBusy = !cell.classList.contains('busy');
-      const busySet = loadBusy();
-      cell.classList.toggle('busy', nowBusy);
-      if (nowBusy) busySet.add(iso); else busySet.delete(iso);
-      saveBusy(busySet);
+      const set = new Set(currentBusySet);
+      const nowBusy = !set.has(iso);
+      if (nowBusy) set.add(iso); else set.delete(iso);
+      currentBusySet = set;
+      updateBusyClasses();
+      saveBusyRemote(set).catch(console.error);
     });
 
-    /* Double click = open notes tab */
+    // дабълклик за бележки (видимо за админ, но всеки може да чете)
     btn.addEventListener('dblclick',(ev)=>{
       ev.preventDefault();
       const iso = ev.currentTarget.dataset.iso;
       openNotes(iso);
     });
   });
+
+  // слушатели
+  attachBusyListener(y,m);
+  attachRangesListener();
+
+  // първоначално маркиране
+  updateBusyClasses();
+  markNoteDots();
 }
 
-/* Month nav */
+function updateBusyClasses(){
+  // маркира busy класовете върху текущата мрежа
+  grid.querySelectorAll('.day.btn').forEach(cell=>{
+    const iso = cell.dataset.iso;
+    cell.classList.toggle('busy', currentBusySet.has(iso));
+  });
+}
+function markNoteDots(){
+  grid.querySelectorAll('.day.btn').forEach(cell=>{
+    const iso = cell.dataset.iso;
+    const has = hasRangeNote(iso);
+    cell.classList.toggle('has-note', has);
+  });
+}
+
+/* ===== Month nav ===== */
 document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
 document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
 
-/* Notes panel logic */
+/* ===== Notes panel logic ===== */
 const notesPanel = document.getElementById('notesPanel');
 const notesTitle = document.getElementById('notesTitle');
 const notesText  = document.getElementById('notesText');
 const saveBtn    = document.getElementById('saveNotes');
 const delBtn     = document.getElementById('deleteNotes');
 const closeBtn   = document.getElementById('closeNotes');
-
-/* NEW: range inputs */
 const notesStart = document.getElementById('notesStart');
 const notesEnd   = document.getElementById('notesEnd');
 
 let currentIso = null;
-let editingIndex = -1; // кой диапазон редактираме (ако има)
+let editingIndex = -1;
+
+function findRangeIndexForDate(iso){
+  for (let i=0;i<currentRanges.length;i++){
+    const r = currentRanges[i];
+    if (iso >= r.start && iso <= r.end) return i;
+  }
+  return -1;
+}
 
 function openNotes(iso){
   currentIso = iso;
-  const arr = loadRanges();
   editingIndex = findRangeIndexForDate(iso);
 
   if (editingIndex !== -1){
-    const r = arr[editingIndex];
+    const r = currentRanges[editingIndex];
     notesStart.value = r.start;
     notesEnd.value   = r.end;
     notesText.value  = r.text || '';
@@ -423,8 +524,7 @@ function openNotes(iso){
   } else {
     notesStart.value = iso;
     notesEnd.value   = iso;
-    // съвместимост със старите еднодневни бележки
-    notesText.value  = loadNote(iso);
+    notesText.value  = '';
     notesTitle.textContent = `Бележка — ${iso}`;
   }
   notesPanel.classList.add('show');
@@ -439,84 +539,119 @@ function closeNotes(){
   editingIndex = -1;
 }
 
-/* Save / Delete / Close (диапазони + legacy) */
 saveBtn.addEventListener('click', ()=>{
+  if (!window.IS_ADMIN) return;
   if (!currentIso) return;
+
   let a = notesStart.value || currentIso;
   let b = notesEnd.value   || a;
   if (a > b) [a,b] = [b,a];
 
-  const text = notesText.value.trim();
-  const arr = loadRanges();
+  const text = (notesText.value || '').trim();
+  const arr = [...currentRanges];
 
   if (!text){
-    if (editingIndex !== -1){
-      arr.splice(editingIndex,1);
-      saveRanges(arr);
-    } else {
-      saveNote(currentIso,'');
-    }
-    renderCal();
+    if (editingIndex !== -1){ arr.splice(editingIndex,1); }
+    saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
     return;
   }
 
   const payload = { start:a, end:b, text };
-  if (editingIndex !== -1) {
-    arr[editingIndex] = payload;
-  } else {
-    arr.push(payload);
-    // чистим стара еднодневна бележка, ако е имало
-    localStorage.removeItem(notesKey(currentIso));
-    editingIndex = findRangeIndexForDate(currentIso);
-  }
-  saveRanges(arr);
+  if (editingIndex !== -1) arr[editingIndex] = payload;
+  else arr.push(payload);
+
+  saveRangesRemote(arr).then(()=>{ /* ok */ }).catch(console.error);
   notesTitle.textContent = `Бележка — ${a} → ${b}`;
-  renderCal();
 });
 
 delBtn.addEventListener('click', ()=>{
+  if (!window.IS_ADMIN) return;
   if (!currentIso) return;
-  const arr = loadRanges();
+  const arr = [...currentRanges];
   if (editingIndex !== -1){
     arr.splice(editingIndex,1);
-    saveRanges(arr);
+    saveRangesRemote(arr).catch(console.error);
   } else {
-    saveNote(currentIso,''); // стара еднодневна
+    // няма диапазон – нищо за триене
   }
   notesText.value = '';
-  renderCal();
 });
 closeBtn.addEventListener('click', closeNotes);
 
-/* Autosave on input (диапазони) */
-let autosaveTimer = null;
-notesText.addEventListener('input', ()=>{
-  if (!currentIso) return;
-  clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(()=>{
-    let a = notesStart.value || currentIso;
-    let b = notesEnd.value   || a;
-    if (a > b) [a,b] = [b,a];
+/* ===== Auth & Admin (без ранни селектори) ===== */
+window.IS_ADMIN = false;
 
-    const text = notesText.value.trim();
-    if (!text) return; // не създаваме празни записи
+function setBadge(user, isAdmin){
+  const badgeEl = document.getElementById('adminBadge'); // намираме го динамично
+  if (!badgeEl){ return; }
+  if (!user){
+    badgeEl.textContent = 'Статус: гост';
+    return;
+  }
+  badgeEl.textContent = isAdmin ? `Админ: ${user.email}` : `Вход: ${user.email}`;
+}
 
-    const arr = loadRanges();
-    const payload = { start:a, end:b, text };
+async function checkAdmin(uid){
+  const doc = await db.collection('meta').doc('admins').get();
+  const list = doc.exists ? (doc.data().list || []) : [];
+  return list.includes(uid);
+}
 
-    if (editingIndex !== -1) arr[editingIndex] = payload;
-    else {
-      arr.push(payload);
-      localStorage.removeItem(notesKey(currentIso));
-      editingIndex = findRangeIndexForDate(currentIso);
-    }
-    saveRanges(arr);
-    renderCal();
-  }, 600);
+auth.onAuthStateChanged(async (user)=>{
+  if (!user){
+    window.IS_ADMIN = false;
+    setBadge(null,false);
+    return;
+  }
+  const isAdmin = await checkAdmin(user.uid).catch(()=>false);
+  window.IS_ADMIN = !!isAdmin;
+  setBadge(user, isAdmin);
 });
 
-/* Init */
+/* ===== Init ===== */
 renderCal();
 </script>
+
+<!-- ===== Admin Drawer Logic (след HTML на admin drawer) ===== -->
+<script>
+/* Отделен admin drawer + hotspot */
+const adminHotspot = document.getElementById('adminHotspot');
+const adminDrawer  = document.getElementById('adminDrawer');
+const adminClose   = document.getElementById('adminClose');
+
+function toggleAdminDrawer(force){
+  const willShow = typeof force === 'boolean' ? force : !adminDrawer.classList.contains('show');
+  adminDrawer.classList.toggle('show', willShow);
+  adminDrawer.setAttribute('aria-hidden', String(!willShow));
+}
+
+adminHotspot.addEventListener('click', (e)=>{ e.stopPropagation(); toggleAdminDrawer(true); });
+adminClose.addEventListener('click',  ()=> toggleAdminDrawer(false));
+
+document.addEventListener('click', (e)=>{
+  const clickInside = adminDrawer.contains(e.target) || adminHotspot.contains(e.target);
+  if (!clickInside) toggleAdminDrawer(false);
+});
+
+/* Слушатели за вход/изход — елементите вече съществуват */
+document.getElementById('adminLogin').addEventListener('click', async ()=>{
+  toggleAdminDrawer(false);
+  const email = prompt('Email за админ вход:');
+  if (!email) return;
+  const pass = prompt('Парола:');
+  if (!pass) return;
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+  }catch(err){
+    alert('Грешен вход: ' + err.message);
+  }
+});
+
+document.getElementById('adminLogout').addEventListener('click', async ()=>{
+  toggleAdminDrawer(false);
+  await auth.signOut();
+});
+</script>
+
 </body>
 </html>
