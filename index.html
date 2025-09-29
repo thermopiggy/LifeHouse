@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lifehouse Semkovo — Къща за гости</title>
+
+<!-- Firebase (compat build) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<style>
+  :root{
+    --glass-bg:rgba(20,20,20,.45);
+    --text:#f5f5f5;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+  /* Fullscreen hero with background */
+  .hero{
+    position:relative;min-height:100%;
+    background:url("lifehouse-semkovo.jpg") center/cover no-repeat fixed;
+    color:#fff;
+    padding-top:78px; /* пространство за фиксирания NAV */
+  }
+
+  /* NAV — цялата ширина, бутоните вдясно на десктоп */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:120;
+    display:flex; align-items:center; gap:12px;
+    padding:10px 18px;
+    border-bottom:1px solid rgba(255,255,255,.25);
+    background:var(--glass-bg); backdrop-filter:saturate(140%) blur(8px);
+    width:100%;
+  }
+  .brand{font-weight:700;letter-spacing:.4px;white-space:nowrap;display:flex;align-items:center}
+  .brand img {height:48px;width:auto;display:block}
+
+  /* Линковете, които бяха в drawer-а */
+  .nav-links{
+    display:none;             /* скрити на мобилно */
+    gap:18px;
+    margin-left:auto;         /* тласка ги плътно вдясно */
+    align-items:center;
+  }
+  .nav-links a{
+    color:var(--text); text-decoration:none; font-weight:600;
+    padding:8px 12px; border-radius:10px;
+  }
+  .nav-links a:hover{ background:rgba(255,255,255,.1); }
+
+  /* Икона за Google Maps в NAV (ползва се и на мобилно) */
+  .maps-pin{
+    display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:10px;
+    border:1px solid rgba(255,255,255,.25);
+    background:transparent; color:#ffd166; cursor:pointer;
+    margin-left:auto; /* докато на мобилно няма .nav-links */
+  }
+
+  /* Burger (само мобилно) */
+  .burger{
+    width:42px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
+    display:none; place-items:center;background:transparent;color:#fff;cursor:pointer
+  }
+  .burger span,.burger::before,.burger::after{
+    content:"";display:block;width:20px;height:2px;background:#fff;border-radius:2px
+  }
+  .burger span{margin:4px 0}
+
+  /* Drawer (мобилно меню) */
+  .drawer{
+    position:fixed; left:10px; top:calc(10px + 48px);
+    width:clamp(240px,70vw,360px); max-height:70vh; overflow:auto;
+    padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
+    background:var(--glass-bg); backdrop-filter:saturate(140%) blur(10px);
+    z-index:110; display:none;
+  }
+  .drawer a, .drawer button{
+    display:block;color:var(--text);text-decoration:none;
+    padding:14px 12px;margin:4px 0;border-radius:10px;font-size:16px;font-weight:600;
+    width:100%; text-align:left; background:transparent; border:none; cursor:pointer;
+  }
+  .drawer a:hover, .drawer button:hover{background:rgba(255,255,255,.1)}
+  .drawer.show{display:block}
+
+  /* На мобилно: бургерът е видим, бутоните са в drawer */
+  @media (max-width:768px){
+    .burger{ display:grid; }
+    .nav-links{ display:none; }
+    .maps-pin{ margin-left:auto; }
+  }
+  /* На десктоп: махаме бургер/дроуър, показваме хоризонталните бутони вдясно */
+  @media (min-width:769px){
+    .burger, .drawer{ display:none !important; }
+    .nav-links{ display:flex; }
+    .maps-pin{ margin-left:0; } /* ще стои преди .nav-links */
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero" id="home">
+    <!-- NAV -->
+    <nav class="nav">
+      <a href="#home" class="brand">
+        <img src="lifehouselogo.png" alt="LifeHouse Semkovo" />
+      </a>
+
+      <!-- ПИН към Google Maps -->
+      <a class="maps-pin" href="https://www.google.com/maps/place/Life+House/" target="_blank" aria-label="Google Maps">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+        </svg>
+      </a>
+
+      <!-- Хоризонтални бутони вдясно (на десктоп) -->
+      <div class="nav-links">
+        <a href="#" id="openCalFromMenu">Календар</a>
+        <a href="#gallery">Галерия</a>
+        <a href="#about">За нас</a>
+      </div>
+
+      <!-- Бургер/дроуър (остава за мобилно) -->
+      <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
+      <div class="drawer" id="drawer" role="menu" aria-hidden="true">
+        <a href="#" id="openCalFromMenuDrawer" role="menuitem">Календар</a>
+        <a href="#gallery" role="menuitem">Галерия</a>
+        <a href="#about" role="menuitem">За нас</a>
+      </div>
+    </nav>
+
+    <!-- Callout -->
+    <div class="headline">
+      <h1>Къща за гости LifeHouse Semkovo</h1>
+      <p>Домашен уют с модерни удобства на крачка от дивата природа...</p>
+      <a class="btn-primary" id="openCalCta" href="#">свободни дати</a>
+    </div>
+
+  </div>
+
+  <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
+  <section id="gallery"><h2>Галерия</h2><p>Снимки и видео ще добавим тук.</p></section>
+  <section id="contact"><h2>Контакти</h2><p>Тел: +359988988623 — booking@lifehouse.bg</p></section>
+
+</body>
+</html>
