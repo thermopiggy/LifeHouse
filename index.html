@@ -557,13 +557,13 @@ background: rgba(50,50,50,.35);
       });
 
     // дабълклик за бележки (само за админ)
-btn.addEventListener('dblclick',(ev)=>{
-  ev.preventDefault();
-  if (!window.IS_ADMIN) return;
-  const iso = ev.currentTarget.dataset.iso;
-  openNotes(iso);
+  btn.addEventListener('dblclick',(ev)=>{
+    ev.preventDefault();
+    if (!window.IS_ADMIN) return;
+    const iso = ev.currentTarget.dataset.iso;
+    openNotes(iso);
+  }); 
 });
-
 
     attachBusyListener(y,m);
     attachRangesListener();
