@@ -70,38 +70,6 @@
   .headline h1{margin:0 0 6px 0;font-size:28px}
   .headline p{margin:0;font-size:14px;opacity:.95}
 
-  /* Calendar hotspot */
-  .calendar-hotspot{
-    position:absolute;
-    left:54.173%;
-    top:11.068%;
-    width:16.837%;
-    height:20.833%;
-    cursor:pointer;
-    background:transparent;
-    border:none;
-    outline:2px solid transparent;
-    z-index:12;
-  }
-  @media (min-width:1024px){ .calendar-hotspot{ top:6%; } }
-  @media (max-width:1023px){
-    .calendar-hotspot{ left:auto; right:0; width:32%; }
-  }
-
-  /* Gallery hotspot */
-  .gallery-hotspot{
-    position:absolute;
-    left:36%;
-    top:22%;
-    width:15%;
-    height:20%;
-    cursor:pointer;
-    background:transparent;
-    border:none;
-    outline:2px solid transparent;
-    z-index:12;
-  }
-  .gallery-hotspot:focus{ outline-color:rgba(255,255,255,.6); outline-offset:2px; }
 
   /* Sections */
   section{min-height:60vh;padding:60px 18px;color:#fff}
@@ -258,9 +226,6 @@
       <a class="btn-primary" id="openCalCta" href="#">свободни дати</a>
     </div>
 
-    <!-- Hotspots -->
-    <button class="calendar-hotspot" id="openCalHotspot" aria-label="Отвори календара"></button>
-    <a href="#gallery" class="gallery-hotspot" aria-label="Отвори галерията"></a>
   </div>
 
   <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
@@ -614,6 +579,7 @@
 
   auth.onAuthStateChanged(async (user)=>{
     if (!user){
+    
       window.IS_ADMIN = false;
       setBadge(null,false);
       return;
