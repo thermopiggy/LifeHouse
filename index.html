@@ -27,13 +27,7 @@
   }
 
   /* NAV */
-  .nav{
-    position:fixed; top:10px; left:10px; z-index:120;
-    display:inline-flex; align-items:center; gap:12px;
-    padding:10px 14px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
-    background:var(--glass-bg); backdrop-filter:saturate(140%) blur(8px);
-    max-width:calc(100vw - 20px);
-  }
+ 
   .brand{font-weight:700;letter-spacing:.4px;white-space:nowrap}
   .brand img {height:100%;max-height:48px;width:auto;display:block}
   .burger{
@@ -192,6 +186,11 @@
     padding:12px; border-radius:10px; font-weight:600;
   }
   .admin-drawer-body button:hover{ background:rgba(255,255,255,.1) }
+  nav {
+  width: calc(100% - 28px); /* удължава до краищата с по 14px от всяка страна */
+  margin: 0 14px;
+}
+
 </style>
 </head>
 <body>
