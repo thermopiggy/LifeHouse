@@ -111,9 +111,14 @@
   .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
   .legend .box.busy{background:#4b5563;border-color:#52575f}
 
-  /* Busy X */
-  .day.busy { position: relative; background:#4b5563; color:transparent; }
-  .day.busy::after { content:"✕"; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:18px; color:#fff; }
+  /* Заети дни без Х, с по-тъмен фон */
+.day.busy{
+  position:relative;
+  background:#4b5563;
+  color:#e8eaee;  /* видимо число */
+}
+.day.busy::after{ content:none; }
+
 
   /* Note indicator */
   .day.has-note::before{
