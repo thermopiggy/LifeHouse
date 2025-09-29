@@ -556,13 +556,14 @@ background: rgba(50,50,50,.35);
         saveBusyRemote(set).catch(console.error);
       });
 
-      // дабълклик за бележки
-      btn.addEventListener('dblclick',(ev)=>{
-        ev.preventDefault();
-        const iso = ev.currentTarget.dataset.iso;
-        openNotes(iso);
-      });
-    });
+    // дабълклик за бележки (само за админ)
+btn.addEventListener('dblclick',(ev)=>{
+  ev.preventDefault();
+  if (!window.IS_ADMIN) return;
+  const iso = ev.currentTarget.dataset.iso;
+  openNotes(iso);
+});
+
 
     attachBusyListener(y,m);
     attachRangesListener();
@@ -576,12 +577,13 @@ background: rgba(50,50,50,.35);
       cell.classList.toggle('busy', currentBusySet.has(iso));
     });
   }
-  function markNoteDots(){
-    grid.querySelectorAll('.day.btn').forEach(cell=>{
-      const iso = cell.dataset.iso;
-      cell.classList.toggle('has-note', hasRangeNote(iso));
-    });
-  }
+function markNoteDots(){
+  grid.querySelectorAll('.day.btn').forEach(cell=>{
+    const iso = cell.dataset.iso;
+    cell.classList.toggle('has-note', window.IS_ADMIN && hasRangeNote(iso));
+  });
+}
+
 
   /* ===== Month nav ===== */
   document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
