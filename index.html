@@ -245,6 +245,25 @@ background: rgba(50,50,50,.35);
   padding:60px 18px;
   min-height:40vh;
 }
+#about{
+  background:rgba(0,0,0,.35);
+  color:#fff;
+  padding:60px 18px;
+}
+.about-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:20px;
+}
+.about-text{flex:1; min-width:250px;}
+.about-img{flex:1; min-width:250px; text-align:center;}
+.about-img img{max-width:100%; height:auto; border-radius:12px;}
+
+@media (max-width:768px){
+  .about-wrap{flex-direction:column;}
+  .about-img{order:-1;} /* картинката да е над текста */
+}
 
 </style>
 </head>
@@ -292,7 +311,18 @@ background: rgba(50,50,50,.35);
 
   </div>
 
-  <section id="about"><h2>За нас</h2><p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p></section>
+ <section id="about">
+  <div class="about-wrap">
+    <div class="about-text">
+      <h2>За нас</h2>
+      <p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p>
+    </div>
+    <div class="about-img">
+      <img src="zanas.png" alt="Къщата LifeHouse Semkovo">
+    </div>
+  </div>
+</section>
+
   
   <!-- нова секция Правила за отказ от резервация -->
   <section id="rules">
