@@ -301,6 +301,15 @@
     margin: 0;     /* премахваме auto марджини */
   }
 }
+.about-img img {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.about-img img.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 
 </style>
@@ -863,6 +872,21 @@
       <img src="medal.png" alt="Отличие LifeHouse Semkovo">
     </div>
   </footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const img = document.querySelector(".about-img img");
+  if (!img) return;
+  const observer = new IntersectionObserver((entries, o) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        o.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  observer.observe(img);
+});
+</script>
 
 </body>
 </html>
