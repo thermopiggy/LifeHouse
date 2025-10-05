@@ -308,6 +308,14 @@
   opacity: 1;
   transform: translateY(0);
 }
+/* Скрол на календара на мобилно */
+@media (max-width: 768px) {
+  .cal {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+}
 
 
 </style>
