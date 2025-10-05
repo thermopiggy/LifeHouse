@@ -316,6 +316,10 @@
     touch-action: pan-y;
   }
 }
+/* Точките за бележки да се виждат само за админ */
+body:not(.admin) .day.has-note::before {
+  content: none !important;
+}
 
 
 </style>
@@ -892,6 +896,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { threshold: 0.2 });
   observer.observe(img);
 });
+  auth.onAuthStateChanged(async (user)=>{
+  if (!user){
+    window.IS_ADMIN = false;
+    document.body.classList.remove('admin');
+    setBadge(null,false);
+    return;
+  }
+  const isAdmin = await checkAdmin(user);
+  window.IS_ADMIN = !!isAdmin;
+  document.body.classList.toggle('admin', isAdmin);
+  setBadge(user, isAdmin);
+});
+
 </script>
 
 </body>
