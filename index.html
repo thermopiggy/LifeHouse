@@ -320,6 +320,28 @@
 body:not(.admin) .day.has-note::before {
   content: none !important;
 }
+/* Карти за отзиви */
+.reviews-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.review-card {
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 18px;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.review-author {
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: right;
+}
 
 
 </style>
@@ -395,11 +417,24 @@ body:not(.admin) .day.has-note::before {
   </section>
 
   <!-- нова секция Отзиви -->
-  <section id="reviews">
-    <h2>Отзиви</h2>
-    <p>„Страхотно място! Уют и спокойствие.“ – Иван<br>
-       „Природа, чист въздух и гостоприемен домакин.“ – Мария</p>
-  </section>
+ <section id="reviews">
+  <h2>Отзиви</h2>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <p>„Страхотно място! Уют и спокойствие.“</p>
+      <div class="review-author">– Иван</div>
+    </div>
+    <div class="review-card">
+      <p>„Природа, чист въздух и гостоприемен домакин.“</p>
+      <div class="review-author">– Мария</div>
+    </div>
+    <div class="review-card">
+      <p>„Перфектна локация и модерни удобства – силно препоръчвам!“</p>
+      <div class="review-author">– Георги</div>
+    </div>
+  </div>
+</section>
+
 
   <section id="gallery"><h2>Гаалерия</h2><p>Снимки и видео ще добавим тук.</p></section>
   <section id="contact"><h2></h2><p>Тел: +359988988623    booking@lifehouse.bg</p></section>
