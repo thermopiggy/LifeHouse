@@ -365,12 +365,16 @@ body:not(.admin) .day.has-note::before {
   background: #2c3138 !important;
   border-color: #3a414a !important;
 }
-/* Дни извън текущия месец (замъглени и неактивни) */
+/* Дни извън текущия месец – като свободните, но по-замъглени */
 .day.out {
-  opacity: 0.35;
-  filter: blur(1px);
+  background: #e6e9ee !important;  /* същия цвят като свободните */
+  color: #111 !important;
+  border-color: #cfd6df !important;
+  opacity: 0.25;
+  filter: blur(2px);
   pointer-events: none;
 }
+
 
 </style>
 </head>
