@@ -377,15 +377,21 @@ body:not(.admin) .day.has-note::before {
 .footer-signature {
   position: fixed;
   bottom: 6px;
-  right: 10px;
+  left: 10px;
   font-size: 12px;
-  color: #aaa;
-  opacity: 0.8;
+  color: #666;
+  opacity: 0.9;
+  text-decoration: none;
   z-index: 9999;
 }
 .footer-signature strong {
-  color: #ccc;
+  color: #444;
 }
+.footer-signature:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
 
 
 </style>
@@ -990,6 +996,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </script>
 <span class="footer-signature">©2025 Design by <strong>Webbadoo</strong></span>
+<a href="https://webbadoo.com" class="footer-signature" target="_blank">© 2025 Design by <strong>Webbadoo</strong></a>
+
 
 </body>
 </html>
