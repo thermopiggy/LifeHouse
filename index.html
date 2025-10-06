@@ -342,18 +342,29 @@ body:not(.admin) .day.has-note::before {
   color: var(--accent);
   text-align: right;
 }
-/* Светли - свободни дати */
-.calendar-day.free {
-  background-color: #d0d0d0 !important;
-  color: #000 !important;
+/* СВОБОДНИ = светли */
+.day {
+  background: #e6e9ee !important;
+  color: #111 !important;
+  border-color: #cfd6df !important;
 }
 
-/* Тъмни - заети дати */
-.calendar-day.busy {
-  background-color: #333 !important;
-  color: #fff !important;
+/* ЗАЕТИ = по-тъмни */
+.day.busy {
+  background: #2c3138 !important;
+  color: #d7dde6 !important;
+  border-color: #3a414a !important;
 }
 
+/* Легенда да съвпада с цветовете */
+.legend .box {
+  background: #e6e9ee !important;
+  border-color: #cfd6df !important;
+}
+.legend .box.busy {
+  background: #2c3138 !important;
+  border-color: #3a414a !important;
+}
 
 </style>
 </head>
