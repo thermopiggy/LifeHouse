@@ -374,6 +374,18 @@ body:not(.admin) .day.has-note::before {
   filter: blur(2px);
   pointer-events: none;
 }
+.footer-signature {
+  position: fixed;
+  bottom: 6px;
+  right: 10px;
+  font-size: 12px;
+  color: #aaa;
+  opacity: 0.8;
+  z-index: 9999;
+}
+.footer-signature strong {
+  color: #ccc;
+}
 
 
 </style>
@@ -977,6 +989,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 </script>
+<span class="footer-signature">©2025 Design by <strong>Webbadoo</strong></span>
 
 </body>
 </html>
