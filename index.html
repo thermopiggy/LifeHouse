@@ -408,6 +408,62 @@ body:not(.admin) .day.has-note::before {
   opacity: 1;
   text-decoration: underline;
 }
+#reviews {
+  position: relative;
+  background: rgba(50,50,50,.35);
+  color: #fff;
+  padding: 40px 0;
+  height: 80vh;              /* фиксирана височина */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reviews-scroll {
+  overflow-y: auto;
+  width: 100%;
+  max-width: 720px;
+  padding: 0 18px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.review-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+.review-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.review-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.review-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.review-content { flex: 1; }
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-name { font-weight: 600; color: var(--accent); }
+.review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
+.review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
 
 
 </style>
@@ -483,41 +539,42 @@ body:not(.admin) .day.has-note::before {
   </section>
 
   <!-- нова секция Отзиви -->
-<div class="reviews-list">
-  <div class="review-item">
-    <div class="review-avatar">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="50" fill="#555"/>
-        <circle cx="50" cy="38" r="18" fill="#888"/>
-        <path d="M10 95a40 40 0 0180 0z" fill="#777"/>
-      </svg>
-    </div>
-    <div class="review-content">
-      <div class="review-header">
-        <span class="review-name">Lev</span>
-        <span class="review-stars">★★★★★</span>
+<section id="reviews">
+  <h2>Отзиви</h2>
+  <div class="reviews-scroll">
+    <div class="reviews-list">
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#555"/><circle cx="50" cy="38" r="18" fill="#888"/><path d="M10 95a40 40 0 0180 0z" fill="#777"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Lev</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">It's awesome home. It's located right inside of the beautiful forest, we didn't want to leave it at all.</p>
+        </div>
       </div>
-      <p class="review-text">It's awesome home. It's located right inside of the beautiful forest, we didn't want to leave it at all.</p>
-    </div>
-  </div>
 
-  <div class="review-item">
-    <div class="review-avatar">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="50" fill="#444"/>
-        <circle cx="50" cy="38" r="18" fill="#777"/>
-        <path d="M10 95a40 40 0 0180 0z" fill="#666"/>
-      </svg>
-    </div>
-    <div class="review-content">
-      <div class="review-header">
-        <span class="review-name">George</span>
-        <span class="review-stars">★★★★★</span>
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#444"/><circle cx="50" cy="38" r="18" fill="#777"/><path d="M10 95a40 40 0 0180 0z" fill="#666"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">George</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">A cozy cottage in a quiet, less-traveled part of the mountain. Perfect for larger groups.</p>
+        </div>
       </div>
-      <p class="review-text">A cozy cottage in a quiet, less-traveled part of the mountain. Perfect for larger groups.</p>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#333"/><circle cx="50" cy="38" r="18" fill="#666"/><path d="M10 95a40 40 0 0180 0z" fill="#555"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Maria</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Lovely place with amazing views and friendly hosts. Highly recommended!</p>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 
   <section id="gallery"><h2>Гаалерия</h2><p>Снимки и видео ще добавим тук.</p></section>
@@ -1032,6 +1089,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <a href="https://webbadoo.com" class="footer-signature" target="_blank">© 2025 Design by <strong>webbadoo</strong></a>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const scrollArea = document.querySelector(".reviews-scroll");
+  const items = document.querySelectorAll(".review-item");
+  if (!scrollArea || !items.length) return;
+
+  function revealOnScroll() {
+    items.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      const parentRect = scrollArea.getBoundingClientRect();
+      if (rect.top < parentRect.bottom - 60) {
+        item.classList.add("visible");
+      }
+    });
+  }
+
+  scrollArea.addEventListener("scroll", revealOnScroll);
+  revealOnScroll(); // начална проверка
+});
+</script>
 
 </body>
 </html>
