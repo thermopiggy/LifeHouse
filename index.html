@@ -465,6 +465,12 @@ body:not(.admin) .day.has-note::before {
 .review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
 .review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
 
+#places {
+  background: rgba(70,70,70,.35);
+  color: #fff;
+  padding: 60px 18px;
+  min-height: 40vh;
+}
 
 
 </style>
@@ -500,16 +506,18 @@ body:not(.admin) .day.has-note::before {
       <!-- Десктоп навигация вдясно (скрита на мобилно) -->
       <div class="nav-links">
         <a href="#" id="openCalFromMenuDesktop">Календар</a>
-        <a href="#gallery">Галерия</a>
         <a href="#about">История</a>
+        <a href="#places">Наоколо</a>
+        <a href="#gallery">Галерия</a>
         <a href="#reviews">Отзиви</a>
       </div>
 
       <!-- Мобилно чекмедже (линковете остават за мобилно) -->
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
-        <a href="#gallery" role="menuitem">Галерия</a>
         <a href="#about" role="menuitem">История</a>
+        <a href="#places" role="menuitem">Наоколо</a>
+        <a href="#gallery" role="menuitem">Галерия</a>
         <a href="#reviews" role="menuitem">Отзиви</a>
       </div>
     </nav>
@@ -534,6 +542,10 @@ body:not(.admin) .day.has-note::before {
       </div>
     </div>
   </section>
+<section id="places">
+  <h2>Забележителности</h2>
+  <p>В близост до къщата се намират множество природни и културни забележителности – водопади, еко пътеки и панорамни гледки към Пирин.</p>
+</section>
 
   <!-- нова секция Правила за отказ от резервация -->
   <section id="rules">
