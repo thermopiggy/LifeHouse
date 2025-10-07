@@ -320,28 +320,45 @@
 body:not(.admin) .day.has-note::before {
   content: none !important;
 }
-/* Карти за отзиви */
-.reviews-grid {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+  margin: 0 auto;
 }
-.review-card {
+.review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
   background: rgba(0,0,0,0.45);
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 14px;
-  padding: 18px;
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.5;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  padding: 16px;
 }
-.review-author {
-  margin-top: 10px;
-  font-weight: 600;
-  color: var(--accent);
-  text-align: right;
+.review-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
 }
+.review-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.review-content { flex: 1; }
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-name { font-weight: 600; color: var(--accent); }
+.review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
+.review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
+
 /* СВОБОДНИ = светли */
 .day {
   background: #e6e9ee !important;
@@ -466,23 +483,41 @@ body:not(.admin) .day.has-note::before {
   </section>
 
   <!-- нова секция Отзиви -->
- <section id="reviews">
-  <h2>Отзиви</h2>
-  <div class="reviews-grid">
-    <div class="review-card">
-      <p>„Страхотно място! Уют и спокойствие.“</p>
-      <div class="review-author">– Иван</div>
+<div class="reviews-list">
+  <div class="review-item">
+    <div class="review-avatar">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="50" fill="#555"/>
+        <circle cx="50" cy="38" r="18" fill="#888"/>
+        <path d="M10 95a40 40 0 0180 0z" fill="#777"/>
+      </svg>
     </div>
-    <div class="review-card">
-      <p>„Природа, чист въздух и гостоприемен домакин.“</p>
-      <div class="review-author">– Мария</div>
-    </div>
-    <div class="review-card">
-      <p>„Перфектна локация и модерни удобства – силно препоръчвам!“</p>
-      <div class="review-author">– Георги</div>
+    <div class="review-content">
+      <div class="review-header">
+        <span class="review-name">Lev</span>
+        <span class="review-stars">★★★★★</span>
+      </div>
+      <p class="review-text">It's awesome home. It's located right inside of the beautiful forest, we didn't want to leave it at all.</p>
     </div>
   </div>
-</section>
+
+  <div class="review-item">
+    <div class="review-avatar">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="50" fill="#444"/>
+        <circle cx="50" cy="38" r="18" fill="#777"/>
+        <path d="M10 95a40 40 0 0180 0z" fill="#666"/>
+      </svg>
+    </div>
+    <div class="review-content">
+      <div class="review-header">
+        <span class="review-name">George</span>
+        <span class="review-stars">★★★★★</span>
+      </div>
+      <p class="review-text">A cozy cottage in a quiet, less-traveled part of the mountain. Perfect for larger groups.</p>
+    </div>
+  </div>
+</div>
 
 
   <section id="gallery"><h2>Гаалерия</h2><p>Снимки и видео ще добавим тук.</p></section>
