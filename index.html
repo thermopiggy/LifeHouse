@@ -472,6 +472,41 @@ body:not(.admin) .day.has-note::before {
   min-height: 40vh;
 }
 
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.gallery-grid img {
+  width: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .3s, filter .3s;
+}
+.gallery-grid img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Модал за голямо изображение */
+#imgModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+#imgModal.show { display: flex; }
+#imgModal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+}
 
 </style>
 </head>
@@ -546,12 +581,21 @@ body:not(.admin) .day.has-note::before {
   <h2>Забележителности</h2>
   <p>В близост до къщата се намират множество природни и културни забележителности – водопади, еко пътеки и панорамни гледки към Пирин.</p>
 </section>
-  <section id="gallery"><h2>Галерия</h2><p>Снимки и видео ще добавим тук.</p></section>
-  <!-- нова секция Правила за отказ от резервация -->
-  <section id="rules">
-    <h2>Правила за отказ от резервация</h2>
-    <p>Ако откажете ще ядете бой.</p>
-  </section>
+ <section id="gallery">
+  <h2>Галерия</h2>
+  <div class="gallery-grid">
+    <img src="lh1.png" alt="LifeHouse 1">
+    <img src="lh2.png" alt="LifeHouse 2">
+    <img src="lh3.png" alt="LifeHouse 3">
+    <img src="lh4.png" alt="LifeHouse 4">
+    <img src="lh5.png" alt="LifeHouse 5">
+    <img src="lh6.png" alt="LifeHouse 6">
+    <img src="lh7.png" alt="LifeHouse 7">
+    <img src="lh8.png" alt="LifeHouse 8">
+    <img src="lh9.png" alt="LifeHouse 9">
+  </div>
+</section>
+
 
   <!-- нова секция Отзиви -->
 <section id="reviews">
@@ -1162,6 +1206,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   scrollArea.addEventListener("scroll", revealOnScroll);
   revealOnScroll(); // начална проверка
+});
+</script>
+<div id="imgModal"><img src="" alt="Preview"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("imgModal");
+  const modalImg = modal.querySelector("img");
+  document.querySelectorAll(".gallery-grid img").forEach(img => {
+    img.addEventListener("click", () => {
+      modalImg.src = img.src;
+      modal.classList.add("show");
+    });
+  });
+  modal.addEventListener("click", () => modal.classList.remove("show"));
 });
 </script>
 
