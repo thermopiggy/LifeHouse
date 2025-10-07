@@ -548,6 +548,14 @@ body:not(.admin) .day.has-note::before {
     width: 100%;
   }
 }
+/* Всеки четен ред в секцията #places да е огледален */
+#places .place-row:nth-child(even) {
+  flex-direction: row-reverse;
+}
+/* На мобилно всички редове стават вертикални */
+@media (max-width: 768px){
+  #places .place-row{ flex-direction: column !important; }
+}
 
 </style>
 </head>
