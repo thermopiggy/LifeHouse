@@ -46,10 +46,10 @@
   }
   .burger span{margin:4px 0}
 
-  /* Drawer */
+  /* Drawer (мобилно меню) */
   .drawer{
-    position:fixed; left:10px; top:calc(10px + 48px);
-    width:clamp(240px,70vw,360px); max-height:70vh; overflow:auto;
+    position:fixed; right:10px; top:calc(10px + 48px);
+    width:clamp(60px,32vw,300px); max-height:70vh; overflow:auto;
     padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
     background:var(--glass-bg); backdrop-filter:saturate(140%) blur(10px);
     z-index:110; display:none;
@@ -57,7 +57,7 @@
   .drawer a, .drawer button{
     display:block;color:var(--text);text-decoration:none;
     padding:14px 12px;margin:4px 0;border-radius:10px;font-size:16px;font-weight:600;
-    width:100%; text-align:left; background:transparent; border:none; cursor:pointer;
+    width:100%; text-align:right; background:transparent; border:none; cursor:pointer;
   }
   .drawer a:hover, .drawer button:hover{background:rgba(255,255,255,.1)}
   .drawer.show{display:block}
@@ -70,7 +70,6 @@
   }
   .headline h1{margin:0 0 6px 0;font-size:28px}
   .headline p{margin:0;font-size:14px;opacity:.95}
-
 
   /* Sections */
   section{min-height:60vh;padding:60px 18px;color:#fff}
@@ -112,15 +111,14 @@
   .legend .box.busy{background:#4b5563;border-color:#52575f}
 
   /* Заети дни без Х, с по-тъмен фон */
-.day.busy{
-  position:relative;
-  background:#4b5563;
-  color:#e8eaee;  /* видимо число */
-}
-.day.busy::after{ content:none; }
+  .day.busy{
+    position:relative;
+    background:#4b5563;
+    color:#e8eaee;
+  }
+  .day.busy::after{ content:none; }
 
-
-  /* Note indicator */
+  /* Note indicator (само за админ вижда точките) */
   .day.has-note::before{
     content:""; position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%;
     background:#ffd166; box-shadow:0 0 0 1px #2d2f33;
@@ -198,86 +196,365 @@
     padding:12px; border-radius:10px; font-weight:600;
   }
   .admin-drawer-body button:hover{ background:rgba(255,255,255,.1) }
-  /* бутони в нав бара */
-.nav .social{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  color:#ccc;          /* сиво, неутрално */
-  transition:color .25s, background .25s;
-}
-.nav .social:hover{ background:rgba(255,255,255,.1); }
 
-.nav .social.fb:hover{ color:#1877F2; }  /* Facebook синьо */
-.nav .social.ig:hover{ color:#E4405F; }  /* Instagram розово-червено */
-.fixed-contacts{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  z-index:150;
+  /* Социалки в нав бара */
+  .nav .social{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    color:#ccc;
+    transition:color .25s, background .25s;
+  }
+  .nav .social:hover{ background:rgba(255,255,255,.1); }
+  .nav .social.fb:hover{ color:#1877F2; }
+  .nav .social.ig:hover{ color:#E4405F; }
+
+  /* Фиксирани контакти */
+  .fixed-contacts{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:150;
+  }
+  .fixed-contacts .contact-btn{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.4);
+    color:#ccc;
+    text-decoration:none;
+    transition:color .25s, background .25s;
+  }
+  .fixed-contacts .contact-btn:hover{ background:rgba(255,255,255,.1); }
+  .fixed-contacts .contact-btn.tel:hover{ color:#34A853; }
+  .fixed-contacts .contact-btn.wa:hover{ color:#25D366; }
+  .fixed-contacts .contact-btn.viber:hover{ color:#7360F2; }
+
+  #rules, #reviews{
+    background: rgba(50,50,50,.35);
+    color:#fff;
+    padding:60px 18px;
+    min-height:40vh;
+  }
+  #about{
+    background:rgba(0,0,0,.35);
+    color:#fff;
+    padding:60px 18px;
+  }
+  .about-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:20px;
+  }
+  .about-text{flex:1; min-width:250px;}
+  .about-img{flex:1; min-width:250px; text-align:center;}
+  .about-img img{max-width:100%; height:auto; border-radius:12px;}
+  @media (max-width:768px){
+    .about-wrap{flex-direction:column;}
+    .about-img{order:-1;}
+  }
+
+  .site-footer{
+    background:#fff;
+    padding:30px 0;
+    text-align:center;
+  }
+  .site-footer .footer-medal img{
+    max-width:160px;
+    height:auto;
+    display:inline-block;
+  }
+
+  /* ===== Desktop меню вдясно ===== */
+  .nav-links{display:none;} /* скрито по подразбиране (мобилно) */
+  @media (min-width:769px){
+    .burger, .drawer{display:none !important;}
+    .nav-links{display:flex;gap:16px;margin-left:auto;}
+    .nav-links a{
+      color:var(--text);
+      text-decoration:none;
+      font-weight:600;
+      padding:8px 12px;
+      border-radius:8px;
+    }
+    .nav-links a:hover{background:rgba(255,255,255,.1);}
+  }
+ @media (max-width: 768px) {
+  
+  .burger {
+    position: absolute;
+    right: 14px;   /* същото отстояние като padding-а на nav */
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;     /* премахваме auto марджини */
+  }
+}
+.about-img img {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.about-img img.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Скрол на календара на мобилно */
+@media (max-width: 768px) {
+  .cal {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+}
+/* Точките за бележки да се виждат само за админ */
+body:not(.admin) .day.has-note::before {
+  content: none !important;
+}
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 16px;
+}
+.review-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.review-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.review-content { flex: 1; }
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-name { font-weight: 600; color: var(--accent); }
+.review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
+.review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
+
+/* СВОБОДНИ = светли */
+.day {
+  background: #e6e9ee !important;
+  color: #111 !important;
+  border-color: #cfd6df !important;
 }
 
-.fixed-contacts .contact-btn{
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,.4);
-  color:#ccc;
-  text-decoration:none;
-  transition:color .25s, background .25s;
+/* ЗАЕТИ = по-тъмни */
+.day.busy {
+  background: #2c3138 !important;
+  color: #d7dde6 !important;
+  border-color: #3a414a !important;
 }
 
-.fixed-contacts .contact-btn:hover{ background:rgba(255,255,255,.1); }
+/* Легенда да съвпада с цветовете */
+.legend .box {
+  background: #e6e9ee !important;
+  border-color: #cfd6df !important;
+}
+.legend .box.busy {
+  background: #2c3138 !important;
+  border-color: #3a414a !important;
+}
+/* Дни извън текущия месец – като свободните, но по-замъглени */
+.day.out {
+  background: #e6e9ee !important;  /* същия цвят като свободните */
+  color: #111 !important;
+  border-color: #cfd6df !important;
+  opacity: 0.25;
+  filter: blur(2px);
+  pointer-events: none;
+}
+.footer-signature {
+  display: block;
+  text-align: left;
+  margin: 30px 20px;
+  font-size: 12px;
+  color: #555;
+  text-decoration: none;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+.footer-signature strong {
+  color: #444;
+}
+.footer-signature:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+#reviews {
+  position: relative;
+  background: rgba(50,50,50,.35);
+  color: #fff;
+  padding: 40px 0;
+  height: 80vh;              /* фиксирана височина */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-/* цветове при hover */
-.fixed-contacts .contact-btn.tel:hover{ color:#34A853; }   /* зелено телефон */
-.fixed-contacts .contact-btn.wa:hover{ color:#25D366; }    /* WhatsApp */
-.fixed-contacts .contact-btn.viber:hover{ color:#7360F2; } /* Viber */
+.reviews-scroll {
+  overflow-y: auto;
+  width: 100%;
+  max-width: 720px;
+  padding: 0 18px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.review-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+.review-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.review-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.review-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.review-content { flex: 1; }
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-name { font-weight: 600; color: var(--accent); }
+.review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
+.review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
 
-#rules, #reviews{
-background: rgba(50,50,50,.35);
+#places {
+  background: rgba(70,70,70,.35);
+  color: #fff;
+  padding: 60px 18px;
+  min-height: 40vh;
+}
 
-  color:#fff;
-  padding:60px 18px;
-  min-height:40vh;
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
 }
-#about{
-  background:rgba(0,0,0,.35);
-  color:#fff;
-  padding:60px 18px;
+.gallery-grid img {
+  width: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .3s, filter .3s;
 }
-.about-wrap{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:20px;
+.gallery-grid img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
 }
-.about-text{flex:1; min-width:250px;}
-.about-img{flex:1; min-width:250px; text-align:center;}
-.about-img img{max-width:100%; height:auto; border-radius:12px;}
 
-@media (max-width:768px){
-  .about-wrap{flex-direction:column;}
-  .about-img{order:-1;} /* картинката да е над текста */
+/* Модал за голямо изображение */
+#imgModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
 }
-.site-footer{
-  background:#fff;
-  padding:30px 0;
-  text-align:center;
+#imgModal.show { display: flex; }
+#imgModal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
 }
-.site-footer .footer-medal img{
-  max-width:160px;  /* изглежда като отличие */
-  height:auto;
-  display:inline-block;
+#places {
+  background: rgba(85,85,85,.35);
+  color: #fff;
+  padding: 60px 18px;
+}
+.place-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin: 40px 0;
+}
+.place-row.alt {
+  flex-direction: row-reverse; /* редува подредбата */
+}
+.place-row img {
+  width: 45%;
+  max-width: 480px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+}
+.place-text {
+  width: 45%;
+}
+.place-text h3 {
+  margin-top: 0;
+  color: var(--accent);
+}
+.place-text p {
+  color: #eee;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .place-row, .place-row.alt {
+    flex-direction: column;
+  }
+  .place-row img, .place-text {
+    width: 100%;
+  }
+}
+/* Всеки четен ред в секцията #places да е огледален */
+#places .place-row:nth-child(even) {
+  flex-direction: row-reverse;
+}
+/* На мобилно всички редове стават вертикални */
+@media (max-width: 768px){
+  #places .place-row{ flex-direction: column !important; }
 }
 
 </style>
@@ -287,75 +564,218 @@ background: rgba(50,50,50,.35);
   <div class="hero" id="home">
     <!-- NAV -->
     <nav class="nav">
-     
+      <!-- Хамбургер (само мобилно; скрит на десктоп с @media) -->
       <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
 
-      <!-- ПИН към Google Maps, до хамбургера -->
+      <!-- ПИН към Google Maps -->
       <a href="https://www.google.com/maps/place/Life+House/@42.0479645,23.5272436,142m/data=!3m1!1e3!4m17!1m7!3m6!1s0x14ab05c2b76ace83:0x9ce278f0d33929d!2sSemkovo+Mountain+Resort!8m2!3d42.0446093!4d23.5258354!16s%2Fg%2F11jm7lr6cv!3m8!1s0x14ab05371801afd1:0x1abbb9a791e4b886!5m2!4m1!1i2!8m2!3d42.0481271!4d23.5274758!16s%2Fg%2F11f8mg2m1x?entry=ttu"
          target="_blank" aria-label="Google Maps">
         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16" style="color:#ffd166;cursor:pointer">
           <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
         </svg>
       </a>
-<a href="https://www.facebook.com/profile.php?id=100057135262751&locale=bg_BG" 
-   target="_blank" 
-   class="social fb" 
-   aria-label="Facebook">
 
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.987C18.343 21.128 22 17 22 12z"/>
-  </svg>
-</a>
+      <!-- Социални бутони -->
+      <a href="https://www.facebook.com/profile.php?id=100057135262751&locale=bg_BG" target="_blank" class="social fb" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.987C18.343 21.128 22 17 22 12z"/>
+        </svg>
+      </a>
+      <a href="https://www.instagram.com/lifehouse_semkovo/" target="_blank" class="social ig" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
+        </svg>
+      </a>
 
-<a href="https://instagram.com" target="_blank" class="social ig" aria-label="Instagram">
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
-  </svg>
-</a>
+      <!-- Десктоп навигация вдясно (скрита на мобилно) -->
+      <div class="nav-links">
+        <a href="#" id="openCalFromMenuDesktop">Календар</a>
+        <a href="#about">История</a>
+        <a href="#places">Наоколо</a>
+        <a href="#gallery">Галерия</a>
+        <a href="#reviews">Отзиви</a>
+      </div>
 
+      <!-- Мобилно чекмедже (линковете остават за мобилно) -->
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
         <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
+        <a href="#about" role="menuitem">История</a>
+        <a href="#places" role="menuitem">Наоколо</a>
         <a href="#gallery" role="menuitem">Галерия</a>
-        <a href="#about" role="menuitem">За нас</a>
+        <a href="#reviews" role="menuitem">Отзиви</a>
       </div>
     </nav>
 
     <!-- Callout -->
     <div class="headline">
-      <h1>Къща за гости LifeHouse Semkovo</h1>
+      <h1> LifeHouse Semkovo</h1>
       <p>Домашен уют с модерни удобства на крачка от дивата природа или нещо такова....</p>
       <a class="btn-primary" id="openCalCta" href="#">свободни дати</a>
     </div>
 
   </div>
 
- <section id="about">
-  <div class="about-wrap">
-    <div class="about-text">
-      <h2>За нас</h2>
-      <p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p>
+  <section id="about">
+    <div class="about-wrap">
+      <div class="about-text">
+        <h2>История</h2>
+        <p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p>
+      </div>
+      <div class="about-img">
+        <img src="zanas.png" alt="Къщата LifeHouse Semkovo">
+      </div>
     </div>
-    <div class="about-img">
-      <img src="zanas.png" alt="Къщата LifeHouse Semkovo">
+  </section>
+
+   <section id="gallery">
+  <h2>Галерия</h2>
+  <div class="gallery-grid">
+    <img src="lh1.png" alt="LifeHouse 1">
+    <img src="lh2.png" alt="LifeHouse 2">
+    <img src="lh3.png" alt="LifeHouse 3">
+    <img src="lh4.png" alt="LifeHouse 4">
+    <img src="lh5.png" alt="LifeHouse 5">
+    <img src="lh6.png" alt="LifeHouse 6">
+    <img src="lh7.png" alt="LifeHouse 7">
+    <img src="lh8.png" alt="LifeHouse 8">
+    <img src="lh9.png" alt="LifeHouse 9">
+  </div>
+</section>
+<section id="places">
+  <h2>Забележителности</h2>
+
+  <div class="place-row">
+    <img src="z1.png" alt="Забележителност 1">
+    <div class="place-text">
+      <h3>Фън парк Белица</h3>
+      <p>Адреналин и прохлада през лятото.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>Екопътека Семково</h3>
+      <p>Горска пътека с панорамни гледки към Пирин, подходяща за разходки и снимки.</p>
+    </div>
+    <img src="z2.png" alt="Забележителност 2">
+  </div>
+
+  <div class="place-row">
+    <img src="z3.png" alt="Забележителност 3">
+    <div class="place-text">
+      <h3>Панорамна площадка Орлово око</h3>
+      <p>Изключителна гледка към планината и долината, достъпна пеша или с джип.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>Парк на тацуващите мечки</h3>
+      <p>Уникална възможност да наблщдавате мечките в естествения им хабитат.</p>
+    </div>
+    <img src="z4.png" alt="Забележителност 4">
+  </div>
+
+  <div class="place-row">
+    <img src="z5.png" alt="Забележителност 5">
+    <div class="place-text">
+      <h3>Семково езеро</h3>
+      <p>Кристални води, обградени от борове – рай за фотографите и туристите.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>Ски писта Семково</h3>
+      <p>Идеална за зимни спортове, със спокоен трафик и чудесни условия за начинаещи.</p>
+    </div>
+    <img src="z6.png" alt="Забележителност 6">
+  </div>
+</section>
+
+
+
+  <!-- нова секция Отзиви -->
+<section id="reviews">
+  <h2>Отзиви</h2>
+  <div class="reviews-scroll">
+    <div class="reviews-list">
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#555"/><circle cx="50" cy="38" r="18" fill="#888"/><path d="M10 95a40 40 0 0180 0z" fill="#777"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Lev</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">It's awesome home. It's located right inside of the beautiful forest, we didn't want to leave it at all.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#444"/><circle cx="50" cy="38" r="18" fill="#777"/><path d="M10 95a40 40 0 0180 0z" fill="#666"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">George</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">A cozy cottage in a quiet, less-traveled part of the mountain. Perfect for larger groups.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#333"/><circle cx="50" cy="38" r="18" fill="#666"/><path d="M10 95a40 40 0 0180 0z" fill="#555"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Maria</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Lovely place with amazing views and friendly hosts. Highly recommended!</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#464"/><circle cx="50" cy="38" r="18" fill="#797"/><path d="M10 95a40 40 0 0180 0z" fill="#585"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Ivan</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Топло, уютно и с много приятна атмосфера. Камината прави вечерите вълшебни.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#355"/><circle cx="50" cy="38" r="18" fill="#678"/><path d="M10 95a40 40 0 0180 0z" fill="#567"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Sofia</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Everything was spotless clean and beautifully arranged. Perfect for a weekend escape.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#633"/><circle cx="50" cy="38" r="18" fill="#866"/><path d="M10 95a40 40 0 0180 0z" fill="#755"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Nikolay</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">The hosts were incredibly kind and helpful. We’ll definitely return in winter!</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#555"/><circle cx="50" cy="38" r="18" fill="#999"/><path d="M10 95a40 40 0 0180 0z" fill="#777"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Petya</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Спокойствие, природа и уют – точно както си го представяхме. Прекрасно място!</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-  
-  <!-- нова секция Правила за отказ от резервация -->
-  <section id="rules">
-    <h2>Правила за отказ от резервация</h2>
-    <p>Ако откажете ще ядете бой.</p>
-  </section>
-
-  <!-- нова секция Отзиви -->
-  <section id="reviews">
-    <h2>Отзиви</h2>
-    <p>„Страхотно място! Уют и спокойствие.“ – Иван<br>
-       „Природа, чист въздух и гостоприемен домакин.“ – Мария</p>
-  </section>
-  <section id="gallery"><h2>Гаалерия</h2><p>Снимки и видео ще добавим тук.</p></section>
-  <section id="contact"><h2></h2><p>Тел: +359988988623    booking@lifehouse.bg</p></section>
+  <section id="contact"><h2></h2><p>Тел: +359988988623 </p></section>
 
   <!-- Admin Drawer (част от потока на страницата) -->
   <div class="admin-drawer" id="adminDrawer" aria-hidden="true">
@@ -429,22 +849,22 @@ background: rgba(50,50,50,.35);
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
-  /* ===== Drawer ===== */
+  /* ===== Drawer (мобилно) ===== */
   const burger = document.getElementById('burger');
   const drawer = document.getElementById('drawer');
-  burger.addEventListener('click',()=>{
+  burger && burger.addEventListener('click',()=>{
     const open = drawer.classList.toggle('show');
     burger.setAttribute('aria-expanded', String(open));
     drawer.setAttribute('aria-hidden', String(!open));
   });
   document.addEventListener('click', (e)=>{
-    if (!drawer.contains(e.target) && !burger.contains(e.target)) {
+    if (drawer && !drawer.contains(e.target) && !burger?.contains(e.target)) {
       drawer.classList.remove('show');
-      burger.setAttribute('aria-expanded','false');
+      burger?.setAttribute('aria-expanded','false');
     }
   });
 
-  /* ===== Modal open/close (устойчиво вързване) ===== */
+  /* ===== Modal open/close ===== */
   const calModal = document.getElementById('calModal');
 
   function openCalendar(e){
@@ -461,7 +881,8 @@ background: rgba(50,50,50,.35);
     typeof closeNotes === 'function' && closeNotes();
   }
 
-  ['openCalHotspot','openCalFromMenu','openCalCta']
+  /* добавихме desktop id за календара */
+  ['openCalHotspot','openCalFromMenu','openCalCta','openCalFromMenuDesktop']
     .map(id => document.getElementById(id))
     .filter(Boolean)
     .forEach(el => el.addEventListener('click', openCalendar));
@@ -556,14 +977,14 @@ background: rgba(50,50,50,.35);
         saveBusyRemote(set).catch(console.error);
       });
 
-    // дабълклик за бележки (само за админ)
-  btn.addEventListener('dblclick',(ev)=>{
-    ev.preventDefault();
-    if (!window.IS_ADMIN) return;
-    const iso = ev.currentTarget.dataset.iso;
-    openNotes(iso);
-  }); 
-});
+      // дабълклик за бележки (само за админ)
+      btn.addEventListener('dblclick',(ev)=>{
+        ev.preventDefault();
+        if (!window.IS_ADMIN) return;
+        const iso = ev.currentTarget.dataset.iso;
+        openNotes(iso);
+      });
+    });
 
     attachBusyListener(y,m);
     attachRangesListener();
@@ -577,68 +998,60 @@ background: rgba(50,50,50,.35);
       cell.classList.toggle('busy', currentBusySet.has(iso));
     });
   }
-function markNoteDots(){
-  grid.querySelectorAll('.day.btn').forEach(cell=>{
-    const iso = cell.dataset.iso;
-    cell.classList.toggle('has-note', window.IS_ADMIN && hasRangeNote(iso));
-  });
-}
-
+  function markNoteDots(){
+    grid.querySelectorAll('.day.btn').forEach(cell=>{
+      const iso = cell.dataset.iso;
+      cell.classList.toggle('has-note', window.IS_ADMIN && hasRangeNote(iso));
+    });
+  }
 
   /* ===== Month nav ===== */
   document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
   document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
   
-// скрол за смяна на месеци
-(function(){
-  const area = document.querySelector('.cal');
-  if(!area) return;
+  // скрол/жестове за смяна на месеци
+  (function(){
+    const area = document.querySelector('.cal');
+    if(!area) return;
 
-  function changeMonth(dir){
-    state.m += dir;
-    if(state.m > 11){ state.m = 0; state.y++; }
-    if(state.m < 0){ state.m = 11; state.y--; }
-    renderCal();
-  }
+    function changeMonth(dir){
+      state.m += dir;
+      if(state.m > 11){ state.m = 0; state.y++; }
+      if(state.m < 0){ state.m = 11; state.y--; }
+      renderCal();
+    }
 
-  let lock = false;                 // анти-спам
-  area.addEventListener('wheel', (e)=>{
-    // swipe за мобилно
-let touchStartX = 0, touchStartY = 0;
-area.addEventListener('touchstart', e=>{
-  const t = e.changedTouches[0];
-  touchStartX = t.clientX;
-  touchStartY = t.clientY;
-}, {passive:true});
+    let lock = false;
+    area.addEventListener('wheel', (e)=>{
+      if(lock) return;
+      const mag = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if(Math.abs(mag) < 20) return;
+      changeMonth(mag > 0 ? 1 : -1);
+      lock = true;
+      setTimeout(()=> lock = false, 180);
+    }, { passive: true });
 
-area.addEventListener('touchend', e=>{
-  const t = e.changedTouches[0];
-  const dx = t.clientX - touchStartX;
-  const dy = t.clientY - touchStartY;
+    let touchStartX = 0, touchStartY = 0;
+    area.addEventListener('touchstart', e=>{
+      const t = e.changedTouches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+    }, {passive:true});
 
-  // игнорираме много малки движения
-  if (Math.abs(dx) < 40 && Math.abs(dy) < 40) return;
-
-  if (Math.abs(dx) > Math.abs(dy)) {
-    // хоризонтален жест
-    if (dx < 0) changeMonth(1);   // swipe наляво → следващ месец
-    else changeMonth(-1);         // swipe надясно → предишен
-  } else {
-    // вертикален жест
-    if (dy < 0) changeMonth(1);   // swipe нагоре → следващ
-    else changeMonth(-1);         // swipe надолу → предишен
-  }
-}, {passive:true});
-
-    if(lock) return;
-    const mag = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    if(Math.abs(mag) < 20) return;  // игнорирай много малки жестове
-    changeMonth(mag > 0 ? 1 : -1);  // надолу/вдясно → следващ, нагоре/вляво → предишен
-    lock = true;
-    setTimeout(()=> lock = false, 180);
-  }, { passive: true });
-})();
-
+    area.addEventListener('touchend', e=>{
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Math.abs(dx) < 40 && Math.abs(dy) < 40) return;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) changeMonth(1);
+        else changeMonth(-1);
+      } else {
+        if (dy < 0) changeMonth(1);
+        else changeMonth(-1);
+      }
+    }, {passive:true});
+  })();
 
   /* ===== Notes panel logic ===== */
   const notesPanel = document.getElementById('notesPanel');
@@ -726,7 +1139,7 @@ area.addEventListener('touchend', e=>{
   });
   closeBtn.addEventListener('click', closeNotes);
 
-  /* ===== Auth & Admin (динамичен badge, UID или Email) ===== */
+  /* ===== Auth & Admin ===== */
   window.IS_ADMIN = false;
 
   function setBadge(user, isAdmin){
@@ -757,7 +1170,6 @@ area.addEventListener('touchend', e=>{
 
   auth.onAuthStateChanged(async (user)=>{
     if (!user){
-    
       window.IS_ADMIN = false;
       setBadge(null,false);
       return;
@@ -816,34 +1228,98 @@ area.addEventListener('touchend', e=>{
     });
   }
   </script>
-<!-- сложи точно преди </body> -->
-<div class="fixed-contacts">
-  <a href="tel:+359988988623" class="contact-btn tel" aria-label="Обади се">
-    <!-- phone icon -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.29 22 2 13.71 2 3a1 1 0 011-1h4.5a1 1 0 011 1c0 1.25.2 2.46.57 3.59a1 1 0 01-.25 1.01l-2.2 2.19z"/>
-    </svg>
-  </a>
 
-  <a href="https://wa.me/359988988623" target="_blank" class="contact-btn wa" aria-label="WhatsApp">
-    <!-- whatsapp icon -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2a10 10 0 00-8.93 14.58l-1.07 3.92 4.02-1.06A10 10 0 1012 2zm5.2 14.3c-.27.77-1.57 1.48-2.18 1.57-.56.08-1.25.11-2.02-.13-.47-.15-1.07-.35-1.85-.73-3.27-1.62-5.39-5.41-5.55-5.67-.16-.27-1.32-1.76-1.32-3.36 0-1.6.84-2.38 1.14-2.71.3-.34.66-.42.88-.42h.63c.2 0 .47-.07.73.56.27.66.92 2.27 1 2.43.08.16.14.34.03.55-.1.2-.15.34-.3.53-.15.18-.32.4-.46.54-.15.15-.3.31-.13.6.16.27.71 1.17 1.52 1.9 1.04.93 1.9 1.22 2.18 1.36.27.14.43.12.6-.07.16-.2.69-.8.87-1.07.18-.27.36-.23.6-.14.25.09 1.57.74 1.84.88.27.14.45.2.52.31.07.11.07.8-.2 1.56z"/>
-    </svg>
-  </a>
+  <!-- Контакти (fixed бутони) -->
+  <div class="fixed-contacts">
+    <a href="tel:+359988988623" class="contact-btn tel" aria-label="Обади се">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.29 22 2 13.71 2 3a1 1 0 011-1h4.5a1 1 0 011 1c0 1.25.2 2.46.57 3.59a1 1 0 01-.25 1.01l-2.2 2.19z"/>
+      </svg>
+    </a>
 
-  <a href="viber://chat?number=%2B359988988623" class="contact-btn viber" aria-label="Viber">
-    <!-- viber icon -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.031-.967-.273-.099-.472-.148-.67.15-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.787-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.497.099-.198.05-.372-.025-.521-.074-.148-.669-1.611-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.273.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.617h-.005C6.533 22 2 17.468 2 11.993 2 6.518 6.533 2 12.046 2c5.484 0 9.995 4.518 9.995 9.993 0 5.475-4.511 10.007-9.99 10.007z"/>
-    </svg>
-  </a>
-</div>
-<footer class="site-footer">
-  <div class="footer-medal">
-    <img src="medal.png" alt="Отличие LifeHouse Semkovo">
+    <a href="https://wa.me/359988988623" target="_blank" class="contact-btn wa" aria-label="WhatsApp">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 00-8.93 14.58l-1.07 3.92 4.02-1.06A10 10 0 1012 2zm5.2 14.3c-.27.77-1.57 1.48-2.18 1.57-.56.08-1.25.11-2.02-.13-.47-.15-1.07-.35-1.85-.73-3.27-1.62-5.39-5.41-5.55-5.67-.16-.27-1.32-1.76-1.32-3.36 0-1.6.84-2.38 1.14-2.71.3-.34.66-.42.88-.42h.63c.2 0 .47-.07.73.56.27.66.92 2.27 1 2.43.08.16.14.34.03.55-.1.2-.15.34-.3.53-.15.18-.32.4-.46.54-.15.15-.3.31-.13.6.16.27.71 1.17 1.52 1.9 1.04.93 1.9 1.22 2.18 1.36.27.14.43.12.6-.07.16-.2.69-.8.87-1.07.18-.27.36-.23.6-.14.25.09 1.57.74 1.84.88.27.14.45.2.52.31.07.11.07.8-.2 1.56z"/>
+      </svg>
+    </a>
+
+    <a href="viber://chat?number=%2B359988988623" class="contact-btn viber" aria-label="Viber">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.031-.967-.273-.099-.472-.148-.67.15-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.787-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.497.099-.198.05-.372-.025-.521-.074-.148-.669-1.611-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.273.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.617h-.005C6.533 22 2 17.468 2 11.993 2 6.518 6.533 2 12.046 2c5.484 0 9.995 4.518 9.995 9.993 0 5.475-4.511 10.007-9.99 10.007z"/>
+      </svg>
+    </a>
   </div>
-</footer>
+
+  <footer class="site-footer">
+    <div class="footer-medal">
+      <img src="medal.png" alt="Отличие LifeHouse Semkovo">
+    </div>
+  </footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const img = document.querySelector(".about-img img");
+  if (!img) return;
+  const observer = new IntersectionObserver((entries, o) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        o.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  observer.observe(img);
+});
+  auth.onAuthStateChanged(async (user)=>{
+  if (!user){
+    window.IS_ADMIN = false;
+    document.body.classList.remove('admin');
+    setBadge(null,false);
+    return;
+  }
+  const isAdmin = await checkAdmin(user);
+  window.IS_ADMIN = !!isAdmin;
+  document.body.classList.toggle('admin', isAdmin);
+  setBadge(user, isAdmin);
+});
+
+</script>
+
+<a href="https://webbadoo.com" class="footer-signature" target="_blank">© 2025 Design by <strong>webbadoo</strong></a>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const scrollArea = document.querySelector(".reviews-scroll");
+  const items = document.querySelectorAll(".review-item");
+  if (!scrollArea || !items.length) return;
+
+  function revealOnScroll() {
+    items.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      const parentRect = scrollArea.getBoundingClientRect();
+      if (rect.top < parentRect.bottom - 60) {
+        item.classList.add("visible");
+      }
+    });
+  }
+
+  scrollArea.addEventListener("scroll", revealOnScroll);
+  revealOnScroll(); // начална проверка
+});
+</script>
+<div id="imgModal"><img src="" alt="Preview"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("imgModal");
+  const modalImg = modal.querySelector("img");
+  document.querySelectorAll(".gallery-grid img").forEach(img => {
+    img.addEventListener("click", () => {
+      modalImg.src = img.src;
+      modal.classList.add("show");
+    });
+  });
+  modal.addEventListener("click", () => modal.classList.remove("show"));
+});
+</script>
 
 </body>
 </html>
