@@ -948,7 +948,7 @@ function uniformField(keys, field){
 
 // --- Firestore
 async function getMonthDoc(id){
-  const snap = await db.collection('calendar').doc(id).get();
+  const snap = await db.collection(CAL_COLL).doc(id).get();
   return snap.exists && snap.data().days ? snap.data().days : {};
 }
 async function writeDays(keys, patch){
@@ -961,7 +961,7 @@ async function writeDays(keys, patch){
     }
     const batch = db.batch();
     for (const [docId, ks] of Object.entries(buckets)){
-      const ref = db.collection('calendar').doc(docId);
+      const ref = db.collection(CAL_COLL).doc(docId);
       const snap = await ref.get();
       const days = (snap.exists && snap.data().days) ? snap.data().days : {};
       ks.forEach(k=>{
