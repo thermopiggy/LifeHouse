@@ -492,6 +492,10 @@
 .abnb-hint{opacity:.6;font-size:12px;margin:0}
 .admin-only{display:none}
 body.admin .admin-only{display:inline-block}
+/* Fix z-index for Airbnb modal */
+.abnb-modal{ position:fixed; inset:0; z-index:9999; }
+.abnb-sheet{ position:absolute; z-index:2; }   /* листът над бекдропа */
+.abnb-backdrop{ position:absolute; z-index:1; }/* бекдропът отдолу */
 
 </style>
 </head>
