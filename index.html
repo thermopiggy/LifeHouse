@@ -829,6 +829,7 @@ body.admin .admin-only{display:inline-block}
       burger?.setAttribute('aria-expanded','false');
     }
   });
+ </script>
 <script>
 /* ===== Airbnb-like Calendar (Firestore) ===== */
 /* СХЕМА: Collection 'calendar' → doc 'YYYY-MM' → field 'days' = {
@@ -1023,7 +1024,7 @@ auth.onAuthStateChanged(async (user)=>{
 });
 </script>
 
-
+<script>
   /* ===== Auth & Admin ===== */
   window.IS_ADMIN = false;
 
@@ -1065,7 +1066,7 @@ auth.onAuthStateChanged(async (user)=>{
   });
 
   /* ===== Init ===== */
-  renderCal();
+
   </script>
 
   <!-- ===== Admin Drawer Logic ===== -->
