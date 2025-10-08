@@ -819,6 +819,7 @@ body.admin .admin-only{display:inline-block}
 /* СХЕМА: Collection 'calendar' → doc 'YYYY-MM' → field 'days' = {
    'YYYY-MM-DD': { busy: true|false, price: number|null, note: string|null }
 } */
+const CAL_COLL = 'calendar_v2';
 
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
