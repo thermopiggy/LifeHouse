@@ -952,29 +952,35 @@ async function getMonthDoc(id){
 }
 async function writeDays(keys, patch){
   if(keys.length===0) return;
-  // групираме по месец
-  const buckets = {};
-  for(const k of keys){
-    const [y,m] = k.split('-'); const docId = `${y}-${m}`;
-    (buckets[docId] ||= []).push(k);
+  try{
+    const buckets = {};
+    for (const k of keys){
+      const [y,m] = k.split('-'); const docId = `${y}-${m}`;
+      (buckets[docId] ||= []).push(k);
+    }
+    const batch = db.batch();
+    for (const [docId, ks] of Object.entries(buckets)){
+      const ref = db.collection('calendar').doc(docId);
+      const snap = await ref.get();
+      const days = (snap.exists && snap.data().days) ? snap.data().days : {};
+      ks.forEach(k=>{
+        days[k] = { busy:false, price:null, note:null, ...(days[k]||{}), ...patch };
+      });
+      batch.set(ref, { days }, { merge:true });
+    }
+    await batch.commit();
+
+    // локално обновяване
+    for (const ks of Object.values(buckets)){
+      ks.forEach(k=>{ monthData[k] = { ...(monthData[k]||{}), ...patch }; });
+    }
+    renderGrid(cur);
+  }catch(e){
+    console.error('Firestore write error:', e);
+    alert('Нямаш права за запис или има грешка в базата: ' + (e?.message||e));
   }
-  const batch = db.batch();
-  for(const [docId, ks] of Object.entries(buckets)){
-    const ref = db.collection('calendar').doc(docId);
-    const snap = await ref.get();
-    const days = (snap.exists && snap.data().days) ? snap.data().days : {};
-    ks.forEach(k=>{
-      days[k] = { busy:false, price:null, note:null, ...(days[k]||{}), ...patch };
-    });
-    batch.set(ref, { days }, { merge:true });
-  }
-  await batch.commit();
-  // локално обновяване и пререндер
-  for(const [docId, ks] of Object.entries(buckets)){
-    ks.forEach(k=>{ monthData[k] = { ...(monthData[k]||{}), ...patch }; });
-  }
-  renderGrid(cur);
 }
+
 
 // --- Действия (ADMIN)
 $('#abnbMarkBusy').addEventListener('click', async ()=>{
