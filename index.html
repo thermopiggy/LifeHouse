@@ -90,65 +90,6 @@
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
 
-  /* Calendar UI */
-  .cal{height:calc(100% - 42px)}
-  .cal .head { display:flex; justify-content:space-between; align-items:center; margin:6px 0 10px }
-  .navbtn { cursor:pointer; border:1px solid #333; padding:6px 10px; border-radius:10px; background:#1b1b1b; color:#eee }
-  .grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
-  .dow { text-align:center; font-size:12px; color:#9aa; }
-  .day {
-    position:relative;
-    border:1px solid #2d2f33; border-radius:12px; padding:14px 0; text-align:center; background:#202225;
-    cursor:default; transition:filter .15s, background .15s, transform .05s; color:#e5e7eb;
-  }
-  .day.btn { cursor:pointer }
-  .day.btn:active{ filter:brightness(.82); transform:scale(.98) }
-  .day.btn:focus-visible{ outline:2px solid rgba(255,255,255,.6); outline-offset:2px }
-  .day.busy { background:#4b5563; color:#0b0e12 }
-  .day.out { opacity:.28 }
-  .legend{font-size:12px;margin-top:10px;color:#bcc}
-  .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
-  .legend .box.busy{background:#4b5563;border-color:#52575f}
-
-  /* Заети дни без Х, с по-тъмен фон */
-  .day.busy{
-    position:relative;
-    background:#4b5563;
-    color:#e8eaee;
-  }
-  .day.busy::after{ content:none; }
-
-  /* Note indicator (само за админ вижда точките) */
-  .day.has-note::before{
-    content:""; position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%;
-    background:#ffd166; box-shadow:0 0 0 1px #2d2f33;
-  }
-
-  /* Notes panel */
-  .notes-panel{
-    position:absolute; right:-420px; top:0; height:100%; width:400px;
-    background:#0f1216; border-left:1px solid #2a2f37; box-shadow:-10px 0 30px rgba(0,0,0,.35);
-    transition:right .22s ease; padding:14px; display:flex; flex-direction:column; gap:10px;
-  }
-  .notes-panel.show{ right:0; }
-  .notes-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .notes-title{font-weight:700}
-  .notes-close{cursor:pointer;border:1px solid #333;background:#1b1f27;color:#ddd;border-radius:10px;padding:6px 10px}
-  .notes-text{flex:1; width:100%; resize:none; background:#0b0e13; color:#e7e9ee; border:1px solid #2a2f37; border-radius:12px; padding:10px; line-height:1.4}
-  .notes-actions{display:flex;gap:8px;justify-content:flex-end}
-  .btn{cursor:pointer;border:1px solid #333;background:#1b1b1b;color:#eee;border-radius:10px;padding:8px 12px}
-  .btn.primary{background:var(--accent);color:#111;border-color:#caa84e;font-weight:700}
-  @media (max-width:520px){
-    .notes-panel{ width:92vw; right:-92vw; }
-    .notes-panel.show{ right:0; }
-  }
-
-  .notes-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .notes-row label{font-size:13px;color:#cfd3da;display:flex;align-items:center;gap:6px}
-  .notes-row input[type="date"]{background:#0b0e13;color:#e7e9ee;border:1px solid #2a2f37;border-radius:10px;padding:6px 8px}
-
-  /* Малък индикатор за админ статуса */
-  .admin-badge{font-size:12px;opacity:.8;margin-left:8px}
 
   /* Админ бутон – долу вдясно на сайта (не fixed) */
   .admin-hotspot{
@@ -308,18 +249,7 @@
   opacity: 1;
   transform: translateY(0);
 }
-/* Скрол на календара на мобилно */
-@media (max-width: 768px) {
-  .cal {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-  }
-}
-/* Точките за бележки да се виждат само за админ */
-body:not(.admin) .day.has-note::before {
-  content: none !important;
-}
+
 .reviews-list {
   display: flex;
   flex-direction: column;
@@ -359,38 +289,7 @@ body:not(.admin) .day.has-note::before {
 .review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
 .review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
 
-/* СВОБОДНИ = светли */
-.day {
-  background: #e6e9ee !important;
-  color: #111 !important;
-  border-color: #cfd6df !important;
-}
 
-/* ЗАЕТИ = по-тъмни */
-.day.busy {
-  background: #2c3138 !important;
-  color: #d7dde6 !important;
-  border-color: #3a414a !important;
-}
-
-/* Легенда да съвпада с цветовете */
-.legend .box {
-  background: #e6e9ee !important;
-  border-color: #cfd6df !important;
-}
-.legend .box.busy {
-  background: #2c3138 !important;
-  border-color: #3a414a !important;
-}
-/* Дни извън текущия месец – като свободните, но по-замъглени */
-.day.out {
-  background: #e6e9ee !important;  /* същия цвят като свободните */
-  color: #111 !important;
-  border-color: #cfd6df !important;
-  opacity: 0.25;
-  filter: blur(2px);
-  pointer-events: none;
-}
 .footer-signature {
   display: block;
   text-align: left;
