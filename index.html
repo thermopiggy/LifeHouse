@@ -997,15 +997,22 @@ $('#abnbSetPrice').addEventListener('click', async ()=>{
   await writeDays(getSelectedKeys(), { price: val });
 });
 
-// --- Интеграция с твоето Auth (вече го имаш)
-auth.onAuthStateChanged(async (user)=>{
-  // използвай твоя checkAdmin ако го имаш, тук е базова версия (email whitelist/claim и т.н.)
-  try{
-    const t = user && await user.getIdTokenResult();
-    isAdmin = !!(t?.claims?.admin);
-  }catch(e){ isAdmin = false; }
-  document.body.classList.toggle('admin', !!isAdmin);
-});
+// --- Интеграция с твоето Auth / синхрон с window.IS_ADMIN
+function syncAdminFlag(){
+  isAdmin = !!window.IS_ADMIN;                     // <-- чети глобалния флаг
+  document.body.classList.toggle('admin', isAdmin);
+}
+
+// когато модалът се отваря – опресни статуса
+function openAbnb() {
+  syncAdminFlag();
+  airCalModal.classList.add('show');
+  loadMonth(cur);
+}
+
+// ако се смени потребителят – опресни след твоя checkAdmin
+auth.onAuthStateChanged(() => setTimeout(syncAdminFlag, 0));
+
 </script>
 
 <script>
