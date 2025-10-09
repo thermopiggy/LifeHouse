@@ -786,14 +786,15 @@ body.admin .admin-only{display:inline-block}
   <!-- ===== Основни скриптове ===== -->
   <script>
   /* ===== Firebase INIT (сложи своя config при нужда) ===== */
-  const firebaseConfig = {
-    apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
-    authDomain: "lifehouse-24137.firebaseapp.com",
-    projectId: "lifehouse-24137",
-    storageBucket: "lifehouse-24137.appspot.com",
-    messagingSenderId: "1017631883575",
-    appId: "1:1017631883575:web:bd44bb5b32bf21e34b1ab2"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAb2fkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+  authDomain: "lhv2-48243.firebaseapp.com",
+  projectId: "lhv2-48243",
+  storageBucket: "lhv2-48243.appspot.com",
+  messagingSenderId: "394167863285",
+  appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+};
+
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
@@ -1051,17 +1052,23 @@ auth.onAuthStateChanged(() => setTimeout(syncAdminFlag, 0));
       return false;
     }
   }
-
-  auth.onAuthStateChanged(async (user)=>{
-    if (!user){
-      window.IS_ADMIN = false;
-      setBadge(null,false);
-      return;
-    }
+auth.onAuthStateChanged(async (user)=>{
+  if (!user){
+    window.IS_ADMIN = false;
+    setBadge(null,false);
+    renderCal();
+    return;
+  }
+  try {
     const isAdmin = await checkAdmin(user);
     window.IS_ADMIN = !!isAdmin;
     setBadge(user, isAdmin);
-  });
+  } catch(e){
+    console.error('Admin check failed:', e);
+    window.IS_ADMIN = false;
+  }
+  renderCal();
+});
 
   /* ===== Init ===== */
 
