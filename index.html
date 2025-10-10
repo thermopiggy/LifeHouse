@@ -787,13 +787,21 @@ body.admin .admin-only{display:inline-block}
   <script>
   /* ===== Firebase INIT (сложи своя config при нужда) ===== */
 const firebaseConfig = {
-  apiKey: "AIzaSyAb2fkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+
+  apiKey: "AIzaSyA2bfkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+
   authDomain: "lhv2-48243.firebaseapp.com",
+
   projectId: "lhv2-48243",
-  storageBucket: "lhv2-48243.appspot.com",
+
+  storageBucket: "lhv2-48243.firebasestorage.app",
+
   messagingSenderId: "394167863285",
+
   appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+
 };
+
 
 
   firebase.initializeApp(firebaseConfig);
@@ -802,7 +810,7 @@ const firebaseConfig = {
 
   /* ===== Drawer (мобилно) ===== */
   const burger = document.getElementById('burger');
-  const drawer = document.getElementById('drawer');
+  const drawer = document.getElementById('drawer'); 
   burger && burger.addEventListener('click',()=>{
     const open = drawer.classList.toggle('show');
     burger.setAttribute('aria-expanded', String(open));
