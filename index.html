@@ -585,6 +585,20 @@ body.kb-open .cal-panel {
   body.admin .admin-only { display: inline-flex !important; }
   .admin-only, #calActions .btn, .calendar-actions .btn { min-height: 40px; }
 }
+/* --- Read-only режим за НЕ-админи --- */
+body:not(.admin) .abnb-side {            /* дясната колона: От–До, бележка, цена */
+  display: none !important;
+}
+body:not(.admin) .abnb-actions {          /* лента с бутони (Запази/Заето/Изчисти) */
+  display: none !important;
+}
+body:not(.admin) .abnb-day {              /* забранява кликове по дните */
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  opacity: 1;                             /* не правим календара прозрачен */
+  cursor: default;
+}
 
 </style>
 </head>
