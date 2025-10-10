@@ -499,19 +499,49 @@ body.admin .admin-only{display:inline-block}
 .abnb-sheet{ position:absolute; z-index:2; }   /* листът над бекдропа */
 .abnb-backdrop{ position:absolute; z-index:1; }/* бекдропът отдолу */
 
- /* --- Mobile calendar modal fixes --- */
-#calendarModal, .calendar-modal, .cal-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  box-sizing: border-box;
-  max-width: 100%;
-  max-height: 100%;
+/* --- Mobile fixes for the Airbnb calendar (match .abnb-* used in index.html) --- */
+
+/* Модалът вече е с висок z-index при теб, оставяме така */
+
+/* Листът (панелът) да запълни височината и да има две редици:
+   1) header (фиксиран)
+   2) body (скролируем) */
+.abnb-sheet{
+  max-height: 100dvh;
+  height: 100dvh;                       /* fallback на some Android */
+  display: grid;
+  grid-template-rows: auto 1fr;         /* header | body */
+  border-radius: 16px 16px 0 0;
 }
+
+/* Тялото да скролира, вместо целия модал да се „реже“ */
+.abnb-wrap{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+}
+
+/* Лентата с бутони да е винаги видима в края на aside */
+.abnb-actions{
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  z-index: 1;
+}
+
+/* По-компактен ден на мобилно, за да се побира повече */
+@media (max-width: 900px){
+  .abnb-day{ height: 68px; }
+}
+
+/* Когато се вдигне клавиатурата – пазим височината на панела */
+body.kb-open .abnb-sheet{
+  max-height: 100dvh;
+  height: 100dvh;
+}
+
 
 #calendarPanel, .calendar-panel, .cal-panel {
   width: min(820px, 100%);
