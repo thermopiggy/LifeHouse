@@ -498,84 +498,63 @@ body.admin .admin-only{display:inline-block}
 .abnb-modal{ position:fixed; inset:0; z-index:9999; }
 .abnb-sheet{ position:absolute; z-index:2; }   /* листът над бекдропа */
 .abnb-backdrop{ position:absolute; z-index:1; }/* бекдропът отдолу */
-/* Мобилен viewport fix (iOS/Android 100vh) */
-:root{
-  --vh: 1vh;
-}
-@supports (height: 100dvh){
-  .use-dvh{ height: 100dvh; }
-}
 
-/* Контейнер на календара/модала */
-.cal-modal,
-.calendar-modal,
-#calendarModal {
+ /* --- Mobile calendar modal fixes --- */
+#calendarModal, .calendar-modal, .cal-modal {
   position: fixed;
-  inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
-  height: calc(var(--vh) * 100); /* fallback */
-  z-index: 9999; /* над навбара и плаващите бутони */
+  inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 12px;
   box-sizing: border-box;
+  max-width: 100%;
+  max-height: 100%;
 }
 
-/* Вътрешен панел */
-.cal-panel,
-.calendar-panel,
-#calendarPanel {
-  width: 100%;
-  max-width: 640px;
+#calendarPanel, .calendar-panel, .cal-panel {
+  width: min(820px, 100%);
+  max-height: 100dvh;           /* новите моб. браузъри */
+  height: 100%;
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  overflow: hidden;              /* скрол ще е вътре */
   display: grid;
-  grid-template-columns: 1fr; /* на мобилно – една колона */
-  grid-auto-rows: min-content;
-  max-height: 100%;
-  overflow: hidden;
+  grid-template-rows: auto 1fr auto; /* header | body | actions */
 }
 
-/* Скрол само вътре, да не реже */
-.cal-panel .grid,
-.cal-panel .content,
-.cal-body,
-.calendar-body {
+/* Скрол само в тялото, за да не се реже */
+#calendarScroll, .calendar-body, .cal-body {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   max-height: 100%;
 }
 
-/* Лента с бутони – винаги видима долу */
-.cal-actions,
-.calendar-actions,
-#calActions {
+/* Лента с бутони залепена долу и винаги видима */
+#calActions, .calendar-actions, .cal-actions {
   position: sticky;
   bottom: 0;
   background: #fff;
-  padding: 12px;
   border-top: 1px solid #eee;
+  padding: 12px;
   display: flex;
   gap: 8px;
   justify-content: flex-end;
   z-index: 1;
 }
 
-/* Админ бутоните на мобилно */
-@media (max-width: 768px){
-  body.admin .admin-only{ display:inline-flex !important; }
-  .cal-actions .btn,
-  .admin-only { min-height: 40px; padding: 10px 14px; }
+/* Когато се вдигне клавиатурата – дайте още място */
+body.kb-open #calendarPanel,
+body.kb-open .calendar-panel,
+body.kb-open .cal-panel {
+  max-height: 100dvh;
 }
 
-/* Предпазно: нищо да не ги скрива */
-*[style*="transform"],
-.transform-parent { isolation: isolate; } /* предотвратява нов z-index контекст */
+@media (max-width: 768px){
+  body.admin .admin-only { display: inline-flex !important; }
+  .admin-only, #calActions .btn, .calendar-actions .btn { min-height: 40px; }
+}
 
 </style>
 </head>
@@ -1302,9 +1281,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script>
-  // 100vh fix за мобилни браузъри с адресни ленти
-  function setVh(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
-  setVh(); window.addEventListener('resize', setVh);
+  // 100vh корекция на мобилно (адресни ленти)
+  function setVh(){ document.documentElement.style.setProperty('--vh', (window.innerHeight*0.01)+'px'); }
+  setVh(); addEventListener('resize', setVh);
+
+  // Маркираме, че клавиатурата е отворена → дава още място на панела
+  (function(){
+    const scope = document.getElementById('calendarModal') || document.querySelector('.calendar-modal,.cal-modal') || document;
+    scope.addEventListener('focusin', (e)=> {
+      if (e.target.matches('input, textarea, [contenteditable="true"]')) document.body.classList.add('kb-open');
+    });
+    scope.addEventListener('focusout', (e)=> {
+      if (e.target.matches('input, textarea, [contenteditable="true"]')) document.body.classList.remove('kb-open');
+    });
+  })();
 </script>
 
 </body>
