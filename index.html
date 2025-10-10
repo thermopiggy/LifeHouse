@@ -1141,6 +1141,8 @@ auth.onAuthStateChanged(() => setTimeout(syncAdminFlag, 0));
     }
   }
 auth.onAuthStateChanged(async (user)=>{
+ document.body.classList.toggle('admin', !!user);
+
   if (!user){
     window.IS_ADMIN = false;
     setBadge(null,false);
