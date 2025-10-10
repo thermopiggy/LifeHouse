@@ -90,65 +90,6 @@
   .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
 
-  /* Calendar UI */
-  .cal{height:calc(100% - 42px)}
-  .cal .head { display:flex; justify-content:space-between; align-items:center; margin:6px 0 10px }
-  .navbtn { cursor:pointer; border:1px solid #333; padding:6px 10px; border-radius:10px; background:#1b1b1b; color:#eee }
-  .grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
-  .dow { text-align:center; font-size:12px; color:#9aa; }
-  .day {
-    position:relative;
-    border:1px solid #2d2f33; border-radius:12px; padding:14px 0; text-align:center; background:#202225;
-    cursor:default; transition:filter .15s, background .15s, transform .05s; color:#e5e7eb;
-  }
-  .day.btn { cursor:pointer }
-  .day.btn:active{ filter:brightness(.82); transform:scale(.98) }
-  .day.btn:focus-visible{ outline:2px solid rgba(255,255,255,.6); outline-offset:2px }
-  .day.busy { background:#4b5563; color:#0b0e12 }
-  .day.out { opacity:.28 }
-  .legend{font-size:12px;margin-top:10px;color:#bcc}
-  .legend .box{display:inline-block;width:14px;height:14px;border:1px solid #2d2f33;vertical-align:-2px;margin-right:6px;background:#202225}
-  .legend .box.busy{background:#4b5563;border-color:#52575f}
-
-  /* Заети дни без Х, с по-тъмен фон */
-  .day.busy{
-    position:relative;
-    background:#4b5563;
-    color:#e8eaee;
-  }
-  .day.busy::after{ content:none; }
-
-  /* Note indicator (само за админ вижда точките) */
-  .day.has-note::before{
-    content:""; position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%;
-    background:#ffd166; box-shadow:0 0 0 1px #2d2f33;
-  }
-
-  /* Notes panel */
-  .notes-panel{
-    position:absolute; right:-420px; top:0; height:100%; width:400px;
-    background:#0f1216; border-left:1px solid #2a2f37; box-shadow:-10px 0 30px rgba(0,0,0,.35);
-    transition:right .22s ease; padding:14px; display:flex; flex-direction:column; gap:10px;
-  }
-  .notes-panel.show{ right:0; }
-  .notes-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .notes-title{font-weight:700}
-  .notes-close{cursor:pointer;border:1px solid #333;background:#1b1f27;color:#ddd;border-radius:10px;padding:6px 10px}
-  .notes-text{flex:1; width:100%; resize:none; background:#0b0e13; color:#e7e9ee; border:1px solid #2a2f37; border-radius:12px; padding:10px; line-height:1.4}
-  .notes-actions{display:flex;gap:8px;justify-content:flex-end}
-  .btn{cursor:pointer;border:1px solid #333;background:#1b1b1b;color:#eee;border-radius:10px;padding:8px 12px}
-  .btn.primary{background:var(--accent);color:#111;border-color:#caa84e;font-weight:700}
-  @media (max-width:520px){
-    .notes-panel{ width:92vw; right:-92vw; }
-    .notes-panel.show{ right:0; }
-  }
-
-  .notes-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .notes-row label{font-size:13px;color:#cfd3da;display:flex;align-items:center;gap:6px}
-  .notes-row input[type="date"]{background:#0b0e13;color:#e7e9ee;border:1px solid #2a2f37;border-radius:10px;padding:6px 8px}
-
-  /* Малък индикатор за админ статуса */
-  .admin-badge{font-size:12px;opacity:.8;margin-left:8px}
 
   /* Админ бутон – долу вдясно на сайта (не fixed) */
   .admin-hotspot{
@@ -308,18 +249,7 @@
   opacity: 1;
   transform: translateY(0);
 }
-/* Скрол на календара на мобилно */
-@media (max-width: 768px) {
-  .cal {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-  }
-}
-/* Точките за бележки да се виждат само за админ */
-body:not(.admin) .day.has-note::before {
-  content: none !important;
-}
+
 .reviews-list {
   display: flex;
   flex-direction: column;
@@ -359,38 +289,7 @@ body:not(.admin) .day.has-note::before {
 .review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
 .review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
 
-/* СВОБОДНИ = светли */
-.day {
-  background: #e6e9ee !important;
-  color: #111 !important;
-  border-color: #cfd6df !important;
-}
 
-/* ЗАЕТИ = по-тъмни */
-.day.busy {
-  background: #2c3138 !important;
-  color: #d7dde6 !important;
-  border-color: #3a414a !important;
-}
-
-/* Легенда да съвпада с цветовете */
-.legend .box {
-  background: #e6e9ee !important;
-  border-color: #cfd6df !important;
-}
-.legend .box.busy {
-  background: #2c3138 !important;
-  border-color: #3a414a !important;
-}
-/* Дни извън текущия месец – като свободните, но по-замъглени */
-.day.out {
-  background: #e6e9ee !important;  /* същия цвят като свободните */
-  color: #111 !important;
-  border-color: #cfd6df !important;
-  opacity: 0.25;
-  filter: blur(2px);
-  pointer-events: none;
-}
 .footer-signature {
   display: block;
   text-align: left;
@@ -556,6 +455,47 @@ body:not(.admin) .day.has-note::before {
 @media (max-width: 768px){
   #places .place-row{ flex-direction: column !important; }
 }
+/* ===== AIRBNB-LIKE CALENDAR ===== */
+.abnb-modal{position:fixed;inset:0;display:none;z-index:9999}
+.abnb-modal.show{display:block}
+.abnb-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+.abnb-sheet{position:absolute;inset:auto 0 0 0;background:#fff;border-radius:16px 16px 0 0;max-height:92vh;overflow:hidden;box-shadow:0 -20px 60px rgba(0,0,0,.2)}
+@media (min-width:900px){.abnb-sheet{inset:5vh auto auto;left:50%;transform:translateX(-50%);width:min(980px,92vw);border-radius:16px}}
+.abnb-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee}
+.abnb-x{border:0;background:transparent;font-size:20px;cursor:pointer;opacity:.7}
+.abnb-nav{display:flex;gap:8px;align-items:center}
+.abnb-month{min-width:220px;text-align:center;font-weight:700;margin:0}
+.abnb-navbtn{border:1px solid #ddd;background:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
+.abnb-wrap{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:16px}
+@media (max-width:900px){.abnb-wrap{grid-template-columns:1fr}}
+.abnb-cal{user-select:none}
+.abnb-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.abnb-dow{opacity:.6;font-size:12px;padding:6px 0;text-align:center}
+.abnb-day{position:relative;border:1px solid #eee;border-radius:12px;padding:8px;height:78px;cursor:pointer;background:#fff;display:flex;flex-direction:column;justify-content:space-between}
+.abnb-day:hover{box-shadow:0 0 0 2px #00000010}
+.abnb-num{font-weight:600;font-size:12px;opacity:.85}
+.abnb-price{font-size:11px;opacity:.75;align-self:flex-end}
+.abnb-day.out{opacity:.35}
+.abnb-day.busy{background:#f5f5f5}
+.abnb-day.busy .abnb-price{opacity:.55;text-decoration:line-through}
+.abnb-day.today{outline:2px solid #00000015}
+.abnb-day.selected{box-shadow:0 0 0 2px #111}
+.abnb-day.in-range{background:#111;color:#fff;border-color:#111}
+.abnb-day.in-range .abnb-price{color:#fff;opacity:.9}
+.abnb-side{display:flex;flex-direction:column;gap:12px}
+.abnb-range{display:flex;flex-direction:column;gap:4px;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:10px}
+.abnb-note textarea{width:100%;min-height:84px;border:1px solid #ddd;border-radius:10px;padding:8px;resize:vertical}
+.abnb-price input{width:100%;border:1px solid #ddd;border-radius:10px;padding:8px}
+.abnb-btn{border:0;background:#111;color:#fff;border-radius:12px;padding:10px 12px;cursor:pointer}
+.abnb-btn.ghost{background:#f3f3f3;color:#111}
+.abnb-actions{display:flex;flex-wrap:wrap;gap:8px}
+.abnb-hint{opacity:.6;font-size:12px;margin:0}
+.admin-only{display:none}
+body.admin .admin-only{display:inline-block}
+/* Fix z-index for Airbnb modal */
+.abnb-modal{ position:fixed; inset:0; z-index:9999; }
+.abnb-sheet{ position:absolute; z-index:2; }   /* листът над бекдропа */
+.abnb-backdrop{ position:absolute; z-index:1; }/* бекдропът отдолу */
 
 </style>
 </head>
@@ -589,7 +529,7 @@ body:not(.admin) .day.has-note::before {
 
       <!-- Десктоп навигация вдясно (скрита на мобилно) -->
       <div class="nav-links">
-        <a href="#" id="openCalFromMenuDesktop">Календар</a>
+        <a href="#"data-open-cal id="openCalFromMenuDesktop">Календар</a>
         <a href="#about">История</a>
         <a href="#places">Наоколо</a>
         <a href="#gallery">Галерия</a>
@@ -598,7 +538,7 @@ body:not(.admin) .day.has-note::before {
 
       <!-- Мобилно чекмедже (линковете остават за мобилно) -->
       <div class="drawer" id="drawer" role="menu" aria-hidden="true">
-        <a href="#" id="openCalFromMenu" role="menuitem">Календар</a>
+        <a href="#"data-open-cal id="openCalFromMenu" role="menuitem">Календар</a>
         <a href="#about" role="menuitem">История</a>
         <a href="#places" role="menuitem">Наоколо</a>
         <a href="#gallery" role="menuitem">Галерия</a>
@@ -793,57 +733,68 @@ body:not(.admin) .day.has-note::before {
   <!-- Невидим бутон долу вдясно (в края на сайта) -->
   <button class="admin-hotspot" id="adminHotspot" aria-label="Админ панел"></button>
 
-  <!-- ===== КАЛЕНДАР МОДАЛ ===== -->
-  <div class="modal" id="calModal" aria-hidden="true" aria-label="Календар за заетост">
-    <div class="modal-card">
-      <div class="modal-head">
-        <strong>свободни дати</strong>
-        <div><button class="x" id="closeCal">Затвори</button></div>
+
+
+  <!-- ===== AIRBNB CALENDAR MODAL ===== -->
+<div id="airCalModal" class="abnb-modal" aria-hidden="true">
+  <div class="abnb-sheet">
+    <header class="abnb-head">
+      <button class="abnb-x" id="abnbClose" aria-label="Close">✕</button>
+      <div class="abnb-nav">
+        <button id="abnbPrev" class="abnb-navbtn" aria-label="Prev">‹</button>
+        <h3 id="abnbMonthLabel" class="abnb-month">—</h3>
+        <button id="abnbNext" class="abnb-navbtn" aria-label="Next">›</button>
       </div>
-      <div class="cal">
-        <div class="head">
-          <button class="navbtn" id="prev">‹</button>
-          <div id="monthLabel"></div>
-          <button class="navbtn" id="next">›</button>
-        </div>
-        <div class="grid" id="grid"></div>
-        <div class="legend">
-          <span class="box"></span> свободно &nbsp; <span class="box busy"></span> заето
-        </div>
+    </header>
+
+    <div class="abnb-wrap">
+      <div class="abnb-cal" id="abnbCal">
+        <!-- рендерира се от JS -->
       </div>
 
-      <!-- Notes panel -->
-      <aside class="notes-panel" id="notesPanel" aria-hidden="true">
-        <div class="notes-head">
-          <div class="notes-title" id="notesTitle">Бележка</div>
-          <button class="notes-close" id="closeNotes">Затвори</button>
+      <aside class="abnb-side">
+        <div class="abnb-range">
+          <div><strong>От:</strong> <span id="abnbFrom">—</span></div>
+          <div><strong>До:</strong> <span id="abnbTo">—</span></div>
         </div>
 
-        <div class="notes-row">
-          <label>От: <input type="date" id="notesStart"></label>
-          <label>До: <input type="date" id="notesEnd"></label>
+        <div class="abnb-note">
+          <label>Бележка (връзка към датите)</label>
+          <textarea id="abnbNote" placeholder="напр. „Резервирано от Иван“"></textarea>
+          <button class="abnb-btn admin-only" id="abnbSaveNote">Запази бележка</button>
         </div>
 
-        <textarea class="notes-text" id="notesText" placeholder="пиши тук…"></textarea>
-        <div class="notes-actions">
-          <button class="btn" id="deleteNotes">Изтрий</button>
-          <button class="btn primary" id="saveNotes">Запази</button>
+        <div class="abnb-price">
+          <label>Цена за нощувка (лв.)</label>
+          <input id="abnbPrice" type="number" inputmode="numeric" min="0" step="1" placeholder="350">
+          <button class="abnb-btn admin-only" id="abnbSetPrice">Задай цена</button>
         </div>
+
+        <div class="abnb-actions">
+          <button class="abnb-btn admin-only" id="abnbMarkBusy">Маркирай Заето</button>
+          <button class="abnb-btn ghost admin-only" id="abnbClearBusy">Освободи</button>
+          <button class="abnb-btn ghost" id="abnbClearSel">Изчисти избора</button>
+        </div>
+
+        <p class="abnb-hint">Клик за начало → клик за край (точно като в Airbnb).</p>
       </aside>
     </div>
   </div>
+  <div class="abnb-backdrop" id="abnbBackdrop"></div>
+</div>
 
   <!-- ===== Основни скриптове ===== -->
   <script>
   /* ===== Firebase INIT (сложи своя config при нужда) ===== */
-  const firebaseConfig = {
-    apiKey: "AIzaSyD_2EbEpx0E-Fpvt-4YqFduD5sXkLJNbS8",
-    authDomain: "lifehouse-24137.firebaseapp.com",
-    projectId: "lifehouse-24137",
-    storageBucket: "lifehouse-24137.appspot.com",
-    messagingSenderId: "1017631883575",
-    appId: "1:1017631883575:web:bd44bb5b32bf21e34b1ab2"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAb2fkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+  authDomain: "lhv2-48243.firebaseapp.com",
+  projectId: "lhv2-48243",
+  storageBucket: "lhv2-48243.appspot.com",
+  messagingSenderId: "394167863285",
+  appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+};
+
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
@@ -863,282 +814,216 @@ body:not(.admin) .day.has-note::before {
       burger?.setAttribute('aria-expanded','false');
     }
   });
+ </script>
+<script>
+/* ===== Airbnb-like Calendar (Firestore) ===== */
+/* СХЕМА: Collection 'calendar' → doc 'YYYY-MM' → field 'days' = {
+   'YYYY-MM-DD': { busy: true|false, price: number|null, note: string|null }
+} */
+const CAL_COLL = 'calendar_v2';
 
-  /* ===== Modal open/close ===== */
-  const calModal = document.getElementById('calModal');
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const fmt = (d) => d.toISOString().slice(0,10);
+const pad = (n) => (n<10?'0':'')+n;
 
-  function openCalendar(e){
-    e && e.preventDefault();
-    if (!calModal) return;
-    calModal.classList.add('show');
-    calModal.setAttribute('aria-hidden','false');
-    drawer && drawer.classList.remove('show');
-  }
-  function closeCalendar(){
-    if (!calModal) return;
-    calModal.classList.remove('show');
-    calModal.setAttribute('aria-hidden','true');
-    typeof closeNotes === 'function' && closeNotes();
-  }
+let cur = new Date();          // текущ показан месец
+cur.setDate(1);
+let selStart = null, selEnd = null;
+let monthData = {};            // map по ден
+let isAdmin = false;           // ще се обнови от auth
 
-  /* добавихме desktop id за календара */
-  ['openCalHotspot','openCalFromMenu','openCalCta','openCalFromMenuDesktop']
-    .map(id => document.getElementById(id))
-    .filter(Boolean)
-    .forEach(el => el.addEventListener('click', openCalendar));
+// --- Open/Close
+const airCalModal = $('#airCalModal');
+const abnbBackdrop = $('#abnbBackdrop');
+const abnbClose = $('#abnbClose');
 
-  const closeCalBtn = document.getElementById('closeCal');
-  closeCalBtn && closeCalBtn.addEventListener('click', closeCalendar);
+function openAbnb() {
+  airCalModal.classList.add('show');
+  loadMonth(cur);
+}
+function closeAbnb() {
+  airCalModal.classList.remove('show');
+  clearSelection();
+}
 
-  calModal && calModal.addEventListener('click', (e)=>{
-    if (e.target === calModal) closeCalendar();
+// закачаме към всичко с [data-open-cal] (и към стария id ако съществува)
+$$('[data-open-cal], #openCalFromMenu, #openCalFromMenuDesktop').forEach(el=>{
+  el.addEventListener('click', (e)=>{ e.preventDefault(); openAbnb(); });
+});
+abnbBackdrop.addEventListener('click', closeAbnb);
+abnbClose.addEventListener('click', closeAbnb);
+
+// --- Навигация
+$('#abnbPrev').addEventListener('click', ()=>{ cur.setMonth(cur.getMonth()-1); loadMonth(cur); });
+$('#abnbNext').addEventListener('click', ()=>{ cur.setMonth(cur.getMonth()+1); loadMonth(cur); });
+
+// --- Рендер
+async function loadMonth(d){
+  const y = d.getFullYear(), m = pad(d.getMonth()+1);
+  $('#abnbMonthLabel').textContent = d.toLocaleString('bg-BG',{month:'long', year:'numeric'});
+  monthData = await getMonthDoc(`${y}-${m}`);
+  renderGrid(d);
+}
+
+function renderGrid(d){
+  const wrap = $('#abnbCal');
+  wrap.innerHTML = '';
+
+  // DOW header
+  const dow = ['П','В','С','Ч','П','С','Н'];
+  const grid = document.createElement('div');
+  grid.className = 'abnb-grid';
+  dow.forEach(w=>{
+    const h = document.createElement('div'); h.className='abnb-dow'; h.textContent=w; grid.appendChild(h);
   });
 
-  /* ===== Calendar state ===== */
-  const grid = document.getElementById('grid');
-  const monthLabel = document.getElementById('monthLabel');
-  const state = { y: new Date().getFullYear(), m: new Date().getMonth() };
+  const year = d.getFullYear(), month = d.getMonth();
+  const first = new Date(year, month, 1);
+  const start = new Date(first); start.setDate(1 - ((first.getDay()+6)%7)); // понеделник начало
+  for(let i=0;i<42;i++){
+    const day = new Date(start); day.setDate(start.getDate()+i);
+    const key = fmt(day);
+    const cell = document.createElement('button');
+    cell.type='button';
+    cell.className = 'abnb-day';
+    if(day.getMonth()!==month) cell.classList.add('out');
+    if(fmt(new Date())===key) cell.classList.add('today');
 
-  /* ===== Remote busy for current month (doc per month) ===== */
-  let unsubBusy = null;
-  let currentBusySet = new Set(); // от Firestore
+    const data = monthData[key] || {};
+    if(data.busy) cell.classList.add('busy');
 
-  function busyDocRef(y,m){ return db.collection('state').doc(`busy_${y}_${m}`); }
+    const num = document.createElement('div'); num.className='abnb-num'; num.textContent = day.getDate(); 
+    const price = document.createElement('div'); price.className='abnb-price';
+    if(typeof data.price==='number') price.textContent = data.price+' лв.';
+    cell.append(num, price);
 
-  function attachBusyListener(y,m){
-    if (unsubBusy) unsubBusy();
-    unsubBusy = busyDocRef(y,m).onSnapshot(snap=>{
-      const arr = snap.exists ? (snap.data().list || []) : [];
-      currentBusySet = new Set(arr);
-      updateBusyClasses();
-    });
+    // selection styles
+    if(selStart && fmt(day)===fmt(selStart)) cell.classList.add('selected');
+    if(selStart && selEnd && day>=floor(selStart) && day<=floor(selEnd)) cell.classList.add('in-range');
+
+    cell.addEventListener('click', ()=>onPick(day));
+    grid.appendChild(cell);
   }
-  async function saveBusyRemote(set){
-    if (!window.IS_ADMIN) return;
-    await busyDocRef(state.y, state.m).set({ list: [...set] }, { merge:false });
+  wrap.appendChild(grid);
+}
+
+function floor(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+// --- Избор на диапазон (Airbnb UX)
+function onPick(day){
+  if(!selStart || (selStart && selEnd)){ selStart = floor(day); selEnd=null; }
+  else if(day < selStart){ selEnd = selStart; selStart = floor(day); }
+  else { selEnd = floor(day); }
+  updateRangeUI();
+  renderGrid(cur);
+}
+
+function updateRangeUI(){
+  $('#abnbFrom').textContent = selStart ? fmt(selStart) : '—';
+  $('#abnbTo').textContent   = selEnd ? fmt(selEnd) : (selStart?'…':'—');
+
+  // показваме първата бележка/цена ако всички са еднакви
+  const days = getSelectedKeys();
+  const sample = uniformField(days,'note');  $('#abnbNote').value = sample ?? '';
+  const p = uniformField(days,'price');      $('#abnbPrice').value = (typeof p==='number')? p : '';
+}
+function clearSelection(){ selStart=null; selEnd=null; updateRangeUI(); renderGrid(cur); }
+$('#abnbClearSel').addEventListener('click', clearSelection);
+
+function getSelectedKeys(){
+  if(!selStart) return [];
+  const end = selEnd || selStart;
+  const out = [];
+  for(let d=new Date(selStart); d<=end; d.setDate(d.getDate()+1)){
+    out.push(fmt(d));
   }
+  return out;
+}
+function uniformField(keys, field){
+  if(keys.length===0) return null;
+  let val = monthData[keys[0]]?.[field];
+  for(const k of keys){ if((monthData[k]?.[field]) !== val) return null; }
+  return val ?? null;
+}
 
-  /* ===== Notes ranges (global doc) ===== */
-  const rangesDoc = db.collection('state').doc('ranges');
-  let unsubRanges = null;
-  let currentRanges = []; // [{start,end,text},...]
-
-  function attachRangesListener(){
-    if (unsubRanges) return; // един слушател е достатъчен
-    unsubRanges = rangesDoc.onSnapshot(snap=>{
-      currentRanges = snap.exists ? (snap.data().list || []) : [];
-      markNoteDots();
-    });
-  }
-  async function saveRangesRemote(arr){
-    if (!window.IS_ADMIN) return;
-    await rangesDoc.set({ list: arr });
-  }
-  function hasRangeNote(iso){
-    return currentRanges.some(r => iso >= r.start && iso <= r.end);
-  }
-
-  /* ===== Render calendar ===== */
-  function renderCal(){
-    const y = state.y, m = state.m;
-    const d1 = new Date(y,m,1);
-    const startDow = (d1.getDay()+6)%7;
-    const daysInMonth = new Date(y,m+1,0).getDate();
-    const prevDays = new Date(y,m,0).getDate();
-
-    monthLabel.innerHTML = `<strong>${d1.toLocaleString('bg-BG',{month:'long'})}</strong> ${y}`;
-    let cells = '';
-    const dows = ['П','В','С','Ч','П','С','Н'].map(x=>`<div class="dow">${x}</div>`).join('');
-    cells += dows;
-
-    for(let i=0;i<startDow;i++){ cells += `<div class="day out">${prevDays - startDow + i + 1}</div>`; }
-    for(let day=1; day<=daysInMonth; day++){
-      const iso = new Date(y,m,day).toISOString().slice(0,10);
-      const cls = `day btn`;
-      cells += `<button class="${cls}" data-iso="${iso}" aria-label="Ден ${day}">${day}</button>`;
+// --- Firestore
+async function getMonthDoc(id){
+  const snap = await db.collection(CAL_COLL).doc(id).get();
+  return snap.exists && snap.data().days ? snap.data().days : {};
+}
+async function writeDays(keys, patch){
+  if(keys.length===0) return;
+  try{
+    const buckets = {};
+    for (const k of keys){
+      const [y,m] = k.split('-'); const docId = `${y}-${m}`;
+      (buckets[docId] ||= []).push(k);
     }
-    const cellsSoFar = 7 + startDow + daysInMonth;
-    const pad = 7*6 - (cellsSoFar - 7);
-    for(let i=0;i<pad;i++){ cells += `<div class="day out">${i+1}</div>`; }
-
-    grid.innerHTML = cells;
-
-    // клик за заетост (само админ)
-    grid.querySelectorAll('.day.btn').forEach(btn=>{
-      btn.addEventListener('click', (ev)=>{
-        if (!window.IS_ADMIN) return;
-        const cell = ev.currentTarget;
-        const iso = cell.dataset.iso;
-        const set = new Set(currentBusySet);
-        const nowBusy = !set.has(iso);
-        if (nowBusy) set.add(iso); else set.delete(iso);
-        currentBusySet = set;
-        updateBusyClasses();
-        saveBusyRemote(set).catch(console.error);
+    const batch = db.batch();
+    for (const [docId, ks] of Object.entries(buckets)){
+      const ref = db.collection(CAL_COLL).doc(docId);
+      const snap = await ref.get();
+      const days = (snap.exists && snap.data().days) ? snap.data().days : {};
+      ks.forEach(k=>{
+        days[k] = { busy:false, price:null, note:null, ...(days[k]||{}), ...patch };
       });
-
-      // дабълклик за бележки (само за админ)
-      btn.addEventListener('dblclick',(ev)=>{
-        ev.preventDefault();
-        if (!window.IS_ADMIN) return;
-        const iso = ev.currentTarget.dataset.iso;
-        openNotes(iso);
-      });
-    });
-
-    attachBusyListener(y,m);
-    attachRangesListener();
-    updateBusyClasses();
-    markNoteDots();
-  }
-
-  function updateBusyClasses(){
-    grid.querySelectorAll('.day.btn').forEach(cell=>{
-      const iso = cell.dataset.iso;
-      cell.classList.toggle('busy', currentBusySet.has(iso));
-    });
-  }
-  function markNoteDots(){
-    grid.querySelectorAll('.day.btn').forEach(cell=>{
-      const iso = cell.dataset.iso;
-      cell.classList.toggle('has-note', window.IS_ADMIN && hasRangeNote(iso));
-    });
-  }
-
-  /* ===== Month nav ===== */
-  document.getElementById('prev').onclick=()=>{ state.m--; if(state.m<0){state.m=11;state.y--;} renderCal(); };
-  document.getElementById('next').onclick=()=>{ state.m++; if(state.m>11){state.m=0;state.y++;} renderCal(); };
-  
-  // скрол/жестове за смяна на месеци
-  (function(){
-    const area = document.querySelector('.cal');
-    if(!area) return;
-
-    function changeMonth(dir){
-      state.m += dir;
-      if(state.m > 11){ state.m = 0; state.y++; }
-      if(state.m < 0){ state.m = 11; state.y--; }
-      renderCal();
+      batch.set(ref, { days }, { merge:true });
     }
+    await batch.commit();
 
-    let lock = false;
-    area.addEventListener('wheel', (e)=>{
-      if(lock) return;
-      const mag = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-      if(Math.abs(mag) < 20) return;
-      changeMonth(mag > 0 ? 1 : -1);
-      lock = true;
-      setTimeout(()=> lock = false, 180);
-    }, { passive: true });
-
-    let touchStartX = 0, touchStartY = 0;
-    area.addEventListener('touchstart', e=>{
-      const t = e.changedTouches[0];
-      touchStartX = t.clientX;
-      touchStartY = t.clientY;
-    }, {passive:true});
-
-    area.addEventListener('touchend', e=>{
-      const t = e.changedTouches[0];
-      const dx = t.clientX - touchStartX;
-      const dy = t.clientY - touchStartY;
-      if (Math.abs(dx) < 40 && Math.abs(dy) < 40) return;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) changeMonth(1);
-        else changeMonth(-1);
-      } else {
-        if (dy < 0) changeMonth(1);
-        else changeMonth(-1);
-      }
-    }, {passive:true});
-  })();
-
-  /* ===== Notes panel logic ===== */
-  const notesPanel = document.getElementById('notesPanel');
-  const notesTitle = document.getElementById('notesTitle');
-  const notesText  = document.getElementById('notesText');
-  const saveBtn    = document.getElementById('saveNotes');
-  const delBtn     = document.getElementById('deleteNotes');
-  const closeBtn   = document.getElementById('closeNotes');
-  const notesStart = document.getElementById('notesStart');
-  const notesEnd   = document.getElementById('notesEnd');
-
-  let currentIso = null;
-  let editingIndex = -1;
-
-  function findRangeIndexForDate(iso){
-    for (let i=0;i<currentRanges.length;i++){
-      const r = currentRanges[i];
-      if (iso >= r.start && iso <= r.end) return i;
+    // локално обновяване
+    for (const ks of Object.values(buckets)){
+      ks.forEach(k=>{ monthData[k] = { ...(monthData[k]||{}), ...patch }; });
     }
-    return -1;
+    renderGrid(cur);
+  }catch(e){
+    console.error('Firestore write error:', e);
+    alert('Нямаш права за запис или има грешка в базата: ' + (e?.message||e));
   }
+}
 
-  function openNotes(iso){
-    currentIso = iso;
-    editingIndex = findRangeIndexForDate(iso);
 
-    if (editingIndex !== -1){
-      const r = currentRanges[editingIndex];
-      notesStart.value = r.start;
-      notesEnd.value   = r.end;
-      notesText.value  = r.text || '';
-      notesTitle.textContent = `Бележка — ${r.start} → ${r.end}`;
-    } else {
-      notesStart.value = iso;
-      notesEnd.value   = iso;
-      notesText.value  = '';
-      notesTitle.textContent = `Бележка — ${iso}`;
-    }
-    notesPanel.classList.add('show');
-    notesPanel.setAttribute('aria-hidden','false');
-    notesText.focus();
-  }
+// --- Действия (ADMIN)
+$('#abnbMarkBusy').addEventListener('click', async ()=>{
+  if(!isAdmin) return;
+  await writeDays(getSelectedKeys(), { busy:true });
+});
+$('#abnbClearBusy').addEventListener('click', async ()=>{
+  if(!isAdmin) return;
+  await writeDays(getSelectedKeys(), { busy:false });
+});
+$('#abnbSaveNote').addEventListener('click', async ()=>{
+  if(!selStart) return;
+  const val = $('#abnbNote').value.trim() || null;
+  await writeDays(getSelectedKeys(), { note: val });
+});
+$('#abnbSetPrice').addEventListener('click', async ()=>{
+  if(!selStart) return;
+  const raw = $('#abnbPrice').value.trim();
+  const val = raw==='' ? null : Number(raw);
+  await writeDays(getSelectedKeys(), { price: val });
+});
 
-  function closeNotes(){
-    notesPanel.classList.remove('show');
-    notesPanel.setAttribute('aria-hidden','true');
-    currentIso = null;
-    editingIndex = -1;
-  }
+// --- Интеграция с твоето Auth / синхрон с window.IS_ADMIN
+function syncAdminFlag(){
+  isAdmin = !!window.IS_ADMIN;                     // <-- чети глобалния флаг
+  document.body.classList.toggle('admin', isAdmin);
+}
 
-  saveBtn.addEventListener('click', ()=>{
-    if (!window.IS_ADMIN) return;
-    if (!currentIso) return;
+// когато модалът се отваря – опресни статуса
+function openAbnb() {
+  syncAdminFlag();
+  airCalModal.classList.add('show');
+  loadMonth(cur);
+}
 
-    let a = notesStart.value || currentIso;
-    let b = notesEnd.value   || a;
-    if (a > b) [a,b] = [b,a];
+// ако се смени потребителят – опресни след твоя checkAdmin
+auth.onAuthStateChanged(() => setTimeout(syncAdminFlag, 0));
 
-    const text = (notesText.value || '').trim();
-    const arr = [...currentRanges];
+</script>
 
-    if (!text){
-      if (editingIndex !== -1){ arr.splice(editingIndex,1); }
-      saveRangesRemote(arr).catch(console.error);
-      return;
-    }
-
-    const payload = { start:a, end:b, text };
-    if (editingIndex !== -1) arr[editingIndex] = payload;
-    else arr.push(payload);
-
-    saveRangesRemote(arr).catch(console.error);
-    notesTitle.textContent = `Бележка — ${a} → ${b}`;
-  });
-
-  delBtn.addEventListener('click', ()=>{
-    if (!window.IS_ADMIN) return;
-    if (!currentIso) return;
-    const arr = [...currentRanges];
-    if (editingIndex !== -1){
-      arr.splice(editingIndex,1);
-      saveRangesRemote(arr).catch(console.error);
-    }
-    notesText.value = '';
-  });
-  closeBtn.addEventListener('click', closeNotes);
-
+<script>
   /* ===== Auth & Admin ===== */
   window.IS_ADMIN = false;
 
@@ -1167,20 +1052,26 @@ body:not(.admin) .day.has-note::before {
       return false;
     }
   }
-
-  auth.onAuthStateChanged(async (user)=>{
-    if (!user){
-      window.IS_ADMIN = false;
-      setBadge(null,false);
-      return;
-    }
+auth.onAuthStateChanged(async (user)=>{
+  if (!user){
+    window.IS_ADMIN = false;
+    setBadge(null,false);
+    renderCal();
+    return;
+  }
+  try {
     const isAdmin = await checkAdmin(user);
     window.IS_ADMIN = !!isAdmin;
     setBadge(user, isAdmin);
-  });
+  } catch(e){
+    console.error('Admin check failed:', e);
+    window.IS_ADMIN = false;
+  }
+  renderCal();
+});
 
   /* ===== Init ===== */
-  renderCal();
+
   </script>
 
   <!-- ===== Admin Drawer Logic ===== -->
