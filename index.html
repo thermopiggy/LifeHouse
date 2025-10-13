@@ -606,6 +606,36 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   color: #555 !important;                 /* по-тъмен текст */
   opacity: 1 !important;                  /* да не е избледнял */
 }
+/* ГАЛЕРИЯ – винаги 3 на ред */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.gallery-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .3s, filter .3s;
+}
+.gallery-grid img:hover {
+  transform: scale(1.03);
+  filter: brightness(1.06);
+}
+
+/* Модал – изображението запълва целия екран без изкривяване */
+#imgModal img {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 0;
+}
 
 </style>
 </head>
@@ -672,25 +702,28 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
         <p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p>
       </div>
       <div class="about-img">
-        <img src="zanas.png" alt="Къщата LifeHouse Semkovo">
+        <img src="zanas.webp" alt="Къщата LifeHouse Semkovo" loading="lazy" decoding="async">
+
       </div>
     </div>
   </section>
 
-   <section id="gallery">
+<section id="gallery">
   <h2>Галерия</h2>
   <div class="gallery-grid">
-    <img src="lh1.png" alt="LifeHouse 1">
-    <img src="lh2.png" alt="LifeHouse 2">
-    <img src="lh3.png" alt="LifeHouse 3">
-    <img src="lh4.png" alt="LifeHouse 4">
-    <img src="lh5.png" alt="LifeHouse 5">
-    <img src="lh6.png" alt="LifeHouse 6">
-    <img src="lh7.png" alt="LifeHouse 7">
-    <img src="lh8.png" alt="LifeHouse 8">
-    <img src="lh9.png" alt="LifeHouse 9">
+    <img src="Lifehouse 1.webp" alt="LifeHouse 1" loading="lazy" decoding="async">
+    <img src="Lifehouse 2.webp" alt="LifeHouse 2" loading="lazy" decoding="async">
+    <img src="Lifehouse 3.webp" alt="LifeHouse 3" loading="lazy" decoding="async">
+    <img src="Lifehouse 4.webp" alt="LifeHouse 4" loading="lazy" decoding="async">
+    <img src="Lifehouse 5.webp" alt="LifeHouse 5" loading="lazy" decoding="async">
+    <img src="Lifehouse 6.webp" alt="LifeHouse 6" loading="lazy" decoding="async">
+    <img src="Lifehouse 7.webp" alt="LifeHouse 7" loading="lazy" decoding="async">
+    <img src="Lifehouse 8.webp" alt="LifeHouse 8" loading="lazy" decoding="async">
+    <img src="Lifehouse 9.webp" alt="LifeHouse 9" loading="lazy" decoding="async">
   </div>
 </section>
+
+
 <section id="places">
   <h2>Забележителности</h2>
 
