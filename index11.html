@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
 <title>Lifehouse Semkovo — Къща за гости</title>
 
 <!-- Firebase (compat build) -->
@@ -497,6 +499,144 @@ body.admin .admin-only{display:inline-block}
 .abnb-sheet{ position:absolute; z-index:2; }   /* листът над бекдропа */
 .abnb-backdrop{ position:absolute; z-index:1; }/* бекдропът отдолу */
 
+/* --- Mobile fixes for the Airbnb calendar (match .abnb-* used in index.html) --- */
+
+/* Модалът вече е с висок z-index при теб, оставяме така */
+
+/* Листът (панелът) да запълни височината и да има две редици:
+   1) header (фиксиран)
+   2) body (скролируем) */
+.abnb-sheet{
+  max-height: 100dvh;
+  height: 100dvh;                       /* fallback на some Android */
+  display: grid;
+  grid-template-rows: auto 1fr;         /* header | body */
+  border-radius: 16px 16px 0 0;
+}
+
+/* Тялото да скролира, вместо целия модал да се „реже“ */
+.abnb-wrap{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+}
+
+/* Лентата с бутони да е винаги видима в края на aside */
+.abnb-actions{
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  z-index: 1;
+}
+
+/* По-компактен ден на мобилно, за да се побира повече */
+@media (max-width: 900px){
+  .abnb-day{ height: 68px; }
+}
+
+/* Когато се вдигне клавиатурата – пазим височината на панела */
+body.kb-open .abnb-sheet{
+  max-height: 100dvh;
+  height: 100dvh;
+}
+
+
+#calendarPanel, .calendar-panel, .cal-panel {
+  width: min(820px, 100%);
+  max-height: 100dvh;           /* новите моб. браузъри */
+  height: 100%;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;              /* скрол ще е вътре */
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* header | body | actions */
+}
+
+/* Скрол само в тялото, за да не се реже */
+#calendarScroll, .calendar-body, .cal-body {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 100%;
+}
+
+/* Лента с бутони залепена долу и винаги видима */
+#calActions, .calendar-actions, .cal-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  z-index: 1;
+}
+
+/* Когато се вдигне клавиатурата – дайте още място */
+body.kb-open #calendarPanel,
+body.kb-open .calendar-panel,
+body.kb-open .cal-panel {
+  max-height: 100dvh;
+}
+
+@media (max-width: 768px){
+  body.admin .admin-only { display: inline-flex !important; }
+  .admin-only, #calActions .btn, .calendar-actions .btn { min-height: 40px; }
+}
+/* --- Read-only режим за НЕ-админи --- */
+body:not(.admin) .abnb-side {            /* дясната колона: От–До, бележка, цена */
+  display: none !important;
+}
+body:not(.admin) .abnb-actions {          /* лента с бутони (Запази/Заето/Изчисти) */
+  display: none !important;
+}
+body:not(.admin) .abnb-day {              /* забранява кликове по дните */
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  opacity: 1;                             /* не правим календара прозрачен */
+  cursor: default;
+}
+/* --- По-тъмно оцветяване на заетите дати --- */
+.abnb-day.busy,
+.abnb-day[data-busy="true"] {
+  background-color: #d8d8d8 !important;   /* малко по-тъмен сив фон */
+  color: #555 !important;                 /* по-тъмен текст */
+  opacity: 1 !important;                  /* да не е избледнял */
+}
+/* ГАЛЕРИЯ – винаги 3 на ред */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.gallery-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .3s, filter .3s;
+}
+.gallery-grid img:hover {
+  transform: scale(1.03);
+  filter: brightness(1.06);
+}
+
+/* Модал – изображението запълва целия екран без изкривяване */
+#imgModal img {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 0;
+}
+
 </style>
 </head>
 <body>
@@ -562,25 +702,28 @@ body.admin .admin-only{display:inline-block}
         <p>Уютна дървена къща с модерни удобства в сърцето на Семково.</p>
       </div>
       <div class="about-img">
-        <img src="zanas.png" alt="Къщата LifeHouse Semkovo">
+        <img src="zanas.webp" alt="Къщата LifeHouse Semkovo" loading="lazy" decoding="async">
+
       </div>
     </div>
   </section>
 
-   <section id="gallery">
+<section id="gallery">
   <h2>Галерия</h2>
   <div class="gallery-grid">
-    <img src="lh1.png" alt="LifeHouse 1">
-    <img src="lh2.png" alt="LifeHouse 2">
-    <img src="lh3.png" alt="LifeHouse 3">
-    <img src="lh4.png" alt="LifeHouse 4">
-    <img src="lh5.png" alt="LifeHouse 5">
-    <img src="lh6.png" alt="LifeHouse 6">
-    <img src="lh7.png" alt="LifeHouse 7">
-    <img src="lh8.png" alt="LifeHouse 8">
-    <img src="lh9.png" alt="LifeHouse 9">
+    <img src="Lifehouse 1.webp" alt="LifeHouse 1" loading="lazy" decoding="async">
+    <img src="Lifehouse 2.webp" alt="LifeHouse 2" loading="lazy" decoding="async">
+    <img src="Lifehouse 3.webp" alt="LifeHouse 3" loading="lazy" decoding="async">
+    <img src="Lifehouse 4.webp" alt="LifeHouse 4" loading="lazy" decoding="async">
+    <img src="Lifehouse 5.webp" alt="LifeHouse 5" loading="lazy" decoding="async">
+    <img src="Lifehouse 6.webp" alt="LifeHouse 6" loading="lazy" decoding="async">
+    <img src="Lifehouse 7.webp" alt="LifeHouse 7" loading="lazy" decoding="async">
+    <img src="Lifehouse 8.webp" alt="LifeHouse 8" loading="lazy" decoding="async">
+    <img src="Lifehouse 9.webp" alt="LifeHouse 9" loading="lazy" decoding="async">
   </div>
 </section>
+
+
 <section id="places">
   <h2>Забележителности</h2>
 
@@ -776,7 +919,7 @@ body.admin .admin-only{display:inline-block}
           <button class="abnb-btn ghost" id="abnbClearSel">Изчисти избора</button>
         </div>
 
-        <p class="abnb-hint">Клик за начало → клик за край (точно като в Airbnb).</p>
+
       </aside>
     </div>
   </div>
@@ -787,13 +930,21 @@ body.admin .admin-only{display:inline-block}
   <script>
   /* ===== Firebase INIT (сложи своя config при нужда) ===== */
 const firebaseConfig = {
-  apiKey: "AIzaSyAb2fkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+
+  apiKey: "AIzaSyA2bfkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+
   authDomain: "lhv2-48243.firebaseapp.com",
+
   projectId: "lhv2-48243",
-  storageBucket: "lhv2-48243.appspot.com",
+
+  storageBucket: "lhv2-48243.firebasestorage.app",
+
   messagingSenderId: "394167863285",
+
   appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+
 };
+
 
 
   firebase.initializeApp(firebaseConfig);
@@ -802,7 +953,7 @@ const firebaseConfig = {
 
   /* ===== Drawer (мобилно) ===== */
   const burger = document.getElementById('burger');
-  const drawer = document.getElementById('drawer');
+  const drawer = document.getElementById('drawer'); 
   burger && burger.addEventListener('click',()=>{
     const open = drawer.classList.toggle('show');
     burger.setAttribute('aria-expanded', String(open));
@@ -1053,6 +1204,8 @@ auth.onAuthStateChanged(() => setTimeout(syncAdminFlag, 0));
     }
   }
 auth.onAuthStateChanged(async (user)=>{
+ document.body.classList.toggle('admin', !!user);
+
   if (!user){
     window.IS_ADMIN = false;
     setBadge(null,false);
@@ -1210,6 +1363,22 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   modal.addEventListener("click", () => modal.classList.remove("show"));
 });
+</script>
+<script>
+  // 100vh корекция на мобилно (адресни ленти)
+  function setVh(){ document.documentElement.style.setProperty('--vh', (window.innerHeight*0.01)+'px'); }
+  setVh(); addEventListener('resize', setVh);
+
+  // Маркираме, че клавиатурата е отворена → дава още място на панела
+  (function(){
+    const scope = document.getElementById('calendarModal') || document.querySelector('.calendar-modal,.cal-modal') || document;
+    scope.addEventListener('focusin', (e)=> {
+      if (e.target.matches('input, textarea, [contenteditable="true"]')) document.body.classList.add('kb-open');
+    });
+    scope.addEventListener('focusout', (e)=> {
+      if (e.target.matches('input, textarea, [contenteditable="true"]')) document.body.classList.remove('kb-open');
+    });
+  })();
 </script>
 
 </body>
