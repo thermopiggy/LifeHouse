@@ -656,6 +656,16 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
 .headline {
   display: none !important;
 }
+/* Плавна поява на снимките в галерията */
+.gallery-grid img{
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .6s ease, transform .6s ease, filter .3s;
+}
+.gallery-grid img.visible{
+  opacity: 1;
+  transform: translateY(0);
+}
 
 </style>
 </head>
@@ -1502,6 +1512,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   obs.observe(modal, { attributes:true, attributeFilter:['style','class','open','hidden'] });
 })();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const imgs = document.querySelectorAll('.gallery-grid img');
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('visible');
+        obs.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  imgs.forEach(img => io.observe(img));
+});
 </script>
 
 </body>
