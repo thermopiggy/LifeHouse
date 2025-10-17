@@ -1511,6 +1511,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   obs.observe(modal, { attributes:true, attributeFilter:['style','class','open','hidden'] });
+                // Малки триъгълници за навигация вляво и вдясно
+  const leftArrow = document.createElement("div");
+  const rightArrow = document.createElement("div");
+  [leftArrow, rightArrow].forEach(el => {
+    el.style.position = "absolute";
+    el.style.top = "50%";
+    el.style.transform = "translateY(-50%)";
+    el.style.fontSize = "42px";
+    el.style.color = "white";
+    el.style.cursor = "pointer";
+    el.style.userSelect = "none";
+    el.style.padding = "10px";
+    el.style.opacity = "0.6";
+    el.style.transition = "opacity .2s";
+    el.addEventListener("mouseenter", () => el.style.opacity = "1");
+    el.addEventListener("mouseleave", () => el.style.opacity = "0.6");
+  });
+  leftArrow.innerHTML = "&#10094;";
+  rightArrow.innerHTML = "&#10095;";
+  leftArrow.style.left = "20px";
+  rightArrow.style.right = "20px";
+
+  modal.appendChild(leftArrow);
+  modal.appendChild(rightArrow);
+
+  leftArrow.addEventListener("click", prev);
+  rightArrow.addEventListener("click", next);
+})();
+
 })();
 </script>
 <script>
