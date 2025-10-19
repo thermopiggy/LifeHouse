@@ -1086,7 +1086,14 @@ const CAL_COLL = 'calendar_v2';
 
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-const fmt = (d) => d.toISOString().slice(0,10);
+// НОВО – локална дата без UTC отместване
+const fmt = (d) => {
+  const y = d.getFullYear();
+  const m = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  return `${y}-${m}-${day}`;
+};
+
 const pad = (n) => (n<10?'0':'')+n;
 
 let cur = new Date();          // текущ показан месец
