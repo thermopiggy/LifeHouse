@@ -667,6 +667,32 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   transform: translateY(0);
 }
 
+ /* Навигационни стрелки в модала */
+#imgModal .img-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  cursor: pointer;
+  user-select: none;
+}
+#imgModal .img-prev { left: 18px; }
+#imgModal .img-next { right: 18px; }
+#imgModal:not(.show) .img-nav { display: none; }
+#imgModal .img-nav:focus-visible { outline: 2px dashed #fff; outline-offset: 3px; }
+ #imgModal .img-nav { z-index: 5; } /* да е над изображението */
+
+
+
+ 
 </style>
 </head>
 <body>
@@ -1451,69 +1477,78 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 (() => {
   const thumbs = Array.from(document.querySelectorAll('.gallery-grid img'));
-  const modal = document.getElementById('imgModal');
-  const modalImg = modal.querySelector('img');
+  const modal  = document.getElementById('imgModal');
+  const modalImg = modal?.querySelector('img');
+  if (!thumbs.length || !modal || !modalImg) return;
+
   let i = 0;
 
-  // запомняме индекса при клик по миниатюра (ползва се и от съществуващия ти отварящ код)
+  // запомняме индекса при клик (използва се от навигацията)
   thumbs.forEach((img, idx) => {
     img.dataset.idx = idx;
     img.addEventListener('click', () => { i = idx; });
   });
 
   function showAt(idx){
-    i = (idx + thumbs.length) % thumbs.length;   // wrap
+    i = (idx + thumbs.length) % thumbs.length;
     modalImg.src = thumbs[i].src;
   }
   function next(){ showAt(i + 1); }
   function prev(){ showAt(i - 1); }
 
-  // Скрол на десктоп: надолу -> следваща, нагоре -> предишна
+  // --- Стрелки в модала ---
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'img-nav img-prev';
+  prevBtn.setAttribute('aria-label','Предишна');
+  prevBtn.textContent = '‹';
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'img-nav img-next';
+  nextBtn.setAttribute('aria-label','Следваща');
+  nextBtn.textContent = '›';
+
+  // да не затварят модала при клик
+  [prevBtn, nextBtn].forEach(btn => btn.addEventListener('click', e => e.stopPropagation()));
+  modal.appendChild(prevBtn);
+  modal.appendChild(nextBtn);
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  // --- Скрол на десктоп (надолу → следваща; нагоре → предишна) ---
   modal.addEventListener('wheel', (e) => {
+    if (!modal.classList.contains('show')) return;
     e.preventDefault();
     (e.deltaY > 0 ? next : prev)();
-  }, { passive:false });
+  }, { passive: false });
 
-  // Стрелки на клавиатурата и ESC за затваряне
-  window.addEventListener('keydown', (e) => {
-    if (modal.offsetParent === null) return; // модалът е скрит
-    if (e.key === 'ArrowRight') next();
-    else if (e.key === 'ArrowLeft') prev();
-    else if (e.key === 'Escape') modal.click(); // ползваш вече съществуващия close handler
+  // --- Клавиатура (само когато модалът е отворен) ---
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('show')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); }
   });
 
-  // Swipe на мобилно
-  let touchX = null, touchY = null;
+  // --- Свайп на мобилно ---
+  let touchX = null;
   modal.addEventListener('touchstart', (e) => {
-    const t = e.changedTouches[0];
-    touchX = t.clientX; touchY = t.clientY;
-  }, { passive:true });
+    touchX = e.changedTouches?.[0]?.clientX ?? null;
+  }, { passive: true });
 
   modal.addEventListener('touchend', (e) => {
-    if (touchX === null) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchX;
-    const dy = t.clientY - touchY;
-    touchX = touchY = null;
+    if (touchX == null) return;
+    const dx = (e.changedTouches?.[0]?.clientX ?? touchX) - touchX;
+    if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+    touchX = null;
+  }, { passive: true });
 
-    // хоризонтален жест с праг ~40px и по-силен хоризонтален компонент
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) next();  // swipe left -> следваща
-      else prev();         // swipe right -> предишна
-    }
-  }, { passive:true });
-
-  // Ако модалът се отваря без да сме кликнали (напр. от друг код), синхронизирай с текущия src
-  const obs = new MutationObserver(() => {
-    if (modal.offsetParent !== null) {
-      const idx = thumbs.findIndex(t => t.src === modalImg.src);
-      if (idx >= 0) i = idx;
-    }
+  // при отваряне с клик от галерията показвай правилната снимка
+  const observer = new MutationObserver(() => {
+    if (modal.classList.contains('show')) showAt(i);
   });
-  obs.observe(modal, { attributes:true, attributeFilter:['style','class','open','hidden'] });
-
-
+  observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
 })();
+
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
