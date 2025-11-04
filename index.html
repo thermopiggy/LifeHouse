@@ -722,6 +722,13 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   }
 }
 
+/* Скриваме само текста + снимката на историята, видеото остава видимо */
+#about .about-wrap {
+  display: none;
+}
+#about.show .about-wrap {
+  display: flex; /* или block – зависи от оригиналната структура */
+}
 
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
@@ -1700,6 +1707,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, { threshold: 0.15 });
   imgs.forEach(img => io.observe(img));
+});
+</script>
+
+ <script>
+// Показва текст + снимка на История при клик в менюто
+document.querySelectorAll('a[href="#about"]').forEach(link => {
+  link.addEventListener('click', () => {
+    const about = document.getElementById('about');
+    about.classList.add('show');
+  });
 });
 </script>
 
