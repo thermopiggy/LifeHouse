@@ -806,6 +806,30 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
 #prices-reservation li::marker {
   color: var(--accent);
 }
+/* --- Тъмен текст за трите нови секции --- */
+#cancellation-rules,
+#accommodation-rules,
+#prices-reservation {
+  color: #333 !important;
+  background: rgba(255,255,255,0.85); /* леко прозрачен светъл фон за четимост */
+}
+
+/* Маркерите на списъците остават в accent цвят */
+#cancellation-rules li::marker,
+#accommodation-rules li::marker,
+#prices-reservation li::marker {
+  color: var(--accent);
+}
+
+/* Заглавията (h2, h3) също стават тъмни */
+#cancellation-rules h2, 
+#accommodation-rules h2,
+#prices-reservation h2,
+#cancellation-rules h3, 
+#accommodation-rules h3,
+#prices-reservation h3 {
+  color: #222;
+}
 
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
