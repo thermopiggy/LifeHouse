@@ -850,6 +850,26 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   .place-photos{ width: 100%; }
 }
 
+ .reasons-gallery img {
+    border-radius: 0 !important;       /* без заоблени ъгли */
+    border: 2px solid #fff;            /* тънка бяла рамка */
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.reasons-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 x 2 подредба */
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.reasons-item {
+    max-width: 700px;                  /* снимките стават по-едри */
+    margin: 0 auto;
+}
+
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
 <meta name="keywords" content="къща за гости Семково, LifeHouse Semkovo, вила под наем, почивка в планината, Беласица, Банско, Белица, планинска къща">
