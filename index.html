@@ -885,6 +885,8 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
     background-attachment: scroll !important;
   }
 }
+#places .place-photos img{ cursor:pointer; transition:transform .3s, filter .3s; }
+#places .place-photos img:hover{ transform:scale(1.03); filter:brightness(1.06); }
 
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
@@ -1945,7 +1947,8 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 <script>
 (() => {
-  const thumbs = Array.from(document.querySelectorAll('.gallery-grid img'));
+ const thumbs = Array.from(document.querySelectorAll('.gallery-grid img, #places .place-photos img'));
+
   const modal  = document.getElementById('imgModal');
   const modalImg = modal?.querySelector('img');
   if (!thumbs.length || !modal || !modalImg) return;
