@@ -1920,7 +1920,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("imgModal");
   const modalImg = modal.querySelector("img");
-  document.querySelectorAll(".gallery-grid img").forEach(img => {
+  document.querySelectorAll(".gallery-grid img, #places .place-photos img").forEach(img => {
     img.addEventListener("click", () => {
       modalImg.src = img.src;
       modal.classList.add("show");
