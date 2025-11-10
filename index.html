@@ -920,6 +920,31 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   color: #333 !important;
 }
 
+ .footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+}
+.footer-social .contact-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.4);
+  color: #ccc;
+  text-decoration: none;
+  transition: color .25s, background .25s;
+}
+.footer-social .contact-btn:hover { background: rgba(255,255,255,.1); }
+.footer-social .wa:hover { color:#25D366; }
+.footer-social .viber:hover { color:#7360F2; }
+.footer-social .tel:hover { color:#34A853; }
+.footer-social .fb:hover { color:#1877F2; }
+.footer-social .ig:hover { color:#E4405F; }
+
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
 <meta name="keywords" content="къща за гости Семково, LifeHouse Semkovo, вила под наем, почивка в планината, Беласица, Банско, Белица, планинска къща">
@@ -1889,10 +1914,24 @@ auth.onAuthStateChanged(async (user)=>{
     </a>
   </div>
 
-  <footer class="site-footer">
-    <div class="footer-medal">
-      <img src="medal.png" alt="Отличие LifeHouse Semkovo">
-    </div>
+  <div class="footer-social">
+  <a href="https://wa.me/359988988623" target="_blank" class="contact-btn wa" aria-label="WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3.5A10.47 10.47 0 0 0 12 1 10.5 10.5 0 0 0 1.5 11.5a10.3 10.3 0 0 0 1.47 5.35L1 23l6.32-1.94a10.47 10.47 0 0 0 4.68 1.12A10.5 10.5 0 0 0 20 3.5ZM12 20a8.46 8.46 0 0 1-4.33-1.18l-.31-.18-3.75 1.15 1.16-3.63-.2-.33a8.45 8.45 0 1 1 7.43 4.17Zm4.79-6.36c-.26-.13-1.53-.75-1.77-.84s-.41-.13-.58.13-.66.84-.81 1-.3.19-.56.06a6.93 6.93 0 0 1-2-1.23 7.45 7.45 0 0 1-1.37-1.7c-.14-.25 0-.39.11-.52.11-.11.26-.29.38-.43a1.76 1.76 0 0 0 .25-.42.47.47 0 0 0 0-.45c-.07-.13-.57-1.39-.78-1.9s-.41-.44-.57-.45h-.49a.94.94 0 0 0-.68.32A2.86 2.86 0 0 0 6 9.8a5 5 0 0 0 1.05 2.64 11.32 11.32 0 0 0 4.31 3.91 14.8 14.8 0 0 0 1.52.56 3.62 3.62 0 0 0 1.64.1 2.67 2.67 0 0 0 1.75-1.22 2.18 2.18 0 0 0 .15-1.22c-.06-.1-.24-.16-.48-.29Z"/></svg>
+  </a>
+  <a href="viber://chat?number=%2B359988988623" class="contact-btn viber" aria-label="Viber">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297 0-.593-.048-.878-.143-1.241-.423-2.744-1.368-3.526-2.15-.782-.783-1.727-2.285-2.15-3.526-.347-1.02-.09-2.006.642-2.737.405-.405.9-.63 1.434-.63.289 0 .58.05.86.147l1.168.42a1 1 0 01.611 1.272l-.484 1.453a1 1 0 01-.958.683h-.002a1 1 0 01-.944-.666l-.062-.177c-.068-.195-.125-.36-.167-.496-.117-.385-.202-.67-.287-.852-.04-.086-.102-.178-.169-.246-.145-.144-.342-.205-.527-.205a.794.794 0 00-.56.232c-.249.25-.309.66-.147 1.113.234.667.632 1.532 1.081 2.201.447.668 1.183 1.405 1.852 1.853.67.45 1.534.848 2.201 1.082.454.16.864.101 1.114-.148a.79.79 0 00.232-.56c0-.185-.06-.382-.205-.527a1.08 1.08 0 00-.246-.17c-.182-.084-.467-.17-.851-.286a6.732 6.732 0 00-.673-.17l-.183-.063a1 1 0 01-.668-.946 1 1 0 01.683-.958l1.452-.484a1 1 0 011.272.612l.42 1.167c.27.756.157 1.587-.308 2.278-.47.698-1.207 1.076-2.02 1.076z"/><path d="M21.5 2h-19A.5.5 0 002 2.5v19c0 .276.224.5.5.5H8l2.79 2.79a.997.997 0 001.41 0L15 22h6.5a.5.5 0 00.5-.5v-19a.5.5 0 00-.5-.5z"/></svg>
+  </a>
+  <a href="tel:+359988988623" class="contact-btn tel" aria-label="Call">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.09 15.09 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.72 11.72 0 003.68.59 1 1 0 011 1V21a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1 11.72 11.72 0 00.59 3.68 1 1 0 01-.25 1.01l-2.22 2.1z"/></svg>
+  </a>
+  <a href="https://www.facebook.com/profile.php?id=100057135262751&locale=bg_BG" target="_blank" class="contact-btn fb" aria-label="Facebook">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.987C18.343 21.128 22 17 22 12z"/></svg>
+  </a>
+  <a href="https://www.instagram.com/lifehouse_semkovo/" target="_blank" class="contact-btn ig" aria-label="Instagram">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/></svg>
+  </a>
+</div>
+
   </footer>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
