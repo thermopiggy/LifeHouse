@@ -2150,28 +2150,49 @@ document.querySelectorAll('a[href="#about"]').forEach(link => {
 });
 </script>
 
-<!-- сложи това преди </body> -->
 <script>
-  const sticky = document.querySelector('.fixed-contacts');
-  const footer = document.querySelector('.site-footer') || document.querySelector('footer');
+  (function () {
+    const sticky = document.querySelector('.fixed-contacts');
+    const footer = document.querySelector('.site-footer') || document.querySelector('footer');
+    if (!sticky || !footer) return;
 
-  if (sticky && footer) {
+    // Ако страницата е по-къса от прозореца – не скриваме бутоните
+    const doc = document.documentElement;
+    const pageShort = doc.scrollHeight <= window.innerHeight + 40;
+    if (pageShort) return;
+
+    // Създаваме „страж“ точно над футъра
+    let sentinel = document.getElementById('bottom-sentinel');
+    if (!sentinel) {
+      sentinel = document.createElement('div');
+      sentinel.id = 'bottom-sentinel';
+      sentinel.style.cssText = 'height:1px;width:100%;';
+      footer.parentNode.insertBefore(sentinel, footer); // точно преди футъра
+    }
+
+    // Плавност
     sticky.style.transition = 'opacity .25s ease';
 
+    // Когато останат ~160px до дъното, скривай
     const io = new IntersectionObserver((entries) => {
-      const atBottom = entries[0].isIntersecting;   // футърът влезе в екрана
-      if (atBottom) {
+      const nearBottom = entries[0].isIntersecting;
+      if (nearBottom) {
         sticky.style.opacity = '0';
         sticky.style.pointerEvents = 'none';
       } else {
         sticky.style.opacity = '1';
         sticky.style.pointerEvents = 'auto';
       }
-    }, { root: null, threshold: 0 });
+    }, {
+      root: null,
+      threshold: 0,
+      rootMargin: '0px 0px -160px 0px' // работи еднакво на десктоп и мобилно
+    });
 
-    io.observe(footer);
-  }
+    io.observe(sentinel);
+  })();
 </script>
+
 
 
 </body>
