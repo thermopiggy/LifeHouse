@@ -926,19 +926,30 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   gap: 14px;
   margin-top: 20px;
 }
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 30px;
+}
+
 .footer-social .contact-btn {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,.4);
-  color: #ccc;
+  background: none !important;
+  color: #444;
   text-decoration: none;
-  transition: color .25s, background .25s;
+  transition: transform .25s, color .25s;
 }
-.footer-social .contact-btn:hover { background: rgba(255,255,255,.1); }
+
+.footer-social .contact-btn:hover {
+  transform: scale(1.15);
+}
+
 .footer-social .wa:hover { color:#25D366; }
 .footer-social .viber:hover { color:#7360F2; }
 .footer-social .tel:hover { color:#34A853; }
