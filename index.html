@@ -2150,23 +2150,29 @@ document.querySelectorAll('a[href="#about"]').forEach(link => {
 });
 </script>
 
-   <script>
-  const stickyBtns = document.querySelector('.fixed-contacts');
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    const docHeight = document.body.offsetHeight;
-    const winHeight = window.innerHeight;
-    const distanceToBottom = docHeight - (scrollY + winHeight);
+<!-- сложи това преди </body> -->
+<script>
+  const sticky = document.querySelector('.fixed-contacts');
+  const footer = document.querySelector('.site-footer') || document.querySelector('footer');
 
-    if (distanceToBottom < 200) {
-      stickyBtns.style.opacity = '0';
-      stickyBtns.style.pointerEvents = 'none';
-    } else {
-      stickyBtns.style.opacity = '1';
-      stickyBtns.style.pointerEvents = 'auto';
-    }
-  });
+  if (sticky && footer) {
+    sticky.style.transition = 'opacity .25s ease';
+
+    const io = new IntersectionObserver((entries) => {
+      const atBottom = entries[0].isIntersecting;   // футърът влезе в екрана
+      if (atBottom) {
+        sticky.style.opacity = '0';
+        sticky.style.pointerEvents = 'none';
+      } else {
+        sticky.style.opacity = '1';
+        sticky.style.pointerEvents = 'auto';
+      }
+    }, { root: null, threshold: 0 });
+
+    io.observe(footer);
+  }
 </script>
+
 
 </body>
 </html>
