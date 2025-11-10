@@ -2150,5 +2150,23 @@ document.querySelectorAll('a[href="#about"]').forEach(link => {
 });
 </script>
 
+   <script>
+  const stickyBtns = document.querySelector('.fixed-contacts');
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    const docHeight = document.body.offsetHeight;
+    const winHeight = window.innerHeight;
+    const distanceToBottom = docHeight - (scrollY + winHeight);
+
+    if (distanceToBottom < 200) {
+      stickyBtns.style.opacity = '0';
+      stickyBtns.style.pointerEvents = 'none';
+    } else {
+      stickyBtns.style.opacity = '1';
+      stickyBtns.style.pointerEvents = 'auto';
+    }
+  });
+</script>
+
 </body>
 </html>
