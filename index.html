@@ -190,12 +190,27 @@ body { overflow-x: hidden; }
   .fixed-contacts .contact-btn.wa:hover{ color:#25D366; }
   .fixed-contacts .contact-btn.viber:hover{ color:#7360F2; }
 
-  #rules, #reviews{
-background: #fff;
-color: #111;
-    padding:60px 18px;
-    min-height:40vh;
-  }
+  #reviews {
+  position: relative;
+  background: #fff;
+  color: #111;
+  padding: 40px 0;
+  min-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reviews-scroll {
+  overflow-y: auto;
+  width: 100%;
+  max-width: 720px;
+  padding: 0 18px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
   #about{
     background:rgba(0,0,0,.35);
     color:#fff;
