@@ -2196,7 +2196,7 @@ document.querySelectorAll('a[href="#about"]').forEach(link => {
 <script>
   (function () {
     const sticky = document.querySelector('.fixed-contacts');
-    const footer = document.querySelector('.site-footer') || document.querySelector('footer');
+    const footer = document.querySelector('.site-footer, footer, .footer-social');
     if (!sticky || !footer) return;
 
     // Ако страницата е по-къса от прозореца – не скриваме бутоните
