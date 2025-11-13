@@ -1008,10 +1008,20 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
 .footer-social .contact-btn:hover{
   filter: saturate(1) brightness(1);
 }
+.footer-signature,
 .photo-credit {
-  font-size: 12px;
-  color: #999;
-  margin-top: 5px;
+  color: #000;          
+  font-size: 14px;      
+  display: block;       
+  text-align: left;     
+}
+
+.footer-signature {
+  margin-bottom: 4px;    /* разстоянието между двете */
+}
+
+.photo-credit {
+  margin-top: 0;         /* да не добавя второ разстояние */
 }
 
 </style>
@@ -2049,7 +2059,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <a href="https://webbadoo.com" class="footer-signature" target="_blank">© 2025 Design by <strong>webbadoo</strong></a>
- <p class="photo-credit">photography by Plamen Gonev</p>
+ <p class="photo-credit">photography by <strong>Plamen Gonev</strong></p>
 
   
 
