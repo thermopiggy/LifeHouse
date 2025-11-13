@@ -1,0 +1,2242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+
+
+<title>Lifehouse Semkovo — Guest House</title>
+
+<!-- Firebase (compat build) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<style>
+ html { -webkit-text-size-adjust: 100%; }
+/* iOS: спира auto-zoom при фокус на полета */
+input, select, textarea { font-size: 16px; }
+
+/* временно предотвратява хор. скрол/зуум от препълване */
+body { overflow-x: hidden; }
+
+  :root{
+    --glass-bg:rgba(20,20,20,.45);
+    --text:#f5f5f5;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+  /* Fullscreen hero with background */
+  .hero{
+    position:relative;min-height:100%;
+    background:url("lifehouse-semkovo.jpg") center/cover no-repeat fixed;
+    color:#fff;
+  }
+
+  /* NAV */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:120;
+  display:flex; align-items:center; gap:12px;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.25);
+  background:var(--glass-bg); backdrop-filter:saturate(140%) blur(8px);
+}
+
+  .brand{font-weight:700;letter-spacing:.4px;white-space:nowrap}
+  .brand img {height:100%;max-height:48px;width:auto;display:block}
+  .burger{
+    width:42px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
+    display:grid;place-items:center;background:transparent;color:#fff;cursor:pointer
+  }
+  .burger span,.burger::before,.burger::after{
+    content:"";display:block;width:20px;height:2px;background:#fff;border-radius:2px
+  }
+  .burger span{margin:4px 0}
+
+  /* Drawer (мобилно меню) */
+  .drawer{
+    position:fixed; right:10px; top:calc(10px + 48px);
+    width:clamp(60px,32vw,300px); max-height:70vh; overflow:auto;
+    padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,.25);
+    background:var(--glass-bg); backdrop-filter:saturate(140%) blur(10px);
+    z-index:110; display:none;
+  }
+  .drawer a, .drawer button{
+    display:block;color:var(--text);text-decoration:none;
+    padding:14px 12px;margin:4px 0;border-radius:10px;font-size:16px;font-weight:600;
+    width:100%; text-align:right; background:transparent; border:none; cursor:pointer;
+  }
+  .drawer a:hover, .drawer button:hover{background:rgba(255,255,255,.1)}
+  .drawer.show{display:block}
+
+  /* Headline */
+  .headline{
+    position:absolute;left:50%;top:65%;transform:translate(-50%,-50%);
+    text-align:center;padding:14px 18px;border-radius:16px;
+    background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2)
+  }
+  .headline h1{margin:0 0 6px 0;font-size:28px}
+  .headline p{margin:0;font-size:14px;opacity:.95}
+
+  /* Sections */
+  section{min-height:60vh;padding:60px 18px;color:#fff}
+  #about,#gallery,#contact{background:rgba(0,0,0,.35)}
+  .btn-primary{display:inline-block;margin-top:10px;background:var(--accent);color:#222;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}
+
+  /* Modal */
+  .modal{
+    position:fixed; inset:0; background:rgba(0,0,0,.55);
+    display:none; align-items:center; justify-content:center; z-index:200; padding:14px
+  }
+  .modal.show{display:flex}
+  .modal-card{
+    position:relative; width:min(1100px,96vw); height:min(740px,92vh); padding:14px;
+    border-radius:18px; background:#111; box-shadow:0 10px 40px rgba(0,0,0,.5);
+    color:#eee; border:1px solid #2a2a2a; overflow:hidden;
+  }
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .x{border:1px solid #333;background:#181818;color:#ddd;border-radius:10px;padding:8px 12px;cursor:pointer}
+
+
+  /* Админ бутон – долу вдясно на сайта (не fixed) */
+  .admin-hotspot{
+    display:block;
+    width:64px;
+    height:64px;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    opacity:0;          /* невидим, но кликаем */
+    margin-left:auto;
+    margin-right:0;
+    margin-top:40px;
+    margin-bottom:0;
+  }
+  .admin-hotspot:focus-visible{
+    outline:2px dashed rgba(255,255,255,.6);
+    outline-offset:4px;
+  }
+
+  /* Admin drawer (част от потока, вдясно долу) */
+  .admin-drawer{
+    position:relative;
+    margin-left:auto;
+    margin-right:0;
+    width:clamp(240px, 60vw, 360px);
+    max-height:70vh;
+    overflow:auto;
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.25);
+    background:var(--glass-bg);
+    backdrop-filter:saturate(140%) blur(10px);
+    display:none;
+    color:var(--text);
+  }
+  .admin-drawer.show{ display:block }
+
+  .admin-drawer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px }
+  .admin-close{ cursor:pointer; border:1px solid #333; background:#1b1b1b; color:#eee; border-radius:10px; padding:6px 10px }
+
+  .admin-drawer-body button{
+    display:block; width:100%; text-align:left; cursor:pointer;
+    border:none; background:transparent; color:var(--text);
+    padding:12px; border-radius:10px; font-weight:600;
+  }
+  .admin-drawer-body button:hover{ background:rgba(255,255,255,.1) }
+
+  /* Социалки в нав бара */
+  .nav .social{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    color:#ccc;
+    transition:color .25s, background .25s;
+  }
+  .nav .social:hover{ background:rgba(255,255,255,.1); }
+  .nav .social.fb:hover{ color:#1877F2; }
+  .nav .social.ig:hover{ color:#E4405F; }
+
+  /* Фиксирани контакти */
+  .fixed-contacts{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:150;
+  }
+  .fixed-contacts .contact-btn{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.4);
+    color:#ccc;
+    text-decoration:none;
+    transition:color .25s, background .25s;
+  }
+  .fixed-contacts .contact-btn:hover{ background:rgba(255,255,255,.1); }
+  .fixed-contacts .contact-btn.tel:hover{ color:#34A853; }
+  .fixed-contacts .contact-btn.wa:hover{ color:#25D366; }
+  .fixed-contacts .contact-btn.viber:hover{ color:#7360F2; }
+
+  #rules, #reviews{
+background: #fff;
+color: #111;
+    padding:60px 18px;
+    min-height:40vh;
+  }
+  #about{
+    background:rgba(0,0,0,.35);
+    color:#fff;
+    padding:60px 18px;
+  }
+  .about-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:20px;
+  }
+  .about-text{flex:1; min-width:250px;}
+  .about-img{flex:1; min-width:250px; text-align:center;}
+  .about-img img{max-width:100%; height:auto; border-radius:12px;}
+  @media (max-width:768px){
+    .about-wrap{flex-direction:column;}
+    .about-img{order:-1;}
+  }
+
+  .site-footer{
+    background:#fff;
+    padding:30px 0;
+    text-align:center;
+  }
+ 
+
+  /* ===== Desktop меню вдясно ===== */
+  .nav-links{display:none;} /* скрито по подразбиране (мобилно) */
+  @media (min-width:769px){
+    .burger, .drawer{display:none !important;}
+    .nav-links{display:flex;gap:16px;margin-left:auto;}
+    .nav-links a{
+      color:var(--text);
+      text-decoration:none;
+      font-weight:600;
+      padding:8px 12px;
+      border-radius:8px;
+    }
+    .nav-links a:hover{background:rgba(255,255,255,.1);}
+  }
+ @media (max-width: 768px) {
+  
+  .burger {
+    position: absolute;
+    right: 14px;   /* същото отстояние като padding-а на nav */
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;     /* премахваме auto марджини */
+  }
+}
+.about-img img {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.about-img img.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 16px;
+}
+.review-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.review-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.review-content { flex: 1; }
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-name { font-weight: 600; color: var(--accent); }
+.review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
+.review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
+
+
+.footer-signature {
+  display: block;
+  text-align: left;
+  margin: 30px 20px;
+  font-size: 12px;
+  color: #555;
+  text-decoration: none;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+.footer-signature strong {
+  color: #444;
+}
+.footer-signature:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+#reviews {
+  position: relative;
+  background: rgba(50,50,50,.35);
+  color: #fff;
+  padding: 40px 0;
+  height: 80vh;              /* фиксирана височина */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reviews-scroll {
+  overflow-y: auto;
+  width: 100%;
+  max-width: 720px;
+  padding: 0 18px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.review-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+.review-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.review-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.review-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.review-content { flex: 1; }
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-name { font-weight: 600; color: var(--accent); }
+.review-stars { color: gold; font-size: 16px; letter-spacing: 1px; }
+.review-text { margin: 0; color: #f0f0f0; line-height: 1.5; }
+#places {
+  background: rgba(255, 255, 255, 0.85);
+  color: #222;
+}
+
+  padding: 60px 18px;
+  min-height: 40vh;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.gallery-grid img {
+  width: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .3s, filter .3s;
+}
+.gallery-grid img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Модал за голямо изображение */
+#imgModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+#imgModal.show { display: flex; }
+#imgModal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+}
+#places {
+  background: rgba(85,85,85,.35);
+  color: #fff;
+  padding: 60px 18px;
+}
+.place-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin: 40px 0;
+}
+.place-row.alt {
+  flex-direction: row-reverse; /* редува подредбата */
+}
+.place-row img {
+  width: 45%;
+  max-width: 480px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+}
+.place-text {
+  width: 45%;
+}
+.place-text h3 {
+  margin-top: 0;
+  color: var(--accent);
+}
+.place-text p {
+  color: #eee;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .place-row, .place-row.alt {
+    flex-direction: column;
+  }
+  .place-row img, .place-text {
+    width: 100%;
+  }
+}
+/* Всеки четен ред в секцията #places да е огледален */
+#places .place-row:nth-child(even) {
+  flex-direction: row-reverse;
+}
+/* На мобилно всички редове стават вертикални */
+@media (max-width: 768px){
+  #places .place-row{ flex-direction: column !important; }
+}
+/* ===== AIRBNB-LIKE CALENDAR ===== */
+.abnb-modal{position:fixed;inset:0;display:none;z-index:9999}
+.abnb-modal.show{display:block}
+.abnb-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+.abnb-sheet{position:absolute;inset:auto 0 0 0;background:#fff;border-radius:16px 16px 0 0;max-height:92vh;overflow:hidden;box-shadow:0 -20px 60px rgba(0,0,0,.2)}
+@media (min-width:900px){.abnb-sheet{inset:5vh auto auto;left:50%;transform:translateX(-50%);width:min(980px,92vw);border-radius:16px}}
+.abnb-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee}
+.abnb-x{border:0;background:transparent;font-size:20px;cursor:pointer;opacity:.7}
+.abnb-nav{display:flex;gap:8px;align-items:center}
+.abnb-month{min-width:220px;text-align:center;font-weight:700;margin:0}
+.abnb-navbtn{border:1px solid #ddd;background:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
+.abnb-wrap{display:grid;grid-template-columns:1fr 300px;gap:16px;padding:16px}
+@media (max-width:900px){.abnb-wrap{grid-template-columns:1fr}}
+.abnb-cal{user-select:none}
+.abnb-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.abnb-dow{opacity:.6;font-size:12px;padding:6px 0;text-align:center}
+.abnb-day{position:relative;border:1px solid #eee;border-radius:12px;padding:8px;height:78px;cursor:pointer;background:#fff;display:flex;flex-direction:column;justify-content:space-between}
+.abnb-day:hover{box-shadow:0 0 0 2px #00000010}
+.abnb-num{font-weight:600;font-size:12px;opacity:.85}
+.abnb-price{font-size:11px;opacity:.75;align-self:flex-end}
+.abnb-day.out{opacity:.35}
+.abnb-day.busy{background:#f5f5f5}
+.abnb-day.busy .abnb-price{opacity:.55;text-decoration:line-through}
+.abnb-day.today{outline:2px solid #00000015}
+.abnb-day.selected{box-shadow:0 0 0 2px #111}
+.abnb-day.in-range{background:#111;color:#fff;border-color:#111}
+.abnb-day.in-range .abnb-price{color:#fff;opacity:.9}
+.abnb-side{display:flex;flex-direction:column;gap:12px}
+.abnb-range{display:flex;flex-direction:column;gap:4px;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:10px}
+.abnb-note textarea{width:100%;min-height:84px;border:1px solid #ddd;border-radius:10px;padding:8px;resize:vertical}
+.abnb-price input{width:100%;border:1px solid #ddd;border-radius:10px;padding:8px}
+.abnb-btn{border:0;background:#111;color:#fff;border-radius:12px;padding:10px 12px;cursor:pointer}
+.abnb-btn.ghost{background:#f3f3f3;color:#111}
+.abnb-actions{display:flex;flex-wrap:wrap;gap:8px}
+.abnb-hint{opacity:.6;font-size:12px;margin:0}
+.admin-only{display:none}
+body.admin .admin-only{display:inline-block}
+/* Fix z-index for Airbnb modal */
+.abnb-modal{ position:fixed; inset:0; z-index:9999; }
+.abnb-sheet{ position:absolute; z-index:2; }   /* листът над бекдропа */
+.abnb-backdrop{ position:absolute; z-index:1; }/* бекдропът отдолу */
+
+/* --- Mobile fixes for the Airbnb calendar (match .abnb-* used in index.html) --- */
+
+/* Модалът вече е с висок z-index при теб, оставяме така */
+
+/* Листът (панелът) да запълни височината и да има две редици:
+   1) header (фиксиран)
+   2) body (скролируем) */
+.abnb-sheet{
+  max-height: 100dvh;
+  height: 100dvh;                       /* fallback на some Android */
+  display: grid;
+  grid-template-rows: auto 1fr;         /* header | body */
+  border-radius: 16px 16px 0 0;
+}
+
+/* Тялото да скролира, вместо целия модал да се „реже“ */
+.abnb-wrap{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+}
+
+/* Лентата с бутони да е винаги видима в края на aside */
+.abnb-actions{
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  z-index: 1;
+}
+
+/* По-компактен ден на мобилно, за да се побира повече */
+@media (max-width: 900px){
+  .abnb-day{ height: 68px; }
+}
+
+/* Когато се вдигне клавиатурата – пазим височината на панела */
+body.kb-open .abnb-sheet{
+  max-height: 100dvh;
+  height: 100dvh;
+}
+
+
+#calendarPanel, .calendar-panel, .cal-panel {
+  width: min(820px, 100%);
+  max-height: 100dvh;           /* новите моб. браузъри */
+  height: 100%;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;              /* скрол ще е вътре */
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* header | body | actions */
+}
+
+/* Скрол само в тялото, за да не се реже */
+#calendarScroll, .calendar-body, .cal-body {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 100%;
+}
+
+/* Лента с бутони залепена долу и винаги видима */
+#calActions, .calendar-actions, .cal-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  z-index: 1;
+}
+
+/* Когато се вдигне клавиатурата – дайте още място */
+body.kb-open #calendarPanel,
+body.kb-open .calendar-panel,
+body.kb-open .cal-panel {
+  max-height: 100dvh;
+}
+
+@media (max-width: 768px){
+  body.admin .admin-only { display: inline-flex !important; }
+  .admin-only, #calActions .btn, .calendar-actions .btn { min-height: 40px; }
+}
+/* --- Read-only режим за НЕ-админи --- */
+body:not(.admin) .abnb-side {            /* дясната колона: От–До, бележка, цена */
+  display: none !important;
+}
+body:not(.admin) .abnb-actions {          /* лента с бутони (Запази/Заето/Изчисти) */
+  display: none !important;
+}
+body:not(.admin) .abnb-day {              /* забранява кликове по дните */
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  opacity: 1;                             /* не правим календара прозрачен */
+  cursor: default;
+}
+/* --- По-тъмно оцветяване на заетите дати --- */
+.abnb-day.busy,
+.abnb-day[data-busy="true"] {
+  background-color: #d8d8d8 !important;   /* малко по-тъмен сив фон */
+  color: #555 !important;                 /* по-тъмен текст */
+  opacity: 1 !important;                  /* да не е избледнял */
+}
+/* ГАЛЕРИЯ – винаги 3 на ред */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.gallery-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .3s, filter .3s;
+}
+.gallery-grid img:hover {
+  transform: scale(1.03);
+  filter: brightness(1.06);
+}
+
+/* Модал – изображението запълва целия екран без изкривяване */
+#imgModal img {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 0;
+}
+.hero-content {
+  background-color: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  color: #fff;                     /* бял текст за контраст */
+  padding: 24px 32px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.15);  /* лека светла сянка вместо тъмна */
+  transition: background-color .3s, box-shadow .3s;
+}
+.hero-content:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 25px rgba(255,255,255,0.25);
+}
+
+
+/* Плавна поява на снимките в галерията */
+.gallery-grid img{
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .6s ease, transform .6s ease, filter .3s;
+}
+.gallery-grid img.visible{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+ /* Навигационни стрелки в модала */
+#imgModal .img-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  cursor: pointer;
+  user-select: none;
+}
+#imgModal .img-prev { left: 18px; }
+#imgModal .img-next { right: 18px; }
+#imgModal:not(.show) .img-nav { display: none; }
+#imgModal .img-nav:focus-visible { outline: 2px dashed #fff; outline-offset: 3px; }
+ #imgModal .img-nav { z-index: 5; } /* да е над изображението */
+
+/* По-тъмни заглавия в секцията Наоколо */
+#places .place-text h3 {
+  color: #333 !important;  /* тъмно сиво за по-добра четимост */
+}
+/* По-тъмни описания под заглавията в секцията Наоколо */
+#places .place-text p {
+  color: #555 !important;  /* по-светло тъмно сиво от заглавието */
+}
+
+/* Галерия – прави снимките с прави ъгли и тънка бяла рамка */
+#gallery .gallery-grid img {
+    border-radius: 0 !important;      /* премахва заоблянето */
+    border: 2px solid #fff;           /* тънка бяла рамка */
+    box-shadow: none !important;      /* маха сенки, ако има */
+}
+
+ /* Галерия – снимките да са максимално широки, почти до ръба на екрана */
+#gallery .gallery-grid {
+    max-width: 100vw;        /* пълна ширина на екрана */
+    padding: 0 4px;          /* минимален отстъп от стените */
+    gap: 6px;                /* по-малко разстояние между снимките */
+}
+
+/* На мобилни – 2 големи снимки на ред */
+@media (max-width: 768px) {
+  #gallery .gallery-grid {
+    grid-template-columns: repeat(2, 1fr); /* вместо 3 снимки */
+  }
+}
+
+/* Скриваме само текста + снимката на историята, видеото остава видимо */
+#about .about-wrap {
+  display: none;
+}
+#about.show .about-wrap {
+  display: flex; /* или block – зависи от оригиналната структура */
+}
+
+ /* Галерия: еднакви плочки с изрязване */
+#gallery .gallery-grid img{
+  aspect-ratio: 4 / 3;   /* еднаква пропорция за всички */
+  width: 100%;
+  height: auto;
+  object-fit: cover;      /* центр. изрязване, без разпъване */
+  border-radius: 0 !important;
+  border: 2px solid #fff;
+}
+
+ #accomodation-rules {
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  padding: 60px 18px;
+  line-height: 1.6;
+}
+#accomodation-rules h2 {
+  margin-top: 0;
+  font-size: 28px;
+}
+#accomodation-rules hr {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,.2);
+  margin: 30px 0;
+}
+#accomodation-rules ul {
+  padding-left: 20px;
+}
+#accomodation-rules li::marker {
+  color: var(--accent);
+}
+
+ #cancellation-rules{
+  background: rgba(0,0,0,.35);
+  padding: 60px 18px;
+}
+#cancellation-rules ul{ padding-left:20px; line-height:1.6; }
+#cancellation-rules li::marker{ color: var(--accent); }
+#accommodation-rules {
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  padding: 60px 18px;
+  line-height: 1.6;
+}
+#accommodation-rules hr {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,.2);
+  margin: 30px 0;
+}
+#accommodation-rules ul {
+  padding-left: 20px;
+}
+#accommodation-rules li::marker {
+  color: var(--accent);
+}
+#prices-reservation {
+  background: rgba(0,0,0,.35);
+  color: #fff;
+  padding: 60px 18px;
+  line-height: 1.6;
+}
+#prices-reservation hr {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,.2);
+  margin: 30px 0;
+}
+#prices-reservation ul {
+  padding-left: 20px;
+}
+#prices-reservation li::marker {
+  color: var(--accent);
+}
+/* --- Тъмен текст за трите нови секции --- */
+#cancellation-rules,
+#accommodation-rules,
+#prices-reservation {
+  color: #333 !important;
+  background: rgba(255,255,255,0.85); /* леко прозрачен светъл фон за четимост */
+}
+
+/* Маркерите на списъците остават в accent цвят */
+#cancellation-rules li::marker,
+#accommodation-rules li::marker,
+#prices-reservation li::marker {
+  color: var(--accent);
+}
+
+/* Заглавията (h2, h3) също стават тъмни */
+#cancellation-rules h2, 
+#accommodation-rules h2,
+#prices-reservation h2,
+#cancellation-rules h3, 
+#accommodation-rules h3,
+#prices-reservation h3 {
+  color: #222;
+}
+
+ /* 2×2 снимки в секцията 10 причини */
+.place-photos{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 45%;
+  max-width: 480px;
+}
+.place-photos img{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+}
+@media (max-width: 768px){
+  .place-photos{ width: 100%; }
+}
+
+ .reasons-gallery img {
+    border-radius: 0 !important;       /* без заоблени ъгли */
+    border: 2px solid #fff;            /* тънка бяла рамка */
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.reasons-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 x 2 подредба */
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.reasons-item {
+    max-width: 700px;                  /* снимките стават по-едри */
+    margin: 0 auto;
+}
+
+ /* 10 причини – прави ъгли, тънка бяла рамка, по-едри снимки */
+#places .place-photos { width: 55%; max-width: 640px; }       /* по-едри на десктоп */
+@media (max-width: 768px){ #places .place-photos { width: 100%; } }
+
+#places .place-photos img{
+  border-radius: 0 !important;
+  border: 2px solid #fff;
+  box-shadow: none !important;
+}
+/* iOS fix – спира background-attachment: fixed */
+@supports (-webkit-touch-callout: none) {
+  .hero {
+    background-attachment: scroll !important;
+  }
+}
+#places .place-photos img{ cursor:pointer; transition:transform .3s, filter .3s; }
+#places .place-photos img:hover{ transform:scale(1.03); filter:brightness(1.06); }
+
+/* По-светъл, но не бял фон за секцията 10 причини */
+#places {
+  background: rgba(240, 240, 240, 0.9) !important;
+  color: #222 !important;
+}
+#places .place-text h3 {
+  color: #111 !important;
+}
+#places .place-text p {
+  color: #333 !important;
+}
+
+ /* Отзиви – малко по-сива от секцията 10 причини */
+#reviews {
+  background: rgba(225, 225, 225, 0.9) !important;
+  color: #222 !important;
+}
+#reviews .review-text {
+  color: #333 !important;
+}
+
+ /* Картите в секцията Отзиви – чисто бели */
+#reviews .review-item {
+  background: #fff !important;
+  border: 1px solid #ddd !important;
+  color: #222 !important;
+}
+#reviews .review-text {
+  color: #333 !important;
+}
+
+ .footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+}
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.footer-social .contact-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none !important;
+  color: #444;
+  text-decoration: none;
+  transition: transform .25s, color .25s;
+}
+
+.footer-social .contact-btn:hover {
+  transform: scale(1.15);
+}
+
+.footer-social .wa:hover { color:#25D366; }
+.footer-social .viber:hover { color:#7360F2; }
+.footer-social .tel:hover { color:#34A853; }
+.footer-social .fb:hover { color:#1877F2; }
+.footer-social .ig:hover { color:#E4405F; }
+
+ .footer-social .contact-btn {
+  transform: scale(2.3);
+  transform-origin: center;
+}
+
+ @media (max-width: 768px) {
+  .footer-social .contact-btn {
+    transform: scale(1.2); /* вместо 3 — по-малки */
+  }
+}
+
+ .footer-social .wa { color:#25D366; }
+.footer-social .viber { color:#7360F2; }
+.footer-social .tel { color:#34A853; }
+.footer-social .fb { color:#1877F2; }
+.footer-social .ig { color:#E4405F; }
+
+/* махаме ефекта при hover */
+.footer-social .contact-btn:hover {
+  transform: scale(1.1);
+  filter: brightness(1.15);
+}
+
+.footer-social,
+.footer-info-text {
+  text-align: center;
+  width: 100%;
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.footer-info-text {
+  font-size: 20px;
+  color: #333;
+  font-weight: 500;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+
+   /* Footer контакти – по-ниска сатурация по подразбиране */
+.footer-social .contact-btn{
+  filter: saturate(0.45) brightness(0.95);
+  transition: filter .25s, transform .25s, color .25s;
+}
+
+/* При hover да стават нормално наситени */
+.footer-social .contact-btn:hover{
+  filter: saturate(1) brightness(1);
+}
+
+</style>
+ <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
+<meta name="keywords" content="къща за гости Семково, LifeHouse Semkovo, вила под наем, почивка в планината, Беласица, Банско, Белица, планинска къща">
+<meta name="author" content="LifeHouse Semkovo">
+<link rel="canonical" href="https://lifehousesemkovo.bg/" />
+<meta property="og:title" content="LifeHouse Semkovo — Къща за гости в планината">
+<meta property="og:description" content="Дом сред боровете — тишина, чист въздух и уют.">
+<meta property="og:image" content="https://lifehousesemkovo.bg/og-image.webp">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="bg_BG">
+<meta property="og:url" content="https://lifehousesemkovo.bg/">
+<meta name="robots" content="index, follow">
+
+ <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LodgingBusiness",
+  "name": "LifeHouse Semkovo",
+  "image": "https://lifehousesemkovo.bg/lifehouse-semkovo.jpg",
+  "description": "Къща за гости в Семково, разположена сред борове, с уютна атмосфера и прекрасна гледка към Пирин.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Семково",
+    "addressRegion": "Благоевград",
+    "addressCountry": "BG"
+  },
+  "telephone": "+359988988623",
+  "priceRange": "350-450 лв.",
+  "url": "https://lifehousesemkovo.bg/",
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 42.0481271,
+    "longitude": 23.5274758
+  },
+  "sameAs": [
+    "https://www.facebook.com/profile.php?id=100057135262751",
+    "https://www.instagram.com/lifehouse_semkovo/"
+  ]
+}
+</script>
+
+</head>
+<body>
+
+  <div class="hero" id="home">
+    <!-- NAV -->
+    <nav class="nav">
+      <!-- Хамбургер (само мобилно; скрит на десктоп с @media) -->
+      <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span></button>
+
+      <!-- ПИН към Google Maps -->
+      <a href="https://www.google.com/maps/place/Life+House/@42.0479645,23.5272436,142m/data=!3m1!1e3!4m17!1m7!3m6!1s0x14ab05c2b76ace83:0x9ce278f0d33929d!2sSemkovo+Mountain+Resort!8m2!3d42.0446093!4d23.5258354!16s%2Fg%2F11jm7lr6cv!3m8!1s0x14ab05371801afd1:0x1abbb9a791e4b886!5m2!4m1!1i2!8m2!3d42.0481271!4d23.5274758!16s%2Fg%2F11f8mg2m1x?entry=ttu"
+         target="_blank" aria-label="Google Maps">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16" style="color:#ffd166;cursor:pointer">
+          <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+        </svg>
+      </a>
+
+      <!-- Социални бутони -->
+      <a href="https://www.facebook.com/profile.php?id=100057135262751&locale=bg_BG" target="_blank" class="social fb" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.987C18.343 21.128 22 17 22 12z"/>
+        </svg>
+      </a>
+      <a href="https://www.instagram.com/lifehouse_semkovo/" target="_blank" class="social ig" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
+        </svg>
+      </a>
+
+      <!-- Десктоп навигация вдясно (скрита на мобилно) -->
+      <div class="nav-links">
+        <a href="#"data-open-cal id="openCalFromMenuDesktop">Calendar</a>
+        <a href="#about">Story</a>
+        <a href="#places">Why visit us</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#reviews">Reviews</a>
+      </div>
+
+      <!-- Мобилно чекмедже (линковете остават за мобилно) -->
+      <div class="drawer" id="drawer" role="menu" aria-hidden="true">
+        <a href="#"data-open-cal id="openCalFromMenu" role="menuitem">Calendar</a>
+        <a href="#about" role="menuitem">Story</a>
+        <a href="#places" role="menuitem">Why visit us</a>
+        <a href="#gallery" role="menuitem">Gallery</a>
+        <a href="#reviews" role="menuitem">Reviews</a>
+      </div>
+    </nav>
+
+    <!-- Callout -->
+    <div class="headline">
+      <h1> LifeHouse Semkovo</h1>
+      <p>
+Това е дом, роден от мечта и възроден от пепелта.
+Място, където планината лекува, а тишината говори повече от думите.</p>
+      
+    </div>
+
+  </div>
+
+  <section id="about">
+    <div class="about-wrap">
+      <div class="about-text">
+        <h2>Story</h2>
+        <p>
+
+Life House е създадена с любов върху място, където някога са стояли студентски бунгала от времето на комунизма. След промените, тук се установява бивш генерал, командвал Първа българска армия, привлечен от тишината и красотата на Семково.
+
+През 2018 г. къщата е закупена от Пламен – човек на приключенията, който оставя зад гърба си градския живот, за да се потопи в магията на планината. Неговата мечта обаче е подложена на изпитание през 2022 г., когато пожар, причинен от небрежни гости, унищожава дома.
+
+С много труд, вяра и помощ от приятели, Пламен възражда мястото от пепелта. Днес Life House е не просто вила – тя е символ на ново начало, свобода и любов към природата.</p>
+      </div>
+      <div class="about-img">
+        <img src="zanas.webp" alt="Къщата LifeHouse Semkovo" loading="lazy" decoding="async">
+
+      </div>
+    </div>
+   <!-- Видео в края на секцията История -->
+<video class="history-video" autoplay muted loop playsinline preload="none" poster="zanas.webp">
+  <source src="lhvideo.mp4" type="video/mp4">
+  Твоят браузър не поддържа видео.
+</video>
+<div class="about-extra">
+  <h3>Лайф Хаус – докосни планината, усети спокойствието</h3>
+  <p>На 1650 метра височина, в най-горната част на курорта Семково, сред аромат на смола и тишина на вековни борове, се намира Лайф Хаус – място, където времето се забавя, а планината е най-близо до теб.</p>
+
+  <p>Районът е тих и спокоен – под нас има няколко вили, които през по-голямата част от годината остават необитаеми. Природата тук е жива, чиста и неподправена – птиците са твоите съседи, а нощем небето е осеяно със звезди.</p>
+
+  <p>Достъпът до вилата е целогодишен. Над нея минава асфалтов път, който през зимата се превръща в ски път идващ от ски пистите. В най-снежните дни автомобилите остават на паркинг на около 150 метра, а последните крачки до къщата са истинска наслада – тишина, пухкав сняг и свеж въздух.</p>
+
+  <p>Вилата е напълно оборудвана с всички удобства за кратък или дълъг престой – уют, топлина и усещане за дом.</p>
+
+  <p>Първият етаж посреща гостите с голяма всекидневна, голяма френска камина, два разгъваеми дивана, трапезария, бар с високи столове, две холни маси и санитарен възел. В антрето има достатъчно място за багаж и съхранение на храна.</p>
+
+  <p>На втория етаж са двете спални – всяка с едно двойно и едно единично легло, с възможност за добавяне на допълнително легло. Разполагаме и с бебешка кошара за най-малките гости. Всяка стая има собствен санитарен възел и излаз към голяма веранда с гледка към гората.</p>
+
+  <p>Outdoors, под дървения навес, те очаква барбекю, готварска печка на дърва, маса и чешма – идеално място в прохладните летни дни или сутрешно кафе сред гората.</p>
+
+  <p><strong>Място в планината – създадено с любов.</strong><br>
+  Лайф Хаус е топла през зимата и прохладна през лятото. Изцяло изградена от дърво, тя носи усещането за жив материал, който диша и пази топлината на всеки спомен. Дизайнът, стилът и изработката са плод на вдъхновението и труда на Пламен Гонев и приятели – хора, които вярват, че домът в планината трябва да се усеща, а не просто да се обитава.</p>
+
+  <p> <em>Лайф Хаус – място, където природата те прегръща, а тишината говори.</em></p>
+</div>
+
+<style>
+.history-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 30px;
+  border-radius: 0;
+  object-fit: cover;
+}
+</style>
+
+  </section>
+
+<section id="gallery">
+  <h2>Gallery</h2>
+
+  <h3>Living room</h3>
+  <div class="gallery-grid">
+  <img src="lifehouse-semkovo.jpg" alt="Всекидневна 1" loading="lazy" decoding="async">
+   <img src="vsekidnevna9.webp" alt="Всекидневна 9" loading="lazy" decoding="async">
+   <img src="vsekidnevna8.webp" alt="Всекидневна 8" loading="lazy" decoding="async">
+   <img src="vsekidnevna7.webp" alt="Всекидневна 7" loading="lazy" decoding="async">
+   <img src="vsekidnevna4.webp" alt="Всекидневна 4" loading="lazy" decoding="async">
+   <img src="vsekidnevna3.webp" alt="Всекидневна 3" loading="lazy" decoding="async">
+   <img src="vsekidnevna5.webp" alt="Всекидневна 5" loading="lazy" decoding="async">
+    <img src="vsekidnevna1.webp" alt="Всекидневна 1" loading="lazy" decoding="async">
+    <img src="vsekidnevna2.webp" alt="Всекидневна 2" loading="lazy" decoding="async">
+   
+    
+    
+    
+    
+  </div>
+
+  <h3>Outdoors</h3>
+  <div class="gallery-grid">
+    
+    <img src="navun4.webp" alt="Навън 2" loading="lazy" decoding="async">
+    <img src="navun3.webp" alt="Навън 3" loading="lazy" decoding="async">
+    <img src="navun6.webp" alt="Навън 6" loading="lazy" decoding="async">
+    <img src="navun7.webp" alt="Навън 7" loading="lazy" decoding="async">
+    <img src="navun1.webp" alt="Навън 1" loading="lazy" decoding="async">
+    <img src="navun8.webp" alt="Навън 8" loading="lazy" decoding="async">
+   
+  </div>
+
+  <h3>Bedroom Zora</h3>
+  <div class="gallery-grid">
+    <img src="spalni1.webp" alt="Спалня 1" loading="lazy" decoding="async">
+    <img src="spalni2.webp" alt="Спалня 2" loading="lazy" decoding="async">
+    <img src="spalni3.webp" alt="Спалня 3" loading="lazy" decoding="async">
+    <img src="spalni9.webp" alt="Спалня 9" loading="lazy" decoding="async">
+    <img src="spalni5.webp" alt="Спалня 5" loading="lazy" decoding="async">
+  
+  </div>
+
+  <h3>Bedroom Vihren</h3>
+  <div class="gallery-grid">
+  
+    <img src="spalni4.webp" alt="Спалня 4" loading="lazy" decoding="async">
+    <img src="spalni10.webp" alt="Спалня 10" loading="lazy" decoding="async">
+    <img src="spalni6.webp" alt="Спалня 6" loading="lazy" decoding="async">
+    <img src="spalni7.webp" alt="Спалня 7" loading="lazy" decoding="async">
+    <img src="spalni8.webp" alt="Спалня 8" loading="lazy" decoding="async">
+    <img src="spalni3.webp" alt="Спалня 3" loading="lazy" decoding="async">
+  </div>
+  <h3>Бани</h3>
+  <div class="gallery-grid">
+    <img src="banya1.webp" alt="Баня 1" loading="lazy" decoding="async">
+    <img src="banya3.webp" alt="Баня 3" loading="lazy" decoding="async">  
+    <img src="banya4.webp" alt="Баня 4" loading="lazy" decoding="async">
+    <img src="banya5.webp" alt="Баня 5" loading="lazy" decoding="async">
+    <img src="banya2.webp" alt="Баня 2" loading="lazy" decoding="async">
+    <img src="banya6.webp" alt="Баня 6" loading="lazy" decoding="async">
+    <img src="banya7.webp" alt="Баня 7" loading="lazy" decoding="async">
+    <img src="banya8.webp" alt="Баня 8" loading="lazy" decoding="async">
+   
+  </div>
+</section>
+
+<section id="places">
+  <h2>10 причини да посетите Life House – Семково</h2>
+
+  <div class="place-row">
+    <div class="place-photos">
+      <img src="p1.webp"   alt="Най-високата къща — 1" loading="lazy" decoding="async">
+      <img src="p1.1.webp" alt="Най-високата къща — 2" loading="lazy" decoding="async">
+    
+    </div>
+    <div class="place-text">
+      <h3>1. Най-високата guest house в България</h3>
+      <p>Разположена на 1650 м надморска височина, Life House ви предлага гледки и въздух, каквито рядко се срещат.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>2. Сърцето на Rila планина</h3>
+      <p>Домът е сгушен сред вековни борове, където тишината и ароматът на гората лекуват ума и сетивата.</p>
+    </div>
+    <div class="place-photos">
+      <img src="p2.webp"   alt="Сърцето на Рила — 1" loading="lazy" decoding="async">
+      <img src="p2.1.webp" alt="Сърцето на Рила — 2" loading="lazy" decoding="async">
+      <img src="p2.2.webp" alt="Сърцето на Рила — 3" loading="lazy" decoding="async">
+      <img src="p2.3.webp" alt="Сърцето на Рила — 4" loading="lazy" decoding="async">
+    </div>
+  </div>
+
+  <div class="place-row">
+    <div class="place-photos">
+      <img src="p3.webp"   alt="Уют дърво и камък — 1" loading="lazy" decoding="async">
+      <img src="p3.1.webp" alt="Уют дърво и камък — 2" loading="lazy" decoding="async">
+  
+    </div>
+    <div class="place-text">
+      <h3>3. Уют, изграден от дърво и камък</h3>
+      <p>Естествените материали и топлото излъчване на интериора създават усещане за истински планински дом.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>4. Кристално чист въздух и вода</h3>
+      <p>Дишате чистота и пиете от извори, които идват направо от планината.</p>
+    </div>
+    <div class="place-photos">
+      <img src="p4.webp"   alt="Чист въздух и вода — 1" loading="lazy" decoding="async">
+      <img src="p4.1.webp" alt="Чист въздух и вода — 2" loading="lazy" decoding="async">
+      <img src="p4.2.webp" alt="Чист въздух и вода — 3" loading="lazy" decoding="async">
+      <img src="p4.3.webp" alt="Чист въздух и вода — 4" loading="lazy" decoding="async">
+    </div>
+  </div>
+
+  <div class="place-row">
+    <div class="place-photos">
+      <img src="p5.webp"   alt="Зими и лета — 1" loading="lazy" decoding="async">
+      <img src="p5.1.webp" alt="Зими и лета — 2" loading="lazy" decoding="async">
+      <img src="p5.2.webp" alt="Зими и лета — 3" loading="lazy" decoding="async">
+      <img src="p5.3.webp" alt="Зими и лета — 4" loading="lazy" decoding="async">
+    </div>
+    <div class="place-text">
+      <h3>5. Снежни зими и прохладни лета</h3>
+      <p>Семково е място, където зимата е приказна, а лятото – свежо и приятно дори в най-горещите дни.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>6. Планински пътеки от самата къща</h3>
+      <p>Излезте от прага и започнете своя преход – маршрутите водят до езера, водопади и панорамни върхове.</p>
+    </div>
+    <div class="place-photos">
+      <img src="p6.webp"   alt="Пътеки от къщата — 1" loading="lazy" decoding="async">
+      <img src="p6.1.webp" alt="Пътеки от къщата — 2" loading="lazy" decoding="async">
+      <img src="p6.2.webp" alt="Пътеки от къщата — 3" loading="lazy" decoding="async">
+      <img src="p6.3.webp" alt="Пътеки от къщата — 4" loading="lazy" decoding="async">
+    </div>
+  </div>
+
+  <div class="place-row">
+    <div class="place-photos">
+      <img src="p7.webp"   alt="Атракции наблизо — 1" loading="lazy" decoding="async">
+      <img src="p7.1.webp" alt="Атракции наблизо — 2" loading="lazy" decoding="async">
+      <img src="p7.2.webp" alt="Атракции наблизо — 3" loading="lazy" decoding="async">
+      <img src="p7.3.webp" alt="Атракции наблизо — 4" loading="lazy" decoding="async">
+    </div>
+    <div class="place-text">
+      <h3>7. Множество атракции в района</h3>
+      <p>Паркът за мечки в Белица, Fun Park Rila, минералните извори и автентичните села – всичко е наблизо.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>8. На кръстопът между три планини</h3>
+      <p>Само за по-малко от час шофиране можете да се потопите в магията на Rhodopeте и Pirin.</p>
+    </div>
+    <div class="place-photos">
+      <img src="p8.webp"   alt="Кръстопът между планини — 1" loading="lazy" decoding="async">
+      <img src="p8.1.webp" alt="Кръстопът между планини — 2" loading="lazy" decoding="async">
+      <img src="p8.2.webp" alt="Кръстопът между планини — 3" loading="lazy" decoding="async">
+      <img src="p8.3.webp" alt="Кръстопът между планини — 4" loading="lazy" decoding="async">
+    </div>
+  </div>
+
+  <div class="place-row">
+    <div class="place-photos">
+      <img src="p9.webp"   alt="Рай за активни — 1" loading="lazy" decoding="async">
+      <img src="p9.1.webp" alt="Рай за активни — 2" loading="lazy" decoding="async">
+      <img src="p9.2.webp" alt="Рай за активни — 3" loading="lazy" decoding="async">
+      <img src="p9.3.webp" alt="Рай за активни — 4" loading="lazy" decoding="async">
+    </div>
+    <div class="place-text">
+      <h3>9. Рай за активни хора</h3>
+      <p>Ски, сноуборд и шейни през зимата; планинско бягане, колоездене и хайкинг през лятото.</p>
+    </div>
+  </div>
+
+  <div class="place-row alt">
+    <div class="place-text">
+      <h3>10. „Life House – създадено от мечта, изградено с ръце, живеещо с душа.“</h3>
+      <p>Това не е просто място за настаняване, а история за възраждане, природа и свобода.</p>
+    </div>
+    <div class="place-photos">
+      <img src="p10.webp"   alt="Създадено от мечта — 1" loading="lazy" decoding="async">
+      <img src="p10.1.webp" alt="Създадено от мечта — 2" loading="lazy" decoding="async">
+    
+    </div>
+  </div>
+
+  <p style="text-align:center; font-style:italic; color:#444; margin-top:50px;">
+    *За най-пълноценно преживяване можете да използвате услугите на местен гид.  
+    Свържете се с нас на някой от посочените контакти.
+  </p>
+</section>
+
+
+  <!-- нова секция Отзиви -->
+<section id="reviews">
+  <h2>Reviews</h2>
+  <div class="reviews-scroll">
+    <div class="reviews-list">
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#555"/><circle cx="50" cy="38" r="18" fill="#888"/><path d="M10 95a40 40 0 0180 0z" fill="#777"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Lev</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">It's awesome home. It's located right inside of the beautiful forest, we didn't want to leave it at all.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#444"/><circle cx="50" cy="38" r="18" fill="#777"/><path d="M10 95a40 40 0 0180 0z" fill="#666"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">George</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">A cozy cottage in a quiet, less-traveled part of the mountain. Perfect for larger groups.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#333"/><circle cx="50" cy="38" r="18" fill="#666"/><path d="M10 95a40 40 0 0180 0z" fill="#555"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Maria</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Lovely place with amazing views and friendly hosts. Highly recommended!</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#464"/><circle cx="50" cy="38" r="18" fill="#797"/><path d="M10 95a40 40 0 0180 0z" fill="#585"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Ivan</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Топло, уютно и с много приятна атмосфера. Камината прави вечерите вълшебни.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#355"/><circle cx="50" cy="38" r="18" fill="#678"/><path d="M10 95a40 40 0 0180 0z" fill="#567"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Sofia</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Everything was spotless clean and beautifully arranged. Perfect for a weekend escape.</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#633"/><circle cx="50" cy="38" r="18" fill="#866"/><path d="M10 95a40 40 0 0180 0z" fill="#755"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Nikolay</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">The hosts were incredibly kind and helpful. We’ll definitely return in winter!</p>
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-avatar">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#555"/><circle cx="50" cy="38" r="18" fill="#999"/><path d="M10 95a40 40 0 0180 0z" fill="#777"/></svg>
+        </div>
+        <div class="review-content">
+          <div class="review-header"><span class="review-name">Petya</span><span class="review-stars">★★★★★</span></div>
+          <p class="review-text">Спокойствие, природа и уют – точно както си го представяхме. Прекрасно място!</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+ <section id="accommodation-rules">
+  <h2>Условия за настаняване</h2>
+  <p>В Лайф Хаус вярваме, че добрата почивка започва с яснота и доверие. Ето няколко важни неща, които е добре да знаете преди своя престой:</p>
+
+  <hr>
+
+  <h3>🕒 Резервации</h3>
+  <p>Резервации се приемат само по телефон, за да можем лично да ви съдействаме и да уточним всички детайли.<br>
+  📞 Можете да се свържете с нас чрез Viber или WhatsApp – бързо, удобно и сигурно.</p>
+
+  <hr>
+
+  <h3>🐾 Домашни любимци</h3>
+  <p>Приемаме кучета до 3 кг, с изградени навици и добро поведение.<br>
+  Молим гостите ни да ни уведомят предварително при резервацията, за да осигурим максимален комфорт за всички.</p>
+
+  <hr>
+
+  <h3>🚭 Пушене</h3>
+  <p>Пушенето във вътрешните помещения на вилата не е позволено.<br>
+  На верандата и в откритите зони има обособени места за пушене.</p>
+
+  <hr>
+
+  <h3>👨‍👩‍👧‍👦 Настаняване и напускане</h3>
+  <ul>
+    <li>Настаняване: след 14:00 ч.</li>
+    <li>Напускане: до 11:00 ч.</li>
+  </ul>
+  <p><em>(При възможност винаги се стараем да сме гъвкави с часовете – просто се обадете предварително.)</em></p>
+
+  <hr>
+
+  <h3>🔥 Отговорно ползване</h3>
+  <p>Вилата е изцяло изградена от дърво – затова молим всички гости да бъдат внимателни при използването на отоплителни уреди и барбекюто.<br>
+  Вашата отговорност и грижа ни помагат да запазим Лайф Хаус така уютна и безопасна, както я обичаме.</p>
+
+  <hr>
+
+  <p><strong>📍 Лайф Хаус – уют, природа и доверие.</strong><br>
+  Ние вярваме, че гостите идват като посетители и си тръгват като приятели. 🌿</p>
+</section>
+<section id="prices-reservation">
+  <h2>Цени и условия за резервация</h2>
+  <p>В Лайф Хаус ценим яснотата и уважението към времето на всеки гост. Ето основната информация относно престоя:</p>
+
+  <hr>
+
+  <h3>💰 Цени на нощувка</h3>
+  <ul>
+    <li>Делнични дни (неделя – четвъртък): <strong>350 лв.</strong> на вечер</li>
+    <li>Почивни и празнични дни: <strong>400 лв.</strong> на вечер</li>
+  </ul>
+  <p>Цената е за цялата вила и включва всички удобства, отопление, интернет и ползване на оборудваната кухня и навес с барбекю.</p>
+
+  <hr>
+
+  <h3>🕒 Минимален брой нощувки</h3>
+  <ul>
+    <li>Минимален престой – <strong>2 нощувки</strong></li>
+    <li>През <strong>февруари</strong> и <strong>август</strong> – минимален престой <strong>4 нощувки</strong></li>
+  </ul>
+  <p><em>(Поради по-голям интерес и натовареност през тези месеци.)</em></p>
+
+  <hr>
+
+  <h3>📞 Резервации</h3>
+  <p>Резервации се правят само по телефон, Viber или WhatsApp, за да можем лично да потвърдим наличността и да ви съдействаме.<br>
+  При потвърждение на резервацията се изисква капаро, което се приспада от общата сума при настаняване.</p>
+
+  <hr>
+
+  <p>📍 Всички гости са добре дошли да се свържат с нас при специални запитвания или дългосрочни престои. Винаги ще се постараем да предложим най-доброто решение. 🌲</p>
+
+  <p><em>* Обявените цени са за семейства с деца, общо до 8 човека.</em></p>
+</section>
+
+<section id="cancellation-rules">
+  <h2>Cancellation Policy (отмяна на резервация)</h2>
+  <p>Разбираме, че плановете понякога се променят, затова се стремим да бъдем максимално гъвкави и коректни към всеки гост.</p>
+  <ul>
+    <li>Безплатна отмяна е възможна до 14 дни преди датата на настаняване.</li>
+    <li>При отмяна между 14 и 7 дни преди пристигане се удържа 50% от общата сума.</li>
+    <li>При отмяна по-малко от 7 дни преди датата на пристигане, както и при неявяване, сумата за престоя не се възстановява.</li>
+    <li>При ранно напускане по време на престоя не се възстановяват неизползваните нощувки.</li>
+  </ul>
+
+  <p>В случай че възникнат непредвидени обстоятелства (например здравословни причини, затворени пътища, бедствия или извънредни ситуации), ние винаги се стремим да намерим справедливо и човешко решение – като пренасочване на датите или частично възстановяване.</p>
+
+  <hr style="border: none; height: 1px; background: rgba(255,255,255,0.2); margin: 30px 0;">
+
+  <p>📅 Молим гостите си да се свържат с нас възможно най-рано при нужда от промяна или отмяна, за да можем да реагираме навреме и да помогнем с алтернативен вариант.</p>
+</section>
+
+
+  <!-- Admin Drawer (част от потока на страницата) -->
+  <div class="admin-drawer" id="adminDrawer" aria-hidden="true">
+    <div class="admin-drawer-head">
+      <strong>Админ панел</strong>
+      <button class="admin-close" id="adminClose" aria-label="Затвори">×</button>
+    </div>
+    <div class="admin-drawer-body">
+      <button id="adminLogin">Админ вход</button>
+      <button id="adminLogout">Изход</button>
+      <div id="adminBadge" class="admin-badge">Статус: гост</div>
+    </div>
+  </div>
+
+  <!-- Невидим бутон долу вдясно (в края на сайта) -->
+  <button class="admin-hotspot" id="adminHotspot" aria-label="Админ панел"></button>
+
+
+
+  <!-- ===== AIRBNB CALENDAR MODAL ===== -->
+<div id="airCalModal" class="abnb-modal" aria-hidden="true">
+  <div class="abnb-sheet">
+    <header class="abnb-head">
+      <button class="abnb-x" id="abnbClose" aria-label="Close">✕</button>
+      <div class="abnb-nav">
+        <button id="abnbPrev" class="abnb-navbtn" aria-label="Prev">‹</button>
+        <h3 id="abnbMonthLabel" class="abnb-month">—</h3>
+        <button id="abnbNext" class="abnb-navbtn" aria-label="Next">›</button>
+      </div>
+    </header>
+
+    <div class="abnb-wrap">
+      <div class="abnb-cal" id="abnbCal">
+        <!-- рендерира се от JS -->
+      </div>
+
+      <aside class="abnb-side">
+        <div class="abnb-range">
+          <div><strong>От:</strong> <span id="abnbFrom">—</span></div>
+          <div><strong>До:</strong> <span id="abnbTo">—</span></div>
+        </div>
+
+        <div class="abnb-note">
+          <label>Note (връзка към датите)</label>
+          <textarea id="abnbNote" placeholder="напр. „Резервирано от Иван“"></textarea>
+          <button class="abnb-btn admin-only" id="abnbSaveNote">Save бележка</button>
+        </div>
+
+        <div class="abnb-price">
+          <label>Цена за нощувка (лв.)</label>
+          <input id="abnbPrice" type="number" inputmode="numeric" min="0" step="1" placeholder="350">
+          <button class="abnb-btn admin-only" id="abnbSetPrice">Задай цена</button>
+        </div>
+
+        <div class="abnb-actions">
+          <button class="abnb-btn admin-only" id="abnbMarkBusy">Маркирай Заето</button>
+          <button class="abnb-btn ghost admin-only" id="abnbClearBusy">Освободи</button>
+          <button class="abnb-btn ghost" id="abnbClearSel">Clear избора</button>
+        </div>
+
+
+      </aside>
+    </div>
+  </div>
+  <div class="abnb-backdrop" id="abnbBackdrop"></div>
+</div>
+
+  <!-- ===== Основни скриптове ===== -->
+  <script>
+  /* ===== Firebase INIT (сложи своя config при нужда) ===== */
+const firebaseConfig = {
+
+  apiKey: "AIzaSyA2bfkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+
+  authDomain: "lhv2-48243.firebaseapp.com",
+
+  projectId: "lhv2-48243",
+
+  storageBucket: "lhv2-48243.firebasestorage.app",
+
+  messagingSenderId: "394167863285",
+
+  appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+
+};
+
+
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+
+  /* ===== Drawer (мобилно) ===== */
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer'); 
+  burger && burger.addEventListener('click',()=>{
+    const open = drawer.classList.toggle('show');
+    burger.setAttribute('aria-expanded', String(open));
+    drawer.setAttribute('aria-hidden', String(!open));
+  });
+  document.addEventListener('click', (e)=>{
+    if (drawer && !drawer.contains(e.target) && !burger?.contains(e.target)) {
+      drawer.classList.remove('show');
+      burger?.setAttribute('aria-expanded','false');
+    }
+  });
+ </script>
+<script>
+/* ===== Airbnb-like Calendar (Firestore) ===== */
+/* СХЕМА: Collection 'calendar' → doc 'YYYY-MM' → field 'days' = {
+   'YYYY-MM-DD': { busy: true|false, price: number|null, note: string|null }
+} */
+const CAL_COLL = 'calendar_v2';
+
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+// НОВО – локална дата без UTC отместване
+const fmt = (d) => {
+  const y = d.getFullYear();
+  const m = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  return `${y}-${m}-${day}`;
+};
+
+const pad = (n) => (n<10?'0':'')+n;
+
+let cur = new Date();          // текущ показан месец
+cur.setDate(1);
+let selStart = null, selEnd = null;
+let monthData = {};            // map по ден
+let isAdmin = false;           // ще се обнови от auth
+
+// --- Open/Close
+const airCalModal = $('#airCalModal');
+const abnbBackdrop = $('#abnbBackdrop');
+const abnbClose = $('#abnbClose');
+
+function openAbnb() {
+  airCalModal.classList.add('show');
+  loadMonth(cur);
+}
+function closeAbnb() {
+  airCalModal.classList.remove('show');
+  clearSelection();
+}
+
+// закачаме към всичко с [data-open-cal] (и към стария id ако съществува)
+$$('[data-open-cal], #openCalFromMenu, #openCalFromMenuDesktop').forEach(el=>{
+  el.addEventListener('click', (e)=>{ e.preventDefault(); openAbnb(); });
+});
+abnbBackdrop.addEventListener('click', closeAbnb);
+abnbClose.addEventListener('click', closeAbnb);
+
+// --- Навигация
+$('#abnbPrev').addEventListener('click', ()=>{ cur.setMonth(cur.getMonth()-1); loadMonth(cur); });
+$('#abnbNext').addEventListener('click', ()=>{ cur.setMonth(cur.getMonth()+1); loadMonth(cur); });
+
+// --- Рендер
+async function loadMonth(d){
+  const y = d.getFullYear(), m = pad(d.getMonth()+1);
+  $('#abnbMonthLabel').textContent = d.toLocaleString('bg-BG',{month:'long', year:'numeric'});
+  monthData = await getMonthDoc(`${y}-${m}`);
+  renderGrid(d);
+}
+
+function renderGrid(d){
+  const wrap = $('#abnbCal');
+  wrap.innerHTML = '';
+
+  // DOW header
+  const dow = ['П','В','С','Ч','П','С','Н'];
+  const grid = document.createElement('div');
+  grid.className = 'abnb-grid';
+  dow.forEach(w=>{
+    const h = document.createElement('div'); h.className='abnb-dow'; h.textContent=w; grid.appendChild(h);
+  });
+
+  const year = d.getFullYear(), month = d.getMonth();
+  const first = new Date(year, month, 1);
+  const start = new Date(first); start.setDate(1 - ((first.getDay()+6)%7)); // понеделник начало
+  for(let i=0;i<42;i++){
+    const day = new Date(start); day.setDate(start.getDate()+i);
+    const key = fmt(day);
+    const cell = document.createElement('button');
+    cell.type='button';
+    cell.className = 'abnb-day';
+    if(day.getMonth()!==month) cell.classList.add('out');
+    if(fmt(new Date())===key) cell.classList.add('today');
+
+    const data = monthData[key] || {};
+    if(data.busy) cell.classList.add('busy');
+
+    const num = document.createElement('div'); num.className='abnb-num'; num.textContent = day.getDate(); 
+    const price = document.createElement('div'); price.className='abnb-price';
+    if(typeof data.price==='number') price.textContent = data.price+' лв.';
+    cell.append(num, price);
+
+    // selection styles
+    if(selStart && fmt(day)===fmt(selStart)) cell.classList.add('selected');
+    if(selStart && selEnd && day>=floor(selStart) && day<=floor(selEnd)) cell.classList.add('in-range');
+
+    cell.addEventListener('click', ()=>onPick(day));
+    grid.appendChild(cell);
+  }
+  wrap.appendChild(grid);
+}
+
+function floor(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+// --- Избор на диапазон (Airbnb UX)
+function onPick(day){
+  if(!selStart || (selStart && selEnd)){ selStart = floor(day); selEnd=null; }
+  else if(day < selStart){ selEnd = selStart; selStart = floor(day); }
+  else { selEnd = floor(day); }
+  updateRangeUI();
+  renderGrid(cur);
+}
+
+function updateRangeUI(){
+  $('#abnbFrom').textContent = selStart ? fmt(selStart) : '—';
+  $('#abnbTo').textContent   = selEnd ? fmt(selEnd) : (selStart?'…':'—');
+
+  // показваме първата бележка/цена ако всички са еднакви
+  const days = getSelectedKeys();
+  const sample = uniformField(days,'note');  $('#abnbNote').value = sample ?? '';
+  const p = uniformField(days,'price');      $('#abnbPrice').value = (typeof p==='number')? p : '';
+}
+function clearSelection(){ selStart=null; selEnd=null; updateRangeUI(); renderGrid(cur); }
+$('#abnbClearSel').addEventListener('click', clearSelection);
+
+function getSelectedKeys(){
+  if(!selStart) return [];
+  const end = selEnd || selStart;
+  const out = [];
+  for(let d=new Date(selStart); d<=end; d.setDate(d.getDate()+1)){
+    out.push(fmt(d));
+  }
+  return out;
+}
+function uniformField(keys, field){
+  if(keys.length===0) return null;
+  let val = monthData[keys[0]]?.[field];
+  for(const k of keys){ if((monthData[k]?.[field]) !== val) return null; }
+  return val ?? null;
+}
+
+// --- Firestore
+async function getMonthDoc(id){
+  const snap = await db.collection(CAL_COLL).doc(id).get();
+  return snap.exists && snap.data().days ? snap.data().days : {};
+}
+async function writeDays(keys, patch){
+  if(keys.length===0) return;
+  try{
+    const buckets = {};
+    for (const k of keys){
+      const [y,m] = k.split('-'); const docId = `${y}-${m}`;
+      (buckets[docId] ||= []).push(k);
+    }
+    const batch = db.batch();
+    for (const [docId, ks] of Object.entries(buckets)){
+      const ref = db.collection(CAL_COLL).doc(docId);
+      const snap = await ref.get();
+      const days = (snap.exists && snap.data().days) ? snap.data().days : {};
+      ks.forEach(k=>{
+        days[k] = { busy:false, price:null, note:null, ...(days[k]||{}), ...patch };
+      });
+      batch.set(ref, { days }, { merge:true });
+    }
+    await batch.commit();
+
+    // локално обновяване
+    for (const ks of Object.values(buckets)){
+      ks.forEach(k=>{ monthData[k] = { ...(monthData[k]||{}), ...patch }; });
+    }
+    renderGrid(cur);
+  }catch(e){
+    console.error('Firestore write error:', e);
+    alert('Нямаш права за запис или има грешка в базата: ' + (e?.message||e));
+  }
+}
+
+
+// --- Действия (ADMIN)
+$('#abnbMarkBusy').addEventListener('click', async ()=>{
+  if(!isAdmin) return;
+  await writeDays(getSelectedKeys(), { busy:true });
+});
+$('#abnbClearBusy').addEventListener('click', async ()=>{
+  if(!isAdmin) return;
+  await writeDays(getSelectedKeys(), { busy:false });
+});
+$('#abnbSaveNote').addEventListener('click', async ()=>{
+  if(!selStart) return;
+  const val = $('#abnbNote').value.trim() || null;
+  await writeDays(getSelectedKeys(), { note: val });
+});
+$('#abnbSetPrice').addEventListener('click', async ()=>{
+  if(!selStart) return;
+  const raw = $('#abnbPrice').value.trim();
+  const val = raw==='' ? null : Number(raw);
+  await writeDays(getSelectedKeys(), { price: val });
+});
+
+// --- Интеграция с твоето Auth / синхрон с window.IS_ADMIN
+function syncAdminFlag(){
+  isAdmin = !!window.IS_ADMIN;                     // <-- чети глобалния флаг
+  document.body.classList.toggle('admin', isAdmin);
+}
+
+// когато модалът се отваря – опресни статуса
+function openAbnb() {
+  syncAdminFlag();
+  airCalModal.classList.add('show');
+  loadMonth(cur);
+}
+
+// ако се смени потребителят – опресни след твоя checkAdmin
+auth.onAuthStateChanged(() => setTimeout(syncAdminFlag, 0));
+
+</script>
+
+<script>
+  /* ===== Auth & Admin ===== */
+  window.IS_ADMIN = false;
+
+  function setBadge(user, isAdmin){
+    const badgeEl = document.getElementById('adminBadge');
+    if (!badgeEl){ return; }
+    if (!user){
+      badgeEl.textContent = 'Статус: гост';
+      return;
+    }
+    badgeEl.textContent = isAdmin ? `Админ: ${user.email}` : `Вход: ${user.email}`;
+  }
+
+  async function checkAdmin(user){
+    try{
+      const snap = await db.collection('meta').doc('admins').get();
+      const data = snap.exists ? snap.data() : {};
+      const uids   = Array.isArray(data.uids)   ? data.uids   : (Array.isArray(data.list) ? data.list : []);
+      const emails = Array.isArray(data.emails) ? data.emails : [];
+      const byUid   = user?.uid   && uids.includes(user.uid);
+      const byEmail = user?.email && emails.map(s=>String(s).toLowerCase().trim())
+                                           .includes(String(user.email).toLowerCase().trim());
+      return !!(byUid || byEmail);
+    }catch(e){
+      console.error('checkAdmin:', e);
+      return false;
+    }
+  }
+auth.onAuthStateChanged(async (user)=>{
+ document.body.classList.toggle('admin', !!user);
+
+  if (!user){
+    window.IS_ADMIN = false;
+    setBadge(null,false);
+    renderCal();
+    return;
+  }
+  try {
+    const isAdmin = await checkAdmin(user);
+    window.IS_ADMIN = !!isAdmin;
+    setBadge(user, isAdmin);
+  } catch(e){
+    console.error('Admin check failed:', e);
+    window.IS_ADMIN = false;
+  }
+  renderCal();
+});
+
+  /* ===== Init ===== */
+
+  </script>
+
+  <!-- ===== Admin Drawer Logic ===== -->
+  <script>
+  const adminHotspot = document.getElementById('adminHotspot');
+  const adminDrawer  = document.getElementById('adminDrawer');
+  const adminClose   = document.getElementById('adminClose');
+
+  function toggleAdminDrawer(force){
+    const willShow = typeof force === 'boolean' ? force : !adminDrawer.classList.contains('show');
+    adminDrawer.classList.toggle('show', willShow);
+    adminDrawer.setAttribute('aria-hidden', String(!willShow));
+  }
+
+  adminHotspot.addEventListener('click', (e)=>{ e.stopPropagation(); toggleAdminDrawer(true); });
+  adminClose.addEventListener('click',  ()=> toggleAdminDrawer(false));
+
+  document.addEventListener('click', (e)=>{
+    const clickInside = adminDrawer.contains(e.target) || adminHotspot.contains(e.target);
+    if (!clickInside) toggleAdminDrawer(false);
+  });
+
+  const loginBtn  = document.getElementById('adminLogin');
+  const logoutBtn = document.getElementById('adminLogout');
+
+  if (loginBtn){
+    loginBtn.addEventListener('click', async ()=>{
+      toggleAdminDrawer(false);
+      const email = prompt('Email за админ вход:');
+      if (!email) return;
+      const pass = prompt('Парола:');
+      if (!pass) return;
+      try{
+        await auth.signInWithEmailAndPassword(email, pass);
+      }catch(err){
+        alert('Грешен вход: ' + err.message);
+      }
+    });
+  }
+
+  if (logoutBtn){
+    logoutBtn.addEventListener('click', async ()=>{
+      toggleAdminDrawer(false);
+      try{ await auth.signOut(); }catch(e){ console.error(e); }
+    });
+  }
+  </script>
+
+  <!-- Контакти (fixed бутони) -->
+  <div class="fixed-contacts">
+    <a href="tel:+359988988623" class="contact-btn tel" aria-label="Обади се">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.29 22 2 13.71 2 3a1 1 0 011-1h4.5a1 1 0 011 1c0 1.25.2 2.46.57 3.59a1 1 0 01-.25 1.01l-2.2 2.19z"/>
+      </svg>
+    </a>
+
+    <a href="https://wa.me/359988988623" target="_blank" class="contact-btn wa" aria-label="WhatsApp">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 00-8.93 14.58l-1.07 3.92 4.02-1.06A10 10 0 1012 2zm5.2 14.3c-.27.77-1.57 1.48-2.18 1.57-.56.08-1.25.11-2.02-.13-.47-.15-1.07-.35-1.85-.73-3.27-1.62-5.39-5.41-5.55-5.67-.16-.27-1.32-1.76-1.32-3.36 0-1.6.84-2.38 1.14-2.71.3-.34.66-.42.88-.42h.63c.2 0 .47-.07.73.56.27.66.92 2.27 1 2.43.08.16.14.34.03.55-.1.2-.15.34-.3.53-.15.18-.32.4-.46.54-.15.15-.3.31-.13.6.16.27.71 1.17 1.52 1.9 1.04.93 1.9 1.22 2.18 1.36.27.14.43.12.6-.07.16-.2.69-.8.87-1.07.18-.27.36-.23.6-.14.25.09 1.57.74 1.84.88.27.14.45.2.52.31.07.11.07.8-.2 1.56z"/>
+      </svg>
+    </a>
+
+    <a href="viber://chat?number=%2B359988988623" class="contact-btn viber" aria-label="Viber">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.031-.967-.273-.099-.472-.148-.67.15-.198.297-.767.966-.94 1.164-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.787-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.173.198-.298.298-.497.099-.198.05-.372-.025-.521-.074-.148-.669-1.611-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.273.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.617h-.005C6.533 22 2 17.468 2 11.993 2 6.518 6.533 2 12.046 2c5.484 0 9.995 4.518 9.995 9.993 0 5.475-4.511 10.007-9.99 10.007z"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="footer-social">
+   <p class="footer-info-text">
+  For more information and reservations, please contact us:
+</p>
+
+  <a href="https://wa.me/359988988623" target="_blank" class="contact-btn wa" aria-label="WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3.5A10.47 10.47 0 0 0 12 1 10.5 10.5 0 0 0 1.5 11.5a10.3 10.3 0 0 0 1.47 5.35L1 23l6.32-1.94a10.47 10.47 0 0 0 4.68 1.12A10.5 10.5 0 0 0 20 3.5ZM12 20a8.46 8.46 0 0 1-4.33-1.18l-.31-.18-3.75 1.15 1.16-3.63-.2-.33a8.45 8.45 0 1 1 7.43 4.17Zm4.79-6.36c-.26-.13-1.53-.75-1.77-.84s-.41-.13-.58.13-.66.84-.81 1-.3.19-.56.06a6.93 6.93 0 0 1-2-1.23 7.45 7.45 0 0 1-1.37-1.7c-.14-.25 0-.39.11-.52.11-.11.26-.29.38-.43a1.76 1.76 0 0 0 .25-.42.47.47 0 0 0 0-.45c-.07-.13-.57-1.39-.78-1.9s-.41-.44-.57-.45h-.49a.94.94 0 0 0-.68.32A2.86 2.86 0 0 0 6 9.8a5 5 0 0 0 1.05 2.64 11.32 11.32 0 0 0 4.31 3.91 14.8 14.8 0 0 0 1.52.56 3.62 3.62 0 0 0 1.64.1 2.67 2.67 0 0 0 1.75-1.22 2.18 2.18 0 0 0 .15-1.22c-.06-.1-.24-.16-.48-.29Z"/></svg>
+  </a>
+  <a href="viber://chat?number=%2B359988988623" class="contact-btn viber" aria-label="Viber">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297 0-.593-.048-.878-.143-1.241-.423-2.744-1.368-3.526-2.15-.782-.783-1.727-2.285-2.15-3.526-.347-1.02-.09-2.006.642-2.737.405-.405.9-.63 1.434-.63.289 0 .58.05.86.147l1.168.42a1 1 0 01.611 1.272l-.484 1.453a1 1 0 01-.958.683h-.002a1 1 0 01-.944-.666l-.062-.177c-.068-.195-.125-.36-.167-.496-.117-.385-.202-.67-.287-.852-.04-.086-.102-.178-.169-.246-.145-.144-.342-.205-.527-.205a.794.794 0 00-.56.232c-.249.25-.309.66-.147 1.113.234.667.632 1.532 1.081 2.201.447.668 1.183 1.405 1.852 1.853.67.45 1.534.848 2.201 1.082.454.16.864.101 1.114-.148a.79.79 0 00.232-.56c0-.185-.06-.382-.205-.527a1.08 1.08 0 00-.246-.17c-.182-.084-.467-.17-.851-.286a6.732 6.732 0 00-.673-.17l-.183-.063a1 1 0 01-.668-.946 1 1 0 01.683-.958l1.452-.484a1 1 0 011.272.612l.42 1.167c.27.756.157 1.587-.308 2.278-.47.698-1.207 1.076-2.02 1.076z"/><path d="M21.5 2h-19A.5.5 0 002 2.5v19c0 .276.224.5.5.5H8l2.79 2.79a.997.997 0 001.41 0L15 22h6.5a.5.5 0 00.5-.5v-19a.5.5 0 00-.5-.5z"/></svg>
+  </a>
+  <a href="tel:+359988988623" class="contact-btn tel" aria-label="Call">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.09 15.09 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.72 11.72 0 003.68.59 1 1 0 011 1V21a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1 11.72 11.72 0 00.59 3.68 1 1 0 01-.25 1.01l-2.22 2.1z"/></svg>
+  </a>
+  <a href="https://www.facebook.com/profile.php?id=100057135262751&locale=bg_BG" target="_blank" class="contact-btn fb" aria-label="Facebook">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.987C18.343 21.128 22 17 22 12z"/></svg>
+  </a>
+  <a href="https://www.instagram.com/lifehouse_semkovo/" target="_blank" class="contact-btn ig" aria-label="Instagram">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/></svg>
+  </a>
+</div>
+
+  </footer>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const img = document.querySelector(".about-img img");
+  if (!img) return;
+  const observer = new IntersectionObserver((entries, o) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        o.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  observer.observe(img);
+});
+  auth.onAuthStateChanged(async (user)=>{
+  if (!user){
+    window.IS_ADMIN = false;
+    document.body.classList.remove('admin');
+    setBadge(null,false);
+    return;
+  }
+  const isAdmin = await checkAdmin(user);
+  window.IS_ADMIN = !!isAdmin;
+  document.body.classList.toggle('admin', isAdmin);
+  setBadge(user, isAdmin);
+});
+
+</script>
+
+<a href="https://webbadoo.com" class="footer-signature" target="_blank">© 2025 Design by <strong>webbadoo</strong><br>
+  photography by <strong>Plamen Gonev</strong></a>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const scrollArea = document.querySelector(".reviews-scroll");
+  const items = document.querySelectorAll(".review-item");
+  if (!scrollArea || !items.length) return;
+
+  function revealOnScroll() {
+    items.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      const parentRect = scrollArea.getBoundingClientRect();
+      if (rect.top < parentRect.bottom - 60) {
+        item.classList.add("visible");
+      }
+    });
+  }
+
+  scrollArea.addEventListener("scroll", revealOnScroll);
+  revealOnScroll(); // начална проверка
+});
+</script>
+<div id="imgModal"><img src="" alt="Preview"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("imgModal");
+  const modalImg = modal.querySelector("img");
+  document.querySelectorAll(".gallery-grid img, #places .place-photos img").forEach(img => {
+    img.addEventListener("click", () => {
+      modalImg.src = img.src;
+      modal.classList.add("show");
+    });
+  });
+  modal.addEventListener("click", () => modal.classList.remove("show"));
+});
+</script>
+<script>
+  // 100vh корекция на мобилно (адресни ленти)
+  function setVh(){ document.documentElement.style.setProperty('--vh', (window.innerHeight*0.01)+'px'); }
+  setVh(); addEventListener('resize', setVh);
+
+  // Маркираме, че клавиатурата е отворена → дава още място на панела
+  (function(){
+    const scope = document.getElementById('calendarModal') || document.querySelector('.calendar-modal,.cal-modal') || document;
+    scope.addEventListener('focusin', (e)=> {
+      if (e.target.matches('input, textarea, [contenteditable="true"]')) document.body.classList.add('kb-open');
+    });
+    scope.addEventListener('focusout', (e)=> {
+      if (e.target.matches('input, textarea, [contenteditable="true"]')) document.body.classList.remove('kb-open');
+    });
+  })();
+</script>
+<script>
+(() => {
+ const thumbs = Array.from(document.querySelectorAll('.gallery-grid img, #places .place-photos img'));
+
+  const modal  = document.getElementById('imgModal');
+  const modalImg = modal?.querySelector('img');
+  if (!thumbs.length || !modal || !modalImg) return;
+
+  let i = 0;
+
+  // запомняме индекса при клик (използва се от навигацията)
+  thumbs.forEach((img, idx) => {
+    img.dataset.idx = idx;
+    img.addEventListener('click', () => { i = idx; });
+  });
+
+  function showAt(idx){
+    i = (idx + thumbs.length) % thumbs.length;
+    modalImg.src = thumbs[i].src;
+  }
+  function next(){ showAt(i + 1); }
+  function prev(){ showAt(i - 1); }
+
+  // --- Стрелки в модала ---
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'img-nav img-prev';
+  prevBtn.setAttribute('aria-label','Предишна');
+  prevBtn.textContent = '‹';
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'img-nav img-next';
+  nextBtn.setAttribute('aria-label','Следваща');
+  nextBtn.textContent = '›';
+
+  // да не затварят модала при клик
+  [prevBtn, nextBtn].forEach(btn => btn.addEventListener('click', e => e.stopPropagation()));
+  modal.appendChild(prevBtn);
+  modal.appendChild(nextBtn);
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  // --- Скрол на десктоп (надолу → следваща; нагоре → предишна) ---
+  modal.addEventListener('wheel', (e) => {
+    if (!modal.classList.contains('show')) return;
+    e.preventDefault();
+    (e.deltaY > 0 ? next : prev)();
+  }, { passive: false });
+
+  // --- Клавиатура (само когато модалът е отворен) ---
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('show')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  });
+
+  // --- Свайп на мобилно ---
+  let touchX = null;
+  modal.addEventListener('touchstart', (e) => {
+    touchX = e.changedTouches?.[0]?.clientX ?? null;
+  }, { passive: true });
+
+  modal.addEventListener('touchend', (e) => {
+    if (touchX == null) return;
+    const dx = (e.changedTouches?.[0]?.clientX ?? touchX) - touchX;
+    if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+    touchX = null;
+  }, { passive: true });
+
+  // при отваряне с клик от галерията показвай правилната снимка
+  const observer = new MutationObserver(() => {
+    if (modal.classList.contains('show')) showAt(i);
+  });
+  observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+})();
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const imgs = document.querySelectorAll('.gallery-grid img');
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('visible');
+        obs.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  imgs.forEach(img => io.observe(img));
+});
+</script>
+
+ <script>
+// Показва текст + снимка на История при клик в менюто
+document.querySelectorAll('a[href="#about"]').forEach(link => {
+  link.addEventListener('click', () => {
+    const about = document.getElementById('about');
+    about.classList.add('show');
+  });
+});
+</script>
+
+<script>
+  (function () {
+    const sticky = document.querySelector('.fixed-contacts');
+    const footer = document.querySelector('.site-footer, footer, .footer-social');
+    if (!sticky || !footer) return;
+
+    // Ако страницата е по-къса от прозореца – не скриваме бутоните
+    const doc = document.documentElement;
+    const pageShort = doc.scrollHeight <= window.innerHeight + 40;
+    if (pageShort) return;
+
+    // Създаваме „страж“ точно над футъра
+    let sentinel = document.getElementById('bottom-sentinel');
+    if (!sentinel) {
+      sentinel = document.createElement('div');
+      sentinel.id = 'bottom-sentinel';
+      sentinel.style.cssText = 'height:1px;width:100%;';
+      footer.parentNode.insertBefore(sentinel, footer); // точно преди футъра
+    }
+
+    // Плавност
+    sticky.style.transition = 'opacity .25s ease';
+
+    // Когато останат ~160px до дъното, скривай
+    const io = new IntersectionObserver((entries) => {
+      const nearBottom = entries[0].isIntersecting;
+      if (nearBottom) {
+        sticky.style.opacity = '0';
+        sticky.style.pointerEvents = 'none';
+      } else {
+        sticky.style.opacity = '1';
+        sticky.style.pointerEvents = 'auto';
+      }
+    }, {
+      root: null,
+      threshold: 0,
+      rootMargin: '0px 0px -160px 0px' // работи еднакво на десктоп и мобилно
+    });
+
+    io.observe(sentinel);
+  })();
+</script>
+
+
+
+</body>
+</html>
