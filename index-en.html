@@ -1939,26 +1939,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <a href="https://webbadoo.com" class="footer-signature" target="_blank">© 2025 Design by <strong>webbadoo</strong><br>
   photography by <strong>Plamen Gonev</strong></a>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const scrollArea = document.querySelector(".reviews-scroll");
-  const items = document.querySelectorAll(".review-item");
-  if (!scrollArea || !items.length) return;
 
-  function revealOnScroll() {
-    items.forEach(item => {
-      const rect = item.getBoundingClientRect();
-      const parentRect = scrollArea.getBoundingClientRect();
-      if (rect.top < parentRect.bottom - 60) {
-        item.classList.add("visible");
-      }
-    });
-  }
-
-  scrollArea.addEventListener("scroll", revealOnScroll);
-  revealOnScroll(); // начална проверка
-});
-</script>
 <div id="imgModal"><img src="" alt="Preview"></div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
