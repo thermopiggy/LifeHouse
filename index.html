@@ -954,13 +954,14 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
     background: rgba(240,240,240,0.9) !important;
   }
 
-  .google-reviews-embed {
-    margin: 0;              /* премахва страничните разлики */
+   .google-reviews-embed {
+    margin: 0 10px;                  /* да не е залепена за стените */
     padding: 0;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: none;       /* маха сянката, която EN няма */
+    box-shadow: 0 4px 12px rgba(0,0,0,.18);
   }
+
 
   .google-reviews-embed iframe {
     width: 100%;
