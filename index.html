@@ -948,30 +948,33 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
   align-items: center;
 }
 
-   @media (max-width: 768px) {
-  #reviews{
-    padding: 24px 0 28px;
+@media (max-width: 768px) {
+  #reviews {
+    padding: 24px 0 20px !important;
+    background: rgba(240,240,240,0.9) !important;
   }
 
-  .google-reviews-embed{
-    margin: 0 10px;      /* отстояние от ръбовете на екрана */
+  .google-reviews-embed {
+    margin: 0;              /* премахва страничните разлики */
     padding: 0;
-    border-radius: 12px; /* заоблени ъгли на картата */
-    overflow: hidden;    /* да се изреже iframe-а по радиуса */
-    box-shadow: 0 4px 12px rgba(0,0,0,.18);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: none;       /* маха сянката, която EN няма */
   }
 
-  .google-reviews-embed iframe{
+  .google-reviews-embed iframe {
     width: 100%;
-    height: 260px;       /* по-ниска карта на мобилно */
+    height: 260px;          /* EN използва приблизително това */
     border: 0;
   }
 
-  #reviews p{
-    padding: 0 16px;
+  #reviews p {
+    margin-top: 14px;
+    padding: 0 12px;
     text-align: center;
   }
 }
+
 
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
