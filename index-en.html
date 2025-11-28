@@ -966,6 +966,36 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
     pointer-events: none;
 }
 
+ #calendar-legend {
+    display: flex;
+    gap: 24px;
+    margin: 20px 0 0 0;
+    font-size: 14px;
+    align-items: center;
+}
+
+#calendar-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.legend-dot.booked {
+    background: #cfcfcf;
+}
+
+.legend-dot.free {
+    background: #ffffff;
+    border: 2px solid #cfcfcf;
+}
+
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
 <meta name="keywords" content="къща за гости Семково, LifeHouse Semkovo, вила под наем, почивка в планината, Беласица, Банско, Белица, планинска къща">
@@ -1519,7 +1549,17 @@ Upon confirmation of the reservation, a deposit is required, which is deducted f
       </aside>
     </div>
   </div>
+ 
   <div class="abnb-backdrop" id="abnbBackdrop"></div>
+</div>
+
+ <div id="calendar-legend">
+  <div class="legend-item">
+    <span class="legend-dot booked"></span> Заето
+  </div>
+  <div class="legend-item">
+    <span class="legend-dot free"></span> Свободно
+  </div>
 </div>
 
   <!-- ===== Основни скриптове ===== -->
