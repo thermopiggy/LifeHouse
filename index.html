@@ -991,6 +991,49 @@ body:not(.admin) .abnb-day {              /* забранява кликове �
     pointer-events: none;
 }
 
+ #calendar-legend {
+    display: flex;
+    gap: 24px;
+    margin: 20px 0 0 0;
+    font-size: 14px;
+    align-items: center;
+}
+
+#calendar-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.legend-dot.booked {
+    background: #cfcfcf;
+}
+
+.legend-dot.free {
+    background: #ffffff;
+    border: 2px solid #cfcfcf;
+}
+
+ /* --- Десктоп: легенда вдясно --- */
+@media (min-width: 1025px) {
+    #calendar-legend {
+        position: absolute;
+        top: 120px;              /* вертикална позиция – може да се коригира */
+        right: 30px;             /* отстояние от десния ръб */
+        display: flex;
+        flex-direction: column;  /* подредба вертикално */
+        gap: 10px;
+        z-index: 20;
+    }
+}
+
 
 </style>
  <meta name="description" content="LifeHouse Semkovo — къща за гости в сърцето на планината Семково. Спокойствие, уют и природа. Резервирай своята почивка днес.">
@@ -1537,6 +1580,15 @@ Life House е създадена с любов върху място, къдет
 
       </aside>
     </div>
+   <div id="calendar-legend">
+  <div class="legend-item">
+    <span class="legend-dot booked"></span> Заето
+  </div>
+  <div class="legend-item">
+    <span class="legend-dot free"></span> Свободно
+  </div>
+</div>
+
   </div>
   <div class="abnb-backdrop" id="abnbBackdrop"></div>
 </div>
